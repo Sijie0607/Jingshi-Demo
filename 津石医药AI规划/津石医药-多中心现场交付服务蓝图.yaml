@@ -1,0 +1,326 @@
+title: 津石医药多中心交付蓝图
+config:
+  height:
+    customerLayer: 160
+    frontstageLayer: 190
+    backstageLayer: 170
+phases:
+  - name: 项目接入
+    customerLayer:
+      journeyStage: 需求对齐
+      actions:
+        - name: 明确项目目标与节点
+          touchpoints: 客户会议/邮件/方案包
+          painPoints:
+            - 交付边界解释不一致
+            - 节点承诺缺少量化依据
+          expectations:
+            - 尽快形成清晰计划
+            - 看到可执行路径
+          experienceScore: 6
+        - name: 确认中心与资源方案
+          touchpoints: 项目经理/汇报材料
+          painPoints:
+            - 看不到匹配判断依据
+            - 担心优质中心被错配
+          expectations:
+            - 资源匹配有数据支撑
+            - 风险提前说明
+          experienceScore: 5
+    frontstageLayer:
+      processStage: 方案澄清
+      activities:
+        - name: 拆解交付需求
+          role: 项目经理
+          systemTouchpoints: CTMS/项目台账
+          dataDependencies:
+            - 方案摘要
+            - 里程碑要求
+            - 历史项目记录
+          painPoints:
+            - 关键信息散落多处
+            - 拆解模板依赖个人经验
+          cognitiveLoad: high
+        - name: 沟通资源配置建议
+          role: 区域负责人
+          systemTouchpoints: 医院库/排班表
+          dataDependencies:
+            - 中心画像
+            - CRC能力标签
+            - 当前负荷信息
+          painPoints:
+            - 资源负荷视图不完整
+            - 多项目并行时易错配
+          cognitiveLoad: critical
+    backstageLayer:
+      supportProcess: 资源建模
+      activities:
+        - name: 维护中心画像
+          role: 运营分析
+          systemTouchpoints: 医院数据库
+          painPoints:
+            - 中心数据更新不及时
+            - PI表现缺少统一口径
+          cognitiveLoad: high
+        - name: 汇总历史交付数据
+          role: 数据团队
+          systemTouchpoints: CTMS/BI
+          painPoints:
+            - 历史数据跨系统分散
+            - 难形成推荐评分
+          cognitiveLoad: high
+
+  - name: 中心启动
+    customerLayer:
+      journeyStage: 启动推进
+      actions:
+        - name: 跟踪启动材料进展
+          touchpoints: 项目群/邮件/表格
+          painPoints:
+            - 不知道卡在哪个节点
+            - 多方催办信息不同步
+          expectations:
+            - 实时看到状态
+            - 超期及时预警
+          experienceScore: 4
+        - name: 参加启动会确认标准
+          touchpoints: 启动会/会议纪要
+          painPoints:
+            - 会后关键事项难追踪
+            - 不同中心理解深浅不一
+          expectations:
+            - 关键要求被明确固化
+            - 执行口径一致
+          experienceScore: 6
+    frontstageLayer:
+      processStage: 启动落地
+      activities:
+        - name: 分派启动任务
+          role: 启动专员
+          systemTouchpoints: CTMS/待办系统
+          dataDependencies:
+            - 启动清单
+            - 中心分配方案
+          painPoints:
+            - 任务状态靠人工更新
+            - 超期识别滞后
+          cognitiveLoad: high
+        - name: 组织启动会对齐
+          role: 项目经理
+          systemTouchpoints: 会议系统/学习App
+          dataDependencies:
+            - 方案要点
+            - SOP要求
+          painPoints:
+            - 新人吸收难度高
+            - 会议知识难沉淀复用
+          cognitiveLoad: medium
+    backstageLayer:
+      supportProcess: 材料流转
+      activities:
+        - name: 维护启动标准包
+          role: 质量团队
+          systemTouchpoints: 文档库/SOP库
+          painPoints:
+            - 模板版本容易混用
+            - 中心差异难配置
+          cognitiveLoad: medium
+        - name: 跟踪跨方审批流
+          role: 运营支持
+          systemTouchpoints: 邮件/流程台账
+          painPoints:
+            - 审批链路不可视
+            - 催办成本高
+          cognitiveLoad: high
+
+  - name: 日常执行
+    customerLayer:
+      journeyStage: 执行体验
+      actions:
+        - name: 感知访视与进度稳定性
+          touchpoints: 项目例会/阶段汇报
+          painPoints:
+            - 现场进度透明度不足
+            - 异常常在事后才知道
+          expectations:
+            - 节点达成更稳定
+            - 风险更早暴露
+          experienceScore: 5
+        - name: 接收中心执行反馈
+          touchpoints: CRC/研究中心
+          painPoints:
+            - 不同中心执行差异大
+            - 协调问题反馈链路长
+          expectations:
+            - 执行标准更一致
+            - 沟通成本更低
+          experienceScore: 5
+    frontstageLayer:
+      processStage: 现场管理
+      activities:
+        - name: 执行访视与待办
+          role: CRC
+          systemTouchpoints: CTMS/日程工具
+          dataDependencies:
+            - 项目计划
+            - 访视安排
+            - 中心待办
+          painPoints:
+            - 多项目任务碎片化
+            - 优先级判断靠经验
+          cognitiveLoad: critical
+        - name: 维护关键记录
+          role: CRC
+          systemTouchpoints: eTMF/药物台账
+          dataDependencies:
+            - 执行记录
+            - 药物记录
+            - 实验室报告
+          painPoints:
+            - 补录现象频繁
+            - 缺失项难实时发现
+          cognitiveLoad: high
+    backstageLayer:
+      supportProcess: 过程支撑
+      activities:
+        - name: 汇总现场过程数据
+          role: 运营支持
+          systemTouchpoints: CTMS/BI
+          painPoints:
+            - 数据采集不连续
+            - 指标口径不统一
+          cognitiveLoad: high
+        - name: 维护文档合规规则
+          role: 质控团队
+          systemTouchpoints: eTMF规则库
+          painPoints:
+            - 规则校验自动化弱
+            - 问题发现偏事后
+          cognitiveLoad: high
+
+  - name: 风险协同
+    customerLayer:
+      journeyStage: 风险响应
+      actions:
+        - name: 接收异常与纠偏说明
+          touchpoints: 项目经理/风险汇报
+          painPoints:
+            - 问题发现时已经较晚
+            - 很难判断影响范围
+          expectations:
+            - 风险提前预警
+            - 处置动作透明可跟踪
+          experienceScore: 4
+        - name: 参与联合决策
+          touchpoints: 专项会议/客户门户
+          painPoints:
+            - 决策依据分散
+            - 后续执行闭环不清楚
+          expectations:
+            - 看到统一事实底座
+            - 处置结果可验证
+          experienceScore: 5
+    frontstageLayer:
+      processStage: 异常处置
+      activities:
+        - name: 识别并升级异常
+          role: 项目经理
+          systemTouchpoints: 风险台账/CTMS
+          dataDependencies:
+            - 执行记录
+            - 偏差信息
+            - 节点状态
+          painPoints:
+            - 风险依赖人工发现
+            - 升级阈值不够前置
+          cognitiveLoad: critical
+        - name: 对客同步处置方案
+          role: 客户经理
+          systemTouchpoints: 汇报材料/客户门户
+          dataDependencies:
+            - 风险分级记录
+            - 联合行动计划
+          painPoints:
+            - 汇报内容手工拼接
+            - 状态一致性难保证
+          cognitiveLoad: high
+    backstageLayer:
+      supportProcess: 风险运营
+      activities:
+        - name: 生成风险分层规则
+          role: 质控负责人
+          systemTouchpoints: 风险规则库
+          painPoints:
+            - 规则经验化严重
+            - 不能持续学习更新
+          cognitiveLoad: high
+        - name: 协调专项复核资源
+          role: 区域质控
+          systemTouchpoints: 抽检计划表
+          painPoints:
+            - 高风险中心排序困难
+            - 人力优先级冲突大
+          cognitiveLoad: high
+
+  - name: 关闭复盘
+    customerLayer:
+      journeyStage: 收尾评价
+      actions:
+        - name: 确认关闭与交付结果
+          touchpoints: 总结报告/结项会议
+          painPoints:
+            - 收尾资料补齐较慢
+            - 很难沉淀可复用经验
+          expectations:
+            - 快速完成结项
+            - 复盘结论清晰可用
+          experienceScore: 6
+        - name: 评估后续合作意愿
+          touchpoints: 客户回访/服务评价
+          painPoints:
+            - 优势和短板缺少量化证据
+            - 成果展示偏静态
+          expectations:
+            - 看到持续改进能力
+            - 对下次合作更有信心
+          experienceScore: 6
+    frontstageLayer:
+      processStage: 收尾交付
+      activities:
+        - name: 执行关闭清单
+          role: CRC
+          systemTouchpoints: 关闭台账/eTMF
+          dataDependencies:
+            - 关闭要求
+            - 全量档案
+          painPoints:
+            - 收尾事项琐碎
+            - 资料核验耗时长
+          cognitiveLoad: medium
+        - name: 组织项目复盘
+          role: 项目经理
+          systemTouchpoints: 复盘模板/知识库
+          dataDependencies:
+            - 偏差记录
+            - 总结材料
+          painPoints:
+            - 复盘内容难落到行动
+            - 案例难进入一线使用
+          cognitiveLoad: high
+    backstageLayer:
+      supportProcess: 知识沉淀
+      activities:
+        - name: 归档结项资料
+          role: 文档支持
+          systemTouchpoints: eTMF/档案系统
+          painPoints:
+            - 盖章流转慢
+            - 证据归档不完整
+          cognitiveLoad: medium
+        - name: 更新案例与标准
+          role: 培训负责人
+          systemTouchpoints: 知识库/学习App
+          painPoints:
+            - 优秀案例结构化不足
+            - 标准升级反馈较慢
+          cognitiveLoad: high

@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>津石医药-访视风险预测与智能提醒AI机会地图</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #10213e;
+      --muted: #5f6b7a;
+      --border: #d9e2ec;
+      --accent: #2d6cdf;
+      --shadow: 0 10px 30px rgba(16, 33, 62, 0.08);
+      --radius: 16px;
+      --hh: #d9485f;
+      --hl: #7c4dff;
+      --lh: #f59e0b;
+      --ll: #94a3b8;
+      --nlp: #2563eb;
+      --decision: #7c3aed;
+      --predict: #0f766e;
+      --vision: #dc2626;
+      --interaction: #ea580c;
+      --doc: #475569;
+      --ready: #0f766e;
+      --growth: #2563eb;
+      --explore: #8b5cf6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+      color: var(--text);
+    }
+    .page {
+      width: min(1500px, 92vw);
+      margin: 28px auto 48px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f1f3d 0%, #19386f 70%, #2b5fb8 100%);
+      color: #fff;
+      border-radius: 24px;
+      padding: 28px 30px 24px;
+      box-shadow: var(--shadow);
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(26px, 3vw, 36px);
+      line-height: 1.15;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 900px;
+      color: rgba(255,255,255,0.84);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .hero-meta {
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+      text-align: right;
+      min-width: 160px;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .metric {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 16px;
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+    }
+    .metric .label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.72);
+      margin-bottom: 8px;
+    }
+    .metric .value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .metric .hint {
+      font-size: 12px;
+      color: rgba(255,255,255,0.78);
+    }
+    .section {
+      margin-top: 22px;
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .section-head {
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .section-head h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 860px;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-soft);
+    }
+    .filters input,
+    .filters select {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      min-height: 40px;
+    }
+    .filters input {
+      min-width: min(320px, 100%);
+      flex: 1 1 280px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .quadrant-high_value_high_priority { background: rgba(217,72,95,0.12); color: var(--hh); }
+    .quadrant-high_value_low_priority { background: rgba(124,77,255,0.12); color: var(--hl); }
+    .quadrant-low_value_high_priority { background: rgba(245,158,11,0.14); color: #b45309; }
+    .quadrant-low_value_low_priority { background: rgba(148,163,184,0.18); color: #475569; }
+    .maturity-ready { background: rgba(15,118,110,0.12); color: var(--ready); }
+    .maturity-growth { background: rgba(37,99,235,0.12); color: var(--growth); }
+    .maturity-explore { background: rgba(139,92,246,0.12); color: var(--explore); }
+    .maturity-high { background: rgba(245,158,11,0.14); color: #b45309; }
+    .maturity-medium { background: rgba(37,99,235,0.12); color: #1d4ed8; }
+    .maturity-low { background: rgba(148,163,184,0.18); color: #475569; }
+    .tech {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.9fr);
+      gap: 0;
+      min-height: 700px;
+    }
+    .map-area {
+      border-right: 1px solid var(--border);
+      overflow: auto;
+      padding: 20px;
+      background:
+        linear-gradient(180deg, rgba(248,250,252,0.4) 0%, rgba(248,250,252,0) 100%);
+    }
+    .detail-panel {
+      padding: 22px;
+      background: #fcfdff;
+      position: sticky;
+      top: 0;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+    }
+    .detail-empty {
+      padding: 14px 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(280px, 1fr));
+      gap: 16px;
+      min-width: 1420px;
+      align-items: start;
+    }
+    .stage-column {
+      background: #fbfdff;
+      border: 1px solid #dde6f1;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 4px 20px rgba(31, 59, 96, 0.04);
+    }
+    .stage-header {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e6edf5;
+    }
+    .stage-order {
+      display: inline-flex;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      background: #e8f0ff;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .stage-header h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .stage-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .subhead {
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #5b6f8e;
+      margin: 16px 0 10px;
+      font-weight: 700;
+    }
+    .node-card,
+    .opp-card,
+    .doc-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .node-card,
+    .opp-card {
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .node-card:hover,
+    .opp-card:hover,
+    .doc-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      border-color: #bfd0e3;
+    }
+    .node-card.active,
+    .opp-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45,108,223,0.12);
+    }
+    .node-card h4,
+    .opp-card h4,
+    .doc-card h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    .node-meta,
+    .opp-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .mini-list,
+    .detail-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+    .mini-list li,
+    .detail-panel li {
+      margin-bottom: 6px;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .node-count {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+    }
+    .opp-card {
+      border-left: 6px solid #cbd5e1;
+    }
+    .opp-card.quadrant-high_value_high_priority { border-left-color: var(--hh); }
+    .opp-card.quadrant-high_value_low_priority { border-left-color: var(--hl); }
+    .opp-card.quadrant-low_value_high_priority { border-left-color: var(--lh); }
+    .opp-card.quadrant-low_value_low_priority { border-left-color: var(--ll); }
+    .detail-panel .section-title {
+      font-size: 12px;
+      color: #5b6f8e;
+      margin: 18px 0 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .detail-panel h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+    .detail-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #eef4ff;
+      color: var(--accent);
+    }
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 20px 24px 26px;
+    }
+    .doc-card {
+      scroll-margin-top: 24px;
+    }
+    .doc-card .doc-head {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .doc-card p {
+      margin: 8px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .footnote {
+      padding: 0 24px 24px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 10px 0 6px;
+    }
+    @media (max-width: 1180px) {
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .map-layout { grid-template-columns: 1fr; }
+      .map-area { border-right: none; border-bottom: 1px solid var(--border); }
+      .detail-panel { position: static; max-height: none; }
+      .doc-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .page { width: min(96vw, 96vw); margin-top: 16px; }
+      .hero { border-radius: 18px; padding: 20px 18px; }
+      .section { border-radius: 18px; }
+      .section-head, .filters, .map-area, .detail-panel, .doc-grid, .footnote { padding-left: 16px; padding-right: 16px; }
+      .metrics { grid-template-columns: 1fr; }
+      .filters { gap: 8px; }
+      .filters input, .filters select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>津石医药-访视风险预测与智能提醒AI机会地图</h1>
+          <p id="hero-scope"></p>
+        </div>
+        <div class="hero-meta">
+          <div id="hero-company"></div>
+          <div style="margin-top:8px;">生成时间：2026-07-18 00:40</div>
+        </div>
+      </div>
+      <div class="metrics" id="metrics"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>AI机会地图</h2>
+          <p>按业务流程顺序展示核心节点和AI落地场景。支持按机会分级、技术类型、业务阶段和关键词筛选，并可点击节点查看完整详情。</p>
+        </div>
+      </div>
+      <div class="filters">
+        <input id="searchInput" type="text" placeholder="搜索场景、节点、技术方向、痛点关键词" />
+        <select id="quadrantFilter"></select>
+        <select id="techFilter"></select>
+        <select id="stageFilter"></select>
+      </div>
+      <div class="map-layout">
+        <div class="map-area">
+          <div class="stage-grid" id="stageGrid"></div>
+        </div>
+        <aside class="detail-panel" id="detailPanel"></aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>AI场景详细说明文档</h2>
+          <p>完整保留全部AI机会点的核心信息，包括应用价值、核心问题、技术实现方向、数据要求和预期指标，便于后续讨论和方案细化。</p>
+        </div>
+      </div>
+      <div class="doc-grid" id="docGrid"></div>
+      <div class="footnote" id="footnote"></div>
+    </section>
+
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>外部相似案例与参考依据</h2>
+          <p>以下资料用于校准机会方向，包括风险导向监查、临床文本近实时监测、AE安全监测和eTMF完整性管理。页面不依赖外部资源加载，链接仅作为后续追溯参考。</p>
+        </div>
+      </div>
+      <div class="doc-grid" id="referenceGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>结构化YAML数据</h2>
+          <p>完整内嵌本次AI机会地图的结构化数据，便于复制、归档和后续进入矩阵评估或MVP规划。</p>
+        </div>
+        <button class="btn btn-primary" id="copyYamlButton" type="button" onclick="copyRawYaml()">复制 YAML</button>
+      </div>
+      <pre id="rawYaml" style="margin:0; padding:20px 24px 28px; white-space:pre-wrap; word-break:break-word; overflow:auto; max-height:520px; background:#0f172a; color:#e2e8f0; font-size:12px; line-height:1.7;">title: &quot;津石医药-访视风险预测与智能提醒AI机会地图&quot;
+company: &quot;津石医药&quot;
+business_flow: &quot;访视风险预测与智能提醒价值流&quot;
+analysis_scope: &quot;基于《津石医药-可服务体验提升业务流程深度分析.html》中的访视风险预测与智能提醒价值流，围绕风险信号采集、规则评分解释、智能提醒编排、临床复核闭环、客户价值与知识回流五个阶段，识别可应用人工智能技术的场景机会。&quot;
+
+quadrant_definition:
+  high_value_high_priority: &quot;高价值高优先级&quot;
+  high_value_low_priority: &quot;高价值低优先级&quot;
+  low_value_high_priority: &quot;低价值高优先级&quot;
+  low_value_low_priority: &quot;低价值低优先级&quot;
+
+stages:
+  - id: &quot;stage_1&quot;
+    order: 1
+    name: &quot;风险信号采集与证据建模&quot;
+    objective: &quot;将访视计划、执行记录、资料上传、受试者状态和沟通记录转化为可计算、可追溯的风险证据。&quot;
+    nodes:
+      - id: &quot;node_1&quot;
+        name: &quot;访视事件时间线生成&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;项目经理&quot;
+        touchpoints:
+          - &quot;CTMS&quot;
+          - &quot;风险台账&quot;
+          - &quot;进度看板&quot;
+          - &quot;中心沟通记录&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;访视事实分散在CTMS、文档库、沟通群和个人记录中，难以形成统一时间线。&quot;
+          - &quot;风险通常在问题显性化后才被发现，错过访视前或访视中的干预窗口。&quot;
+        efficiency_bottlenecks:
+          - &quot;项目经理需要人工跨系统还原预约、到访、采样、资料上传、复核和沟通动作。&quot;
+          - &quot;节点状态口径不统一，导致现场事实确认和风险判断耗时。&quot;
+        experience_improvement_space:
+          - &quot;让项目经理和质控人员看到一条统一的访视事件链。&quot;
+          - &quot;让CRC减少重复汇报，让客户感知津石对过程风险的主动掌控。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;访视安排&quot;
+            - &quot;执行记录&quot;
+            - &quot;资料上传状态&quot;
+            - &quot;中心沟通记录&quot;
+          data_gaps:
+            - &quot;跨系统事件ID和时间戳尚未统一。&quot;
+            - &quot;沟通记录中的关键事件需要语义抽取和结构化。&quot;
+
+      - id: &quot;node_2&quot;
+        name: &quot;资料完整性信号采集&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;质控专员&quot;
+        touchpoints:
+          - &quot;eTMF&quot;
+          - &quot;文档库&quot;
+          - &quot;自动归档模块&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;资料完整性问题通常在质控或申办方复核时才暴露。&quot;
+          - &quot;关键文档准时完整率不稳定，影响申办方复核一次通过率。&quot;
+        efficiency_bottlenecks:
+          - &quot;资料清单、上传状态、复核状态和归档状态需要人工比对。&quot;
+          - &quot;缺失、过期、版本不一致等问题缺少实时提醒。&quot;
+        experience_improvement_space:
+          - &quot;把检查前集中返工提前到访视过程内处理。&quot;
+          - &quot;让申办方看到实时完整性状态，而不是事后追问。&quot;
+        data_foundation:
+          readiness: &quot;high&quot;
+          available_data:
+            - &quot;访视资料清单&quot;
+            - &quot;已上传文件&quot;
+            - &quot;复核状态&quot;
+            - &quot;导出归档记录&quot;
+          data_gaps:
+            - &quot;不同项目资料模板和命名规则需要标准化映射。&quot;
+
+      - id: &quot;node_3&quot;
+        name: &quot;受试者状态风险信号采集&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;研究者&quot;
+        touchpoints:
+          - &quot;访视记录表&quot;
+          - &quot;临床判断备忘&quot;
+          - &quot;AE工作台&quot;
+        decision_complexity: &quot;高&quot;
+        pain_points:
+          - &quot;临床状态预判依赖个人经验和口头反复确认，缺少结构化证据。&quot;
+          - &quot;异常响应可能延迟，受试者体验、安全感和合规追溯都受到影响。&quot;
+        efficiency_bottlenecks:
+          - &quot;症状变化、用药变化和检查数值变化需要人工汇总后再请医生判断。&quot;
+          - &quot;AE/SAE/CM线索容易散落在访视记录和沟通记录中。&quot;
+        experience_improvement_space:
+          - &quot;把依赖CRC经验的口头预判变成可留痕的结构化风险输入。&quot;
+          - &quot;让研究者更快获得需要复核的关键信息。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;受试者监测值&quot;
+            - &quot;症状变化&quot;
+            - &quot;用药变化&quot;
+            - &quot;既往访视表现&quot;
+          data_gaps:
+            - &quot;临床异常阈值和项目方案要求需要结构化。&quot;
+            - &quot;非结构化症状描述需要标准化术语映射。&quot;
+
+  - id: &quot;stage_2&quot;
+    order: 2
+    name: &quot;风险规则匹配与评分解释&quot;
+    objective: &quot;将风险信号与项目SOP、历史偏差、AE/SAE/CM规则和中心执行表现匹配，形成可解释的风险等级。&quot;
+    nodes:
+      - id: &quot;node_4&quot;
+        name: &quot;风险规则与SOP匹配&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;质控专员&quot;
+          - &quot;项目经理&quot;
+        touchpoints:
+          - &quot;风险规则库&quot;
+          - &quot;SOP知识库&quot;
+        decision_complexity: &quot;高&quot;
+        pain_points:
+          - &quot;风险提示缺少规则依据时，一线很难判断是否需要立即处理。&quot;
+          - &quot;提醒容易被忽略，或者造成过度升级，降低现场使用体验。&quot;
+        efficiency_bottlenecks:
+          - &quot;SOP、方案要求和历史偏差没有被拆成机器可匹配的规则。&quot;
+          - &quot;风险命中依据和下一步动作需要质控专员人工解释。&quot;
+        experience_improvement_space:
+          - &quot;让提醒不仅告诉一线有风险，还解释为什么有风险。&quot;
+          - &quot;让风险判断从专家口径转为可复用的规则资产。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;访视事件时间线&quot;
+            - &quot;资料缺失清单&quot;
+            - &quot;受试者状态风险标签&quot;
+            - &quot;SOP要求&quot;
+          data_gaps:
+            - &quot;SOP和方案要求需要结构化为规则、阈值和例外条件。&quot;
+
+      - id: &quot;node_5&quot;
+        name: &quot;访视级风险评分&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;项目经理&quot;
+          - &quot;质控专员&quot;
+        touchpoints:
+          - &quot;风险评分模型&quot;
+          - &quot;质控看板&quot;
+        decision_complexity: &quot;高&quot;
+        pain_points:
+          - &quot;当前缺少对访视级风险的动态评分和贡献因子解释。&quot;
+          - &quot;质控资源无法精准投向高风险访视，重大偏差更难提前拦截。&quot;
+        efficiency_bottlenecks:
+          - &quot;过程数据没有被连续监测。&quot;
+          - &quot;风险等级与现场动作之间没有形成闭环。&quot;
+        experience_improvement_space:
+          - &quot;帮助项目经理和质控团队把资源优先投向最可能影响高质量闭环的访视。&quot;
+          - &quot;让风险评分具备可解释性，便于一线接受。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;风险命中规则&quot;
+            - &quot;历史异常记录&quot;
+            - &quot;中心执行表现&quot;
+            - &quot;CRC负荷状态&quot;
+          data_gaps:
+            - &quot;历史异常样本需要统一标签。&quot;
+            - &quot;风险评分结果需要与后续处置成效回流。&quot;
+
+      - id: &quot;node_6&quot;
+        name: &quot;相似案例与处理模板推荐&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;质控专员&quot;
+          - &quot;培训负责人&quot;
+        touchpoints:
+          - &quot;案例知识库&quot;
+          - &quot;学习App&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;风险处置建议依赖资深人员记忆，案例复用效率低。&quot;
+          - &quot;同类风险在不同中心重复发生，新人处理质量波动大。&quot;
+        efficiency_bottlenecks:
+          - &quot;偏差、CAPA和客户反馈没有按场景和动作标签沉淀。&quot;
+          - &quot;新人难以快速找到相似处置模板。&quot;
+        experience_improvement_space:
+          - &quot;把资深CRC和质控人员经验变成新人也能调用的行动知识。&quot;
+          - &quot;降低跨中心处理质量波动。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;风险贡献因子&quot;
+            - &quot;历史偏差案例&quot;
+            - &quot;CAPA案例&quot;
+            - &quot;客户质疑记录&quot;
+          data_gaps:
+            - &quot;历史案例缺少统一分类和动作标签。&quot;
+
+  - id: &quot;stage_3&quot;
+    order: 3
+    name: &quot;智能提醒与任务编排&quot;
+    objective: &quot;将风险评分和规则依据转化为CRC、项目经理、研究者、质控专员可执行的任务提醒。&quot;
+    nodes:
+      - id: &quot;node_7&quot;
+        name: &quot;CRC下一步动作提醒&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+        touchpoints:
+          - &quot;CRC Copilot&quot;
+          - &quot;移动端提醒&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;提醒如果只停留在风险提示，不能转化为具体动作。&quot;
+          - &quot;CRC仍需自己判断下一步，智能提醒对体验改善有限。&quot;
+        efficiency_bottlenecks:
+          - &quot;风险模型和现场任务编排没有形成一一对应关系。&quot;
+          - &quot;高压现场中CRC需要同时处理补传、沟通、复核和状态更新。&quot;
+        experience_improvement_space:
+          - &quot;减少CRC在高压现场中自行判断优先级的负担。&quot;
+          - &quot;把风险提醒变成可执行、可关闭的行动清单。&quot;
+        data_foundation:
+          readiness: &quot;high&quot;
+          available_data:
+            - &quot;访视风险等级&quot;
+            - &quot;规则依据说明&quot;
+            - &quot;待办事项&quot;
+            - &quot;现场工作负荷&quot;
+          data_gaps:
+            - &quot;不同风险等级与具体动作模板需要映射。&quot;
+
+      - id: &quot;node_8&quot;
+        name: &quot;跨角色协同提醒&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;研究者&quot;
+          - &quot;项目经理&quot;
+        touchpoints:
+          - &quot;沟通群&quot;
+          - &quot;协同待办&quot;
+          - &quot;客户协同门户&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;现场问题常靠CRC重复通知各角色推进。&quot;
+          - &quot;问题处理链路长，异常响应滞后，影响受试者和申办方体验。&quot;
+        efficiency_bottlenecks:
+          - &quot;风险责任归属、通知节奏和升级阈值没有被系统化编排。&quot;
+          - &quot;多角色任务之间缺少统一状态视图。&quot;
+        experience_improvement_space:
+          - &quot;减少重复通知和责任不清，让风险协同更快进入处理状态。&quot;
+          - &quot;让申办方看到责任、动作和进度。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;行动提醒&quot;
+            - &quot;责任角色&quot;
+            - &quot;升级规则&quot;
+            - &quot;截止时间&quot;
+          data_gaps:
+            - &quot;不同角色的任务权限、通知偏好和升级路径需要配置。&quot;
+
+      - id: &quot;node_9&quot;
+        name: &quot;提醒有效性反馈&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;项目经理&quot;
+        touchpoints:
+          - &quot;CRC Copilot&quot;
+          - &quot;风险看板&quot;
+        decision_complexity: &quot;低&quot;
+        pain_points:
+          - &quot;提醒效果缺少反馈，难以判断哪些提醒真正改善了闭环质量。&quot;
+          - &quot;提醒过多会造成疲劳，提醒过少又无法提前拦截风险。&quot;
+        efficiency_bottlenecks:
+          - &quot;任务完成、风险结果和规则命中没有形成反馈学习机制。&quot;
+          - &quot;误报和漏报无法快速进入规则优化。&quot;
+        experience_improvement_space:
+          - &quot;让智能提醒持续变准，而不是一次性规则配置。&quot;
+          - &quot;降低一线提醒疲劳。&quot;
+        data_foundation:
+          readiness: &quot;high&quot;
+          available_data:
+            - &quot;提醒触达记录&quot;
+            - &quot;任务完成状态&quot;
+            - &quot;风险结果&quot;
+            - &quot;用户反馈&quot;
+          data_gaps:
+            - &quot;提醒是否有效需要定义统一标注口径。&quot;
+
+  - id: &quot;stage_4&quot;
+    order: 4
+    name: &quot;临床复核与风险闭环&quot;
+    objective: &quot;对可能影响受试者安全、AE/SAE/CM上报或重大偏差的风险进行医生复核、升级、纠偏和关闭。&quot;
+    nodes:
+      - id: &quot;node_10&quot;
+        name: &quot;临床异常预判与医生复核&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;研究者&quot;
+        touchpoints:
+          - &quot;访视记录表&quot;
+          - &quot;临床判断备忘&quot;
+          - &quot;沟通记录&quot;
+        decision_complexity: &quot;高&quot;
+        pain_points:
+          - &quot;受试者异常是否需要医生复核常依赖口头反复确认。&quot;
+          - &quot;异常响应可能延迟，记录不完整会影响合规追溯。&quot;
+        efficiency_bottlenecks:
+          - &quot;医生复核前的信息整理和证据汇总依赖人工。&quot;
+          - &quot;复核结论、后续行动和留痕记录容易断裂。&quot;
+        experience_improvement_space:
+          - &quot;让受试者异常响应更快，且每次判断都有证据和留痕。&quot;
+          - &quot;降低CRC和研究者之间的反复确认成本。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;受试者状态风险标签&quot;
+            - &quot;受试者监测值&quot;
+            - &quot;症状变化&quot;
+            - &quot;风险规则依据&quot;
+          data_gaps:
+            - &quot;医生复核结论需要结构化记录。&quot;
+
+      - id: &quot;node_11&quot;
+        name: &quot;AE/SAE/CM升级判断&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;CRC&quot;
+          - &quot;项目经理&quot;
+          - &quot;质控专员&quot;
+        touchpoints:
+          - &quot;AE/SAE/CM工作台&quot;
+          - &quot;风险台账&quot;
+        decision_complexity: &quot;高&quot;
+        pain_points:
+          - &quot;AE/SAE/CM升级判断需要结合临床信息、项目规则和时限要求，人工判断压力高。&quot;
+          - &quot;漏报或迟报会直接影响质量合规与客户信任。&quot;
+        efficiency_bottlenecks:
+          - &quot;安全事件线索、上报SLA和资料准备清单没有被统一联动。&quot;
+          - &quot;人工判断时容易遗漏时限和材料要求。&quot;
+        experience_improvement_space:
+          - &quot;降低漏报、迟报和资料不完整风险。&quot;
+          - &quot;让项目经理、质控和申办方看到明确的升级依据与倒计时。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;医生复核确认记录&quot;
+            - &quot;AE/SAE/CM线索&quot;
+            - &quot;SLA规则&quot;
+            - &quot;项目上报要求&quot;
+          data_gaps:
+            - &quot;事件线索与上报规则之间需要精细映射。&quot;
+
+      - id: &quot;node_12&quot;
+        name: &quot;纠偏动作闭环跟踪&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;项目经理&quot;
+          - &quot;质控专员&quot;
+        touchpoints:
+          - &quot;风险台账&quot;
+          - &quot;CAPA记录&quot;
+          - &quot;客户协同门户&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;风险升级后缺少自动跟踪和闭环提醒。&quot;
+          - &quot;风险处理容易拖延，客户难以及时感知津石的过程控制能力。&quot;
+        efficiency_bottlenecks:
+          - &quot;风险台账与客户同步、质控复核、CRC待办没有打通。&quot;
+          - &quot;关闭证据和CAPA经验条目依赖人工沉淀。&quot;
+        experience_improvement_space:
+          - &quot;让风险不只被发现，还能按时关闭并沉淀为组织能力。&quot;
+          - &quot;提升客户对津石过程控制能力的透明感。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;升级判断结论&quot;
+            - &quot;纠偏动作&quot;
+            - &quot;责任人&quot;
+            - &quot;关闭证据&quot;
+          data_gaps:
+            - &quot;关闭标准、证据模板和CAPA标签需要标准化。&quot;
+
+  - id: &quot;stage_5&quot;
+    order: 5
+    name: &quot;客户价值呈现与知识回流&quot;
+    objective: &quot;把风险预测、提醒响应、纠偏结果和复盘经验转化为客户可感知的服务价值，以及内部可复用的知识资产。&quot;
+    nodes:
+      - id: &quot;node_13&quot;
+        name: &quot;客户视角风险同步&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;客户经理&quot;
+          - &quot;项目经理&quot;
+        touchpoints:
+          - &quot;客户协同门户&quot;
+          - &quot;阶段汇报&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;客户汇报仍依赖人工拼接多个系统状态。&quot;
+          - &quot;客户感知不到实时控制能力，协作体验和信任下降。&quot;
+        efficiency_bottlenecks:
+          - &quot;项目过程数据没有被产品化呈现。&quot;
+          - &quot;风险、进展、纠偏动作和关闭状态需要人工整理为客户语言。&quot;
+        experience_improvement_space:
+          - &quot;让申办方不仅看到结果，也看到过程控制能力。&quot;
+          - &quot;提升客户对津石主动预警和透明协同的感知。&quot;
+        data_foundation:
+          readiness: &quot;high&quot;
+          available_data:
+            - &quot;风险关闭记录&quot;
+            - &quot;项目进度状态&quot;
+            - &quot;纠偏动作&quot;
+            - &quot;访视闭环指标&quot;
+          data_gaps:
+            - &quot;内部运营语言需要转换为客户可理解的汇报语言。&quot;
+
+      - id: &quot;node_14&quot;
+        name: &quot;风险运营指标复盘&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;运营负责人&quot;
+          - &quot;质控负责人&quot;
+        touchpoints:
+          - &quot;经营看板&quot;
+          - &quot;质控看板&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;风险复盘缺少经营视角，难以转化为资源配置和培训优先级。&quot;
+          - &quot;培训和质控投入不够精准，核心CRC成长路径不清晰。&quot;
+        efficiency_bottlenecks:
+          - &quot;风险结果没有沉淀为中心画像、CRC画像和能力标签。&quot;
+          - &quot;复盘动作容易停留在单点案例层面。&quot;
+        experience_improvement_space:
+          - &quot;把单点风险处置升级为中心和人员能力治理。&quot;
+          - &quot;让运营负责人看到可行动的资源配置和培训建议。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;风险评分分布&quot;
+            - &quot;提醒触达记录&quot;
+            - &quot;风险关闭时效&quot;
+            - &quot;访视闭环结果&quot;
+          data_gaps:
+            - &quot;CRC画像、中心画像和能力标签需要长期沉淀。&quot;
+
+      - id: &quot;node_15&quot;
+        name: &quot;风险案例沉淀与训练&quot;
+        layer: &quot;L2流程节点&quot;
+        primary_roles:
+          - &quot;培训负责人&quot;
+          - &quot;质控负责人&quot;
+        touchpoints:
+          - &quot;知识库&quot;
+          - &quot;学习App&quot;
+        decision_complexity: &quot;中&quot;
+        pain_points:
+          - &quot;经验沉淀常停留在复盘文档，不能直接进入一线执行。&quot;
+          - &quot;新人上手慢，同类问题在不同中心重复发生。&quot;
+        efficiency_bottlenecks:
+          - &quot;知识库没有与具体场景、动作和提醒规则绑定。&quot;
+          - &quot;案例难以转化为训练题、处置模板和规则优化建议。&quot;
+        experience_improvement_space:
+          - &quot;让风险管理能力从少数骨干经验扩展为一线团队可复制的标准动作。&quot;
+          - &quot;把客户质疑、CAPA经验和复核记录转化为训练资产。&quot;
+        data_foundation:
+          readiness: &quot;medium&quot;
+          available_data:
+            - &quot;风险案例&quot;
+            - &quot;复核记录&quot;
+            - &quot;客户质疑记录&quot;
+            - &quot;CAPA经验条目&quot;
+          data_gaps:
+            - &quot;案例需要按风险类型、根因、动作、结果和适用项目打标签。&quot;
+
+opportunities:
+  - id: &quot;opp_01&quot;
+    stage_id: &quot;stage_1&quot;
+    node_ids:
+      - &quot;node_1&quot;
+      - &quot;node_2&quot;
+      - &quot;node_3&quot;
+    name: &quot;访视事件时间线与风险证据图谱&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「项目经理/质控专员」在「风险信号采集与证据建模」下提供[跨系统访视事件抽取、时间线生成与证据图谱]能力，以「高价值高优先级」方式把分散现场事实转化为可追溯的风险判断底座。&quot;
+    core_problem: &quot;访视事实分散在CTMS、文档库、沟通群和个人记录中，风险判断缺少统一时间线和证据链。&quot;
+    application_value: &quot;降低项目经理跨系统还原事实的时间，让风险从事后发现转为访视前和访视中的前置识别。&quot;
+    technical_direction:
+      - &quot;基于流程挖掘和事件抽取生成受试者-访视-中心三层时间线。&quot;
+      - &quot;用NLP从沟通记录和访视备注中抽取关键事件、责任人和时间点。&quot;
+      - &quot;建立受试者、访视、资料、风险、动作之间的知识图谱。&quot;
+    required_data:
+      - &quot;访视安排与执行记录&quot;
+      - &quot;资料上传与复核状态&quot;
+      - &quot;中心沟通记录&quot;
+      - &quot;受试者状态变化记录&quot;
+    expected_kpis:
+      - &quot;访视事实还原耗时下降50%以上&quot;
+      - &quot;高风险访视提前识别率提升&quot;
+      - &quot;关键风险证据链完整率提升&quot;
+    tech_types:
+      - &quot;流程挖掘&quot;
+      - &quot;NLP信息抽取&quot;
+      - &quot;知识图谱&quot;
+
+  - id: &quot;opp_02&quot;
+    stage_id: &quot;stage_1&quot;
+    node_ids:
+      - &quot;node_2&quot;
+    name: &quot;资料完整性与时效风险预警&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC/质控专员」在「资料完整性信号采集」下提供[缺失、逾期、版本不一致自动识别与风险提醒]能力，以「高价值高优先级」方式把质控和申办方复核阶段的集中返工前置到访视过程中。&quot;
+    core_problem: &quot;资料清单、上传状态、复核状态和归档状态未形成自动校验链，缺失问题常在后端暴露。&quot;
+    application_value: &quot;提升关键文档准时完整率和申办方一次复核通过率，减少CRC补传和返工。&quot;
+    technical_direction:
+      - &quot;建立项目资料期望清单与实际文件的自动匹配规则。&quot;
+      - &quot;用文档分类模型识别文件类型、版本和归档位置。&quot;
+      - &quot;按访视窗口、SLA和资料重要性生成风险等级。&quot;
+    required_data:
+      - &quot;访视资料清单&quot;
+      - &quot;文件元数据&quot;
+      - &quot;上传时间&quot;
+      - &quot;复核结果&quot;
+      - &quot;归档记录&quot;
+    expected_kpis:
+      - &quot;关键资料准时完整率提升&quot;
+      - &quot;资料缺失返工次数下降&quot;
+      - &quot;申办方一次复核通过率提升&quot;
+    tech_types:
+      - &quot;文档智能&quot;
+      - &quot;规则引擎&quot;
+      - &quot;异常检测&quot;
+
+  - id: &quot;opp_03&quot;
+    stage_id: &quot;stage_1&quot;
+    node_ids:
+      - &quot;node_3&quot;
+      - &quot;node_10&quot;
+    name: &quot;受试者状态异常预判&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC/研究者」在「受试者状态风险信号采集」下提供[监测值、症状、用药变化与项目方案联动的异常预判]能力，以「高价值高优先级」方式把口头经验判断转化为结构化复核输入。&quot;
+    core_problem: &quot;受试者状态风险依赖CRC经验和口头确认，异常响应和医生复核可能延迟。&quot;
+    application_value: &quot;缩短异常发现到医生复核的时间，提升受试者安全感和合规追溯完整性。&quot;
+    technical_direction:
+      - &quot;建立受试者监测值、症状、用药变化的纵向变化特征。&quot;
+      - &quot;用规则模型和机器学习模型识别异常趋势与复核触发条件。&quot;
+      - &quot;输出可解释的异常依据和医生复核材料包。&quot;
+    required_data:
+      - &quot;受试者监测值&quot;
+      - &quot;症状变化&quot;
+      - &quot;用药变化&quot;
+      - &quot;既往访视表现&quot;
+      - &quot;项目方案阈值&quot;
+    expected_kpis:
+      - &quot;异常到复核平均时长下降&quot;
+      - &quot;医生复核材料完整率提升&quot;
+      - &quot;受试者安全相关风险漏识别率下降&quot;
+    tech_types:
+      - &quot;预测模型&quot;
+      - &quot;临床规则引擎&quot;
+      - &quot;可解释AI&quot;
+
+  - id: &quot;opp_04&quot;
+    stage_id: &quot;stage_2&quot;
+    node_ids:
+      - &quot;node_4&quot;
+    name: &quot;SOP语义规则匹配引擎&quot;
+    quadrant: &quot;high_value_low_priority&quot;
+    maturity: &quot;explore&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「质控专员/项目经理」在「风险规则与SOP匹配」下提供[SOP、方案要求和风险信号的语义匹配与规则依据解释]能力，以「高价值低优先级」方式把专家口径沉淀为可复用规则资产。&quot;
+    core_problem: &quot;SOP和项目方案多为文档化要求，难以直接转化为机器可执行规则。&quot;
+    application_value: &quot;提升风险提示的可解释性和一线采纳率，但需要先完成知识治理和规则标准化。&quot;
+    technical_direction:
+      - &quot;用文档解析和语义分块构建SOP知识库。&quot;
+      - &quot;将关键要求转化为条件、阈值、例外和动作建议。&quot;
+      - &quot;用RAG生成风险命中依据并保留引用来源。&quot;
+    required_data:
+      - &quot;SOP文档&quot;
+      - &quot;项目方案&quot;
+      - &quot;历史偏差案例&quot;
+      - &quot;风险命中记录&quot;
+    expected_kpis:
+      - &quot;风险解释生成覆盖率提升&quot;
+      - &quot;人工查找SOP依据时间下降&quot;
+      - &quot;风险提醒采纳率提升&quot;
+    tech_types:
+      - &quot;RAG&quot;
+      - &quot;规则引擎&quot;
+      - &quot;知识库&quot;
+
+  - id: &quot;opp_05&quot;
+    stage_id: &quot;stage_2&quot;
+    node_ids:
+      - &quot;node_5&quot;
+    name: &quot;访视级风险评分与贡献因子解释&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「项目经理/质控专员」在「访视级风险评分」下提供[多因素风险评分、贡献因子解释与优先处理清单]能力，以「高价值高优先级」方式把质控资源投向最可能影响高质量访视闭环的节点。&quot;
+    core_problem: &quot;缺少动态风险评分和贡献因子解释，质控资源难以精准投放。&quot;
+    application_value: &quot;提升高风险访视提前拦截率，降低重大偏差和客户质疑概率。&quot;
+    technical_direction:
+      - &quot;融合资料完整性、访视窗口、受试者状态、中心表现和CRC负荷数据。&quot;
+      - &quot;用梯度提升、异常检测或评分卡模型生成访视风险等级。&quot;
+      - &quot;通过SHAP或规则贡献展示风险升高原因。&quot;
+    required_data:
+      - &quot;风险命中规则&quot;
+      - &quot;历史异常记录&quot;
+      - &quot;中心执行表现&quot;
+      - &quot;CRC负荷状态&quot;
+      - &quot;风险处置结果&quot;
+    expected_kpis:
+      - &quot;高风险访视提前识别率提升&quot;
+      - &quot;重大偏差提前拦截率提升&quot;
+      - &quot;质控资源命中率提升&quot;
+    tech_types:
+      - &quot;机器学习评分&quot;
+      - &quot;异常检测&quot;
+      - &quot;可解释AI&quot;
+
+  - id: &quot;opp_06&quot;
+    stage_id: &quot;stage_2&quot;
+    node_ids:
+      - &quot;node_6&quot;
+      - &quot;node_15&quot;
+    name: &quot;相似风险案例与处理模板推荐&quot;
+    quadrant: &quot;high_value_low_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「质控专员/培训负责人」在「相似案例与处理模板推荐」下提供[风险案例检索、相似度匹配和处置模板生成]能力，以「高价值低优先级」方式把资深人员经验转化为可复用行动知识。&quot;
+    core_problem: &quot;历史偏差、CAPA和客户反馈没有按场景和动作标签沉淀，案例复用效率低。&quot;
+    application_value: &quot;降低新人处理质量波动，减少同类风险跨中心重复发生。&quot;
+    technical_direction:
+      - &quot;构建风险案例向量库，按风险类型、根因、动作和结果进行标签化。&quot;
+      - &quot;用相似案例检索推荐处理模板和注意事项。&quot;
+      - &quot;由专家反馈校准案例标签和模板质量。&quot;
+    required_data:
+      - &quot;历史偏差案例&quot;
+      - &quot;CAPA案例&quot;
+      - &quot;客户质疑记录&quot;
+      - &quot;复核结论&quot;
+      - &quot;处置结果&quot;
+    expected_kpis:
+      - &quot;相似案例检索命中率提升&quot;
+      - &quot;新人风险处置一致性提升&quot;
+      - &quot;同类问题重复发生率下降&quot;
+    tech_types:
+      - &quot;向量检索&quot;
+      - &quot;RAG&quot;
+      - &quot;案例推理&quot;
+
+  - id: &quot;opp_07&quot;
+    stage_id: &quot;stage_3&quot;
+    node_ids:
+      - &quot;node_7&quot;
+    name: &quot;CRC下一步动作智能提醒&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC」在「CRC下一步动作提醒」下提供[风险到行动的任务转译、优先级排序和关闭提醒]能力，以「高价值高优先级」方式减少现场判断负担并提升访视闭环效率。&quot;
+    core_problem: &quot;风险提醒如果不能转化为具体动作，CRC仍要自行判断补传、复核、沟通和更新的优先级。&quot;
+    application_value: &quot;提升一线可服务体验，让CRC获得可执行、可关闭、可追踪的行动清单。&quot;
+    technical_direction:
+      - &quot;建立风险等级到行动模板的映射。&quot;
+      - &quot;按访视窗口、SLA、受试者安全和客户关注度排序任务。&quot;
+      - &quot;在移动端推送下一步动作、所需资料和关闭标准。&quot;
+    required_data:
+      - &quot;访视风险等级&quot;
+      - &quot;规则依据说明&quot;
+      - &quot;待办事项&quot;
+      - &quot;现场工作负荷&quot;
+      - &quot;任务完成记录&quot;
+    expected_kpis:
+      - &quot;CRC日常风险判断耗时下降&quot;
+      - &quot;提醒转行动率提升&quot;
+      - &quot;访视闭环时效提升&quot;
+    tech_types:
+      - &quot;任务推荐&quot;
+      - &quot;规则引擎&quot;
+      - &quot;智能通知&quot;
+
+  - id: &quot;opp_08&quot;
+    stage_id: &quot;stage_3&quot;
+    node_ids:
+      - &quot;node_8&quot;
+    name: &quot;多角色协同任务编排引擎&quot;
+    quadrant: &quot;high_value_low_priority&quot;
+    maturity: &quot;explore&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「CRC/研究者/项目经理」在「跨角色协同提醒」下提供[责任拆解、通知节奏、升级倒计时和状态同步]能力，以「高价值低优先级」方式重构风险协同处置链路。&quot;
+    core_problem: &quot;现场问题常靠CRC重复通知各角色推进，责任归属和升级节奏不清。&quot;
+    application_value: &quot;缩短跨角色响应链路，提升受试者和申办方对异常处理的体验。&quot;
+    technical_direction:
+      - &quot;基于风险类型自动拆解CRC、研究者、项目经理、质控专员任务。&quot;
+      - &quot;配置升级阈值、提醒频率和责任人路由。&quot;
+      - &quot;将任务状态同步到风险看板和客户协同门户。&quot;
+    required_data:
+      - &quot;行动提醒&quot;
+      - &quot;责任角色&quot;
+      - &quot;升级规则&quot;
+      - &quot;截止时间&quot;
+      - &quot;任务完成状态&quot;
+    expected_kpis:
+      - &quot;跨角色响应时长下降&quot;
+      - &quot;责任不清导致的延期事件下降&quot;
+      - &quot;异常处理SLA达成率提升&quot;
+    tech_types:
+      - &quot;工作流编排&quot;
+      - &quot;智能通知&quot;
+      - &quot;规则引擎&quot;
+
+  - id: &quot;opp_09&quot;
+    stage_id: &quot;stage_3&quot;
+    node_ids:
+      - &quot;node_9&quot;
+    name: &quot;提醒有效性反馈与误报漏报标注&quot;
+    quadrant: &quot;low_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC/项目经理」在「提醒有效性反馈」下提供[提醒采纳、任务完成、风险结果和误报漏报标注]能力，以「低价值高优先级」方式为后续风险模型和规则优化建立反馈闭环。&quot;
+    core_problem: &quot;提醒是否真正降低风险缺少反馈，规则无法持续优化。&quot;
+    application_value: &quot;单点业务价值不如风险评分高，但它是所有智能提醒持续变准的基础能力。&quot;
+    technical_direction:
+      - &quot;记录提醒触达、点击、接受、忽略、关闭和结果状态。&quot;
+      - &quot;设置误报、漏报、有效、无效等轻量标注。&quot;
+      - &quot;将反馈样本用于规则阈值优化和模型再训练。&quot;
+    required_data:
+      - &quot;提醒触达记录&quot;
+      - &quot;任务完成状态&quot;
+      - &quot;风险结果&quot;
+      - &quot;用户反馈&quot;
+    expected_kpis:
+      - &quot;提醒有效性可度量率达到90%以上&quot;
+      - &quot;重复误报率下降&quot;
+      - &quot;规则迭代周期缩短&quot;
+    tech_types:
+      - &quot;反馈学习&quot;
+      - &quot;埋点分析&quot;
+      - &quot;模型监控&quot;
+
+  - id: &quot;opp_10&quot;
+    stage_id: &quot;stage_4&quot;
+    node_ids:
+      - &quot;node_10&quot;
+    name: &quot;医生复核材料自动整理&quot;
+    quadrant: &quot;low_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC/研究者」在「临床异常预判与医生复核」下提供[复核证据包自动汇总和医生确认记录结构化归档]能力，以「低价值高优先级」方式减少反复口头确认和记录断层。&quot;
+    core_problem: &quot;医生复核前的信息整理和复核后的留痕依赖人工，容易遗漏证据或后续行动。&quot;
+    application_value: &quot;降低复核材料准备负担，提升复核留痕完整性，为高阶临床异常预判打基础。&quot;
+    technical_direction:
+      - &quot;按异常类型自动汇总监测值、症状变化、规则依据和历史访视表现。&quot;
+      - &quot;将医生确认结论转为结构化字段和后续行动指令。&quot;
+      - &quot;自动归档复核时间、参与人、结论和证据。&quot;
+    required_data:
+      - &quot;受试者状态风险标签&quot;
+      - &quot;监测值&quot;
+      - &quot;症状变化&quot;
+      - &quot;医生复核记录&quot;
+    expected_kpis:
+      - &quot;复核材料准备时间下降&quot;
+      - &quot;复核留痕完整率提升&quot;
+      - &quot;复核后行动遗漏率下降&quot;
+    tech_types:
+      - &quot;文档生成&quot;
+      - &quot;结构化抽取&quot;
+      - &quot;临床规则引擎&quot;
+
+  - id: &quot;opp_11&quot;
+    stage_id: &quot;stage_4&quot;
+    node_ids:
+      - &quot;node_11&quot;
+    name: &quot;AE/SAE/CM升级判断与SLA倒计时&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「CRC/项目经理/质控专员」在「AE/SAE/CM升级判断」下提供[安全事件线索识别、上报规则匹配、SLA倒计时和材料清单生成]能力，以「高价值高优先级」方式降低漏报、迟报和资料不完整风险。&quot;
+    core_problem: &quot;AE/SAE/CM升级判断需要综合临床信息、项目规则和时限要求，人工判断压力高。&quot;
+    application_value: &quot;直接保护质量合规和客户信任，是风险预测链路中最关键的安全类场景。&quot;
+    technical_direction:
+      - &quot;用NLP识别症状、诊断、用药变化和严重程度线索。&quot;
+      - &quot;匹配项目上报规则、SLA和材料要求。&quot;
+      - &quot;生成升级结论建议、倒计时提醒和上报准备清单。&quot;
+    required_data:
+      - &quot;医生复核确认记录&quot;
+      - &quot;AE/SAE/CM线索&quot;
+      - &quot;SLA规则&quot;
+      - &quot;项目上报要求&quot;
+      - &quot;历史上报结果&quot;
+    expected_kpis:
+      - &quot;AE/SAE/CM迟报率下降&quot;
+      - &quot;上报资料一次完整率提升&quot;
+      - &quot;安全事件线索识别召回率提升&quot;
+    tech_types:
+      - &quot;NLP分类&quot;
+      - &quot;临床规则引擎&quot;
+      - &quot;智能SLA提醒&quot;
+
+  - id: &quot;opp_12&quot;
+    stage_id: &quot;stage_4&quot;
+    node_ids:
+      - &quot;node_12&quot;
+    name: &quot;风险闭环与CAPA自动跟踪&quot;
+    quadrant: &quot;high_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「项目经理/质控专员」在「纠偏动作闭环跟踪」下提供[风险处置单自动生成、责任人催办、关闭证据校验和CAPA经验沉淀]能力，以「高价值高优先级」方式确保风险按时关闭并可被客户追溯。&quot;
+    core_problem: &quot;风险升级后缺少自动跟踪和闭环提醒，处理容易拖延。&quot;
+    application_value: &quot;提升风险关闭时效和客户透明度，把风险处置从人工追踪转为系统闭环。&quot;
+    technical_direction:
+      - &quot;按风险等级自动生成处置单、责任人和截止时间。&quot;
+      - &quot;监控任务进展并触发升级催办。&quot;
+      - &quot;对关闭证据进行完整性校验并生成CAPA经验条目。&quot;
+    required_data:
+      - &quot;升级判断结论&quot;
+      - &quot;纠偏动作&quot;
+      - &quot;责任人&quot;
+      - &quot;关闭证据&quot;
+      - &quot;CAPA记录&quot;
+    expected_kpis:
+      - &quot;风险关闭SLA达成率提升&quot;
+      - &quot;逾期未关闭风险数量下降&quot;
+      - &quot;CAPA经验沉淀率提升&quot;
+    tech_types:
+      - &quot;工作流自动化&quot;
+      - &quot;文档智能&quot;
+      - &quot;智能催办&quot;
+
+  - id: &quot;opp_13&quot;
+    stage_id: &quot;stage_5&quot;
+    node_ids:
+      - &quot;node_13&quot;
+    name: &quot;客户视角风险摘要自动生成&quot;
+    quadrant: &quot;high_value_low_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「客户经理/项目经理」在「客户视角风险同步」下提供[项目进度、风险、纠偏动作和关闭状态的客户语言摘要生成]能力，以「高价值低优先级」方式让申办方看到津石的过程控制能力。&quot;
+    core_problem: &quot;客户汇报依赖人工拼接多个系统状态，客户难以实时感知主动预警和过程控制价值。&quot;
+    application_value: &quot;提升客户透明协同体验和客户信任，但依赖前面风险数据和闭环数据质量。&quot;
+    technical_direction:
+      - &quot;自动汇总风险状态、处理动作、关闭证据和访视闭环指标。&quot;
+      - &quot;用生成式AI转写为客户可理解的阶段汇报摘要。&quot;
+      - &quot;支持按客户、项目、中心和风险类型生成不同视图。&quot;
+    required_data:
+      - &quot;风险关闭记录&quot;
+      - &quot;项目进度状态&quot;
+      - &quot;纠偏动作&quot;
+      - &quot;访视闭环指标&quot;
+      - &quot;客户关注点&quot;
+    expected_kpis:
+      - &quot;阶段汇报准备时间下降&quot;
+      - &quot;客户风险同步及时率提升&quot;
+      - &quot;客户质疑响应时长下降&quot;
+    tech_types:
+      - &quot;生成式AI&quot;
+      - &quot;BI摘要&quot;
+      - &quot;客户门户&quot;
+
+  - id: &quot;opp_14&quot;
+    stage_id: &quot;stage_5&quot;
+    node_ids:
+      - &quot;node_14&quot;
+    name: &quot;中心/CRC风险画像与运营复盘&quot;
+    quadrant: &quot;high_value_low_priority&quot;
+    maturity: &quot;growth&quot;
+    business_value_level: &quot;high&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「运营负责人/质控负责人」在「风险运营指标复盘」下提供[中心风险画像、CRC能力标签和培训优先级建议]能力，以「高价值低优先级」方式把单点风险处置升级为组织能力治理。&quot;
+    core_problem: &quot;风险复盘缺少经营视角，难以转化为资源配置、培训优先级和核心CRC成长路径。&quot;
+    application_value: &quot;让运营和质控投入更加精准，形成中心治理和人员能力提升闭环。&quot;
+    technical_direction:
+      - &quot;按中心、CRC、资料类型、访视节点聚合风险和闭环指标。&quot;
+      - &quot;构建中心风险画像、CRC能力画像和风险主题聚类。&quot;
+      - &quot;自动生成培训、排班和质控投入建议。&quot;
+    required_data:
+      - &quot;风险评分分布&quot;
+      - &quot;提醒触达记录&quot;
+      - &quot;风险关闭时效&quot;
+      - &quot;访视闭环结果&quot;
+      - &quot;人员与中心基础信息&quot;
+    expected_kpis:
+      - &quot;培训命中高风险主题比例提升&quot;
+      - &quot;重复风险发生率下降&quot;
+      - &quot;高风险中心改善周期缩短&quot;
+    tech_types:
+      - &quot;画像建模&quot;
+      - &quot;聚类分析&quot;
+      - &quot;经营分析&quot;
+
+  - id: &quot;opp_15&quot;
+    stage_id: &quot;stage_5&quot;
+    node_ids:
+      - &quot;node_15&quot;
+      - &quot;node_6&quot;
+    name: &quot;风险案例知识库与训练题生成&quot;
+    quadrant: &quot;low_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「培训负责人/质控负责人」在「风险案例沉淀与训练」下提供[典型案例结构化、训练题生成和规则优化建议]能力，以「低价值高优先级」方式把复盘文档转化为一线可训练、可执行的知识资产。&quot;
+    core_problem: &quot;经验沉淀常停留在复盘文档，不能直接进入一线执行和新人训练。&quot;
+    application_value: &quot;单次业务价值有限，但建设成本低、可快速提升知识复用，并支撑案例推荐和风险规则优化。&quot;
+    technical_direction:
+      - &quot;从复核记录、客户质疑和CAPA经验中抽取风险场景、根因、动作和结果。&quot;
+      - &quot;生成训练题、处置卡片和规则优化建议。&quot;
+      - &quot;通过专家审核形成高质量案例库。&quot;
+    required_data:
+      - &quot;风险案例&quot;
+      - &quot;复核记录&quot;
+      - &quot;客户质疑记录&quot;
+      - &quot;CAPA经验条目&quot;
+    expected_kpis:
+      - &quot;典型案例结构化率提升&quot;
+      - &quot;新人训练题库覆盖率提升&quot;
+      - &quot;同类问题重复发生率下降&quot;
+    tech_types:
+      - &quot;NLP抽取&quot;
+      - &quot;生成式AI&quot;
+      - &quot;知识库&quot;
+
+  - id: &quot;opp_16&quot;
+    stage_id: &quot;stage_1&quot;
+    node_ids:
+      - &quot;node_1&quot;
+      - &quot;node_13&quot;
+    name: &quot;访视风险周报自动摘要&quot;
+    quadrant: &quot;low_value_high_priority&quot;
+    maturity: &quot;ready&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;high&quot;
+    scenario_summary: &quot;「项目经理/客户经理」在「访视事件时间线生成」下提供[周度风险进展、待办、关闭状态自动摘要]能力，以「低价值高优先级」方式减少例行汇报整理并提升信息同步稳定性。&quot;
+    core_problem: &quot;例行周报需要人工从时间线、风险台账和沟通记录中拼接信息。&quot;
+    application_value: &quot;实现成本低，能快速改善项目沟通效率，但不直接改变风险预测核心能力。&quot;
+    technical_direction:
+      - &quot;按周汇总新增风险、关闭风险、逾期风险和关键动作。&quot;
+      - &quot;生成项目经理版、客户经理版和客户版摘要。&quot;
+      - &quot;保留来源链接和人工编辑入口。&quot;
+    required_data:
+      - &quot;访视事件时间线&quot;
+      - &quot;风险台账&quot;
+      - &quot;关闭记录&quot;
+      - &quot;项目进度状态&quot;
+    expected_kpis:
+      - &quot;周报准备时间下降&quot;
+      - &quot;风险同步准时率提升&quot;
+      - &quot;重复沟通次数下降&quot;
+    tech_types:
+      - &quot;生成式AI&quot;
+      - &quot;自动摘要&quot;
+      - &quot;BI报表&quot;
+
+  - id: &quot;opp_17&quot;
+    stage_id: &quot;stage_3&quot;
+    node_ids:
+      - &quot;node_7&quot;
+      - &quot;node_3&quot;
+    name: &quot;受试者沟通话术辅助&quot;
+    quadrant: &quot;low_value_low_priority&quot;
+    maturity: &quot;explore&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「CRC」在「CRC下一步动作提醒」下提供[基于风险类型的受试者沟通话术建议]能力，以「低价值低优先级」方式辅助非标准沟通但不替代临床判断。&quot;
+    core_problem: &quot;部分受试者状态确认和提醒沟通依赖CRC个人表达经验。&quot;
+    application_value: &quot;可改善少量沟通体验，但场景边界敏感、需要严格避免医疗建议越界。&quot;
+    technical_direction:
+      - &quot;基于项目允许话术和合规边界生成沟通建议。&quot;
+      - &quot;按风险类型提供需要确认的问题清单。&quot;
+      - &quot;强制加入人工确认和免责声明。&quot;
+    required_data:
+      - &quot;项目沟通规范&quot;
+      - &quot;受试者状态标签&quot;
+      - &quot;风险类型&quot;
+      - &quot;合规话术库&quot;
+    expected_kpis:
+      - &quot;受试者状态确认遗漏率下降&quot;
+      - &quot;沟通记录完整率提升&quot;
+      - &quot;不合规话术触发率为零&quot;
+    tech_types:
+      - &quot;生成式AI&quot;
+      - &quot;话术推荐&quot;
+      - &quot;合规护栏&quot;
+
+  - id: &quot;opp_18&quot;
+    stage_id: &quot;stage_2&quot;
+    node_ids:
+      - &quot;node_4&quot;
+      - &quot;node_14&quot;
+    name: &quot;跨项目风险规则迁移模拟器&quot;
+    quadrant: &quot;low_value_low_priority&quot;
+    maturity: &quot;explore&quot;
+    business_value_level: &quot;low&quot;
+    priority_level: &quot;low&quot;
+    scenario_summary: &quot;「质控负责人/运营负责人」在「风险规则与SOP匹配」下提供[跨项目规则迁移影响模拟]能力，以「低价值低优先级」方式辅助规则库长期治理和项目复用评估。&quot;
+    core_problem: &quot;不同项目规则差异大，跨项目复用容易引入误报或漏报。&quot;
+    application_value: &quot;适合规则库成熟后做治理优化，短期不应作为MVP重点。&quot;
+    technical_direction:
+      - &quot;比较项目方案、SOP和历史风险分布差异。&quot;
+      - &quot;模拟旧规则迁移到新项目后的命中率和误报风险。&quot;
+      - &quot;输出需要人工复核的规则差异清单。&quot;
+    required_data:
+      - &quot;项目SOP&quot;
+      - &quot;历史规则命中记录&quot;
+      - &quot;风险结果标签&quot;
+      - &quot;项目方案差异&quot;
+    expected_kpis:
+      - &quot;规则迁移复核时间下降&quot;
+      - &quot;跨项目误报率下降&quot;
+      - &quot;规则库复用率提升&quot;
+    tech_types:
+      - &quot;规则模拟&quot;
+      - &quot;知识图谱&quot;
+      - &quot;异常检测&quot;
+
+external_references:
+  - title: &quot;FDA AI draft guidance for drug regulatory decision-making&quot;
+    url: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/considerations-use-artificial-intelligence-support-regulatory-decision-making-drug-biological&quot;
+    relevance: &quot;用于提示AI模型在药物研发相关场景中需要定义使用情境、可信度评估和风险控制。&quot;
+  - title: &quot;Risk-Based Monitoring in Clinical Trials: 2021 Update&quot;
+    url: &quot;https://pmc.ncbi.nlm.nih.gov/articles/PMC9829217/&quot;
+    relevance: &quot;支持集中化监查、KRI/QTL、跨数据源异常识别和前置风险监测方向。&quot;
+  - title: &quot;Real-time clinical note monitoring to detect conditions for rapid follow-up&quot;
+    url: &quot;https://academic.oup.com/jamia/article/28/1/126/5943222&quot;
+    relevance: &quot;提供临床文本近实时监测、自动触发研究团队复核的相似案例。&quot;
+  - title: &quot;AI-enabled safety monitoring in Alzheimer&#x27;s disease clinical trials&quot;
+    url: &quot;https://www.sciencedirect.com/science/article/pii/S2274580724005946&quot;
+    relevance: &quot;支持AI/NLP用于AE编码、临床试验安全监测和人机协同复核方向。&quot;
+  - title: &quot;Scaling eTMF Completeness for a Hyper-Growth Biotech&quot;
+    url: &quot;https://www.usdm.com/resources/case-studies/scaling-etmf-completeness-for-a-hyper-growth-biotech&quot;
+    relevance: &quot;支持eTMF完整性、缺失文档可视化、任务所有权和检查就绪追踪方向。&quot;
+
+analysis_conclusion:
+  coverage_statement: &quot;本地图覆盖访视风险预测与智能提醒价值流的5个L1阶段、15个核心L2业务节点，共识别18个AI机会点。其中高价值高优先级7个，建议作为MVP主线；高价值低优先级5个，适合作为平台化能力二期建设；低价值高优先级4个，适合作为数据闭环和低成本快赢；低价值低优先级2个，建议暂缓。外部案例显示，临床试验行业正在从人工监查转向风险导向、集中化、可追溯的质量管理；NLP、规则引擎、异常检测和生成式AI可用于临床文本监测、AE辅助编码、eTMF完整性追踪和风险闭环。&quot;
+  implementation_sequence:
+    - &quot;第一优先级：资料完整性与时效风险预警、CRC下一步动作智能提醒、风险闭环与CAPA自动跟踪。&quot;
+    - &quot;第二优先级：访视事件时间线与风险证据图谱、访视级风险评分与贡献因子解释、AE/SAE/CM升级判断与SLA倒计时。&quot;
+    - &quot;第三优先级：提醒有效性反馈、医生复核材料自动整理、风险案例知识库与训练题生成。&quot;
+    - &quot;第四优先级：客户视角风险摘要、中心/CRC风险画像、相似风险案例推荐和SOP语义规则匹配。&quot;
+</pre>
+    </section>
+
+  </div>
+
+  <script>
+    const data = {"title": "津石医药-访视风险预测与智能提醒AI机会地图", "company": "津石医药", "business_flow": "访视风险预测与智能提醒价值流", "analysis_scope": "基于《津石医药-可服务体验提升业务流程深度分析.html》中的访视风险预测与智能提醒价值流，围绕风险信号采集、规则评分解释、智能提醒编排、临床复核闭环、客户价值与知识回流五个阶段，识别可应用人工智能技术的场景机会。", "quadrant_definition": {"high_value_high_priority": "高价值高优先级", "high_value_low_priority": "高价值低优先级", "low_value_high_priority": "低价值高优先级", "low_value_low_priority": "低价值低优先级"}, "stages": [{"id": "stage_1", "order": 1, "name": "风险信号采集与证据建模", "objective": "将访视计划、执行记录、资料上传、受试者状态和沟通记录转化为可计算、可追溯的风险证据。", "nodes": [{"id": "node_1", "name": "访视事件时间线生成", "layer": "L2流程节点", "primary_roles": ["CRC", "项目经理"], "touchpoints": ["CTMS", "风险台账", "进度看板", "中心沟通记录"], "decision_complexity": "中", "pain_points": ["访视事实分散在CTMS、文档库、沟通群和个人记录中，难以形成统一时间线。", "风险通常在问题显性化后才被发现，错过访视前或访视中的干预窗口。"], "efficiency_bottlenecks": ["项目经理需要人工跨系统还原预约、到访、采样、资料上传、复核和沟通动作。", "节点状态口径不统一，导致现场事实确认和风险判断耗时。"], "experience_improvement_space": ["让项目经理和质控人员看到一条统一的访视事件链。", "让CRC减少重复汇报，让客户感知津石对过程风险的主动掌控。"], "data_foundation": {"readiness": "medium", "available_data": ["访视安排", "执行记录", "资料上传状态", "中心沟通记录"], "data_gaps": ["跨系统事件ID和时间戳尚未统一。", "沟通记录中的关键事件需要语义抽取和结构化。"]}}, {"id": "node_2", "name": "资料完整性信号采集", "layer": "L2流程节点", "primary_roles": ["CRC", "质控专员"], "touchpoints": ["eTMF", "文档库", "自动归档模块"], "decision_complexity": "中", "pain_points": ["资料完整性问题通常在质控或申办方复核时才暴露。", "关键文档准时完整率不稳定，影响申办方复核一次通过率。"], "efficiency_bottlenecks": ["资料清单、上传状态、复核状态和归档状态需要人工比对。", "缺失、过期、版本不一致等问题缺少实时提醒。"], "experience_improvement_space": ["把检查前集中返工提前到访视过程内处理。", "让申办方看到实时完整性状态，而不是事后追问。"], "data_foundation": {"readiness": "high", "available_data": ["访视资料清单", "已上传文件", "复核状态", "导出归档记录"], "data_gaps": ["不同项目资料模板和命名规则需要标准化映射。"]}}, {"id": "node_3", "name": "受试者状态风险信号采集", "layer": "L2流程节点", "primary_roles": ["CRC", "研究者"], "touchpoints": ["访视记录表", "临床判断备忘", "AE工作台"], "decision_complexity": "高", "pain_points": ["临床状态预判依赖个人经验和口头反复确认，缺少结构化证据。", "异常响应可能延迟，受试者体验、安全感和合规追溯都受到影响。"], "efficiency_bottlenecks": ["症状变化、用药变化和检查数值变化需要人工汇总后再请医生判断。", "AE/SAE/CM线索容易散落在访视记录和沟通记录中。"], "experience_improvement_space": ["把依赖CRC经验的口头预判变成可留痕的结构化风险输入。", "让研究者更快获得需要复核的关键信息。"], "data_foundation": {"readiness": "medium", "available_data": ["受试者监测值", "症状变化", "用药变化", "既往访视表现"], "data_gaps": ["临床异常阈值和项目方案要求需要结构化。", "非结构化症状描述需要标准化术语映射。"]}}]}, {"id": "stage_2", "order": 2, "name": "风险规则匹配与评分解释", "objective": "将风险信号与项目SOP、历史偏差、AE/SAE/CM规则和中心执行表现匹配，形成可解释的风险等级。", "nodes": [{"id": "node_4", "name": "风险规则与SOP匹配", "layer": "L2流程节点", "primary_roles": ["质控专员", "项目经理"], "touchpoints": ["风险规则库", "SOP知识库"], "decision_complexity": "高", "pain_points": ["风险提示缺少规则依据时，一线很难判断是否需要立即处理。", "提醒容易被忽略，或者造成过度升级，降低现场使用体验。"], "efficiency_bottlenecks": ["SOP、方案要求和历史偏差没有被拆成机器可匹配的规则。", "风险命中依据和下一步动作需要质控专员人工解释。"], "experience_improvement_space": ["让提醒不仅告诉一线有风险，还解释为什么有风险。", "让风险判断从专家口径转为可复用的规则资产。"], "data_foundation": {"readiness": "medium", "available_data": ["访视事件时间线", "资料缺失清单", "受试者状态风险标签", "SOP要求"], "data_gaps": ["SOP和方案要求需要结构化为规则、阈值和例外条件。"]}}, {"id": "node_5", "name": "访视级风险评分", "layer": "L2流程节点", "primary_roles": ["项目经理", "质控专员"], "touchpoints": ["风险评分模型", "质控看板"], "decision_complexity": "高", "pain_points": ["当前缺少对访视级风险的动态评分和贡献因子解释。", "质控资源无法精准投向高风险访视，重大偏差更难提前拦截。"], "efficiency_bottlenecks": ["过程数据没有被连续监测。", "风险等级与现场动作之间没有形成闭环。"], "experience_improvement_space": ["帮助项目经理和质控团队把资源优先投向最可能影响高质量闭环的访视。", "让风险评分具备可解释性，便于一线接受。"], "data_foundation": {"readiness": "medium", "available_data": ["风险命中规则", "历史异常记录", "中心执行表现", "CRC负荷状态"], "data_gaps": ["历史异常样本需要统一标签。", "风险评分结果需要与后续处置成效回流。"]}}, {"id": "node_6", "name": "相似案例与处理模板推荐", "layer": "L2流程节点", "primary_roles": ["质控专员", "培训负责人"], "touchpoints": ["案例知识库", "学习App"], "decision_complexity": "中", "pain_points": ["风险处置建议依赖资深人员记忆，案例复用效率低。", "同类风险在不同中心重复发生，新人处理质量波动大。"], "efficiency_bottlenecks": ["偏差、CAPA和客户反馈没有按场景和动作标签沉淀。", "新人难以快速找到相似处置模板。"], "experience_improvement_space": ["把资深CRC和质控人员经验变成新人也能调用的行动知识。", "降低跨中心处理质量波动。"], "data_foundation": {"readiness": "medium", "available_data": ["风险贡献因子", "历史偏差案例", "CAPA案例", "客户质疑记录"], "data_gaps": ["历史案例缺少统一分类和动作标签。"]}}]}, {"id": "stage_3", "order": 3, "name": "智能提醒与任务编排", "objective": "将风险评分和规则依据转化为CRC、项目经理、研究者、质控专员可执行的任务提醒。", "nodes": [{"id": "node_7", "name": "CRC下一步动作提醒", "layer": "L2流程节点", "primary_roles": ["CRC"], "touchpoints": ["CRC Copilot", "移动端提醒"], "decision_complexity": "中", "pain_points": ["提醒如果只停留在风险提示，不能转化为具体动作。", "CRC仍需自己判断下一步，智能提醒对体验改善有限。"], "efficiency_bottlenecks": ["风险模型和现场任务编排没有形成一一对应关系。", "高压现场中CRC需要同时处理补传、沟通、复核和状态更新。"], "experience_improvement_space": ["减少CRC在高压现场中自行判断优先级的负担。", "把风险提醒变成可执行、可关闭的行动清单。"], "data_foundation": {"readiness": "high", "available_data": ["访视风险等级", "规则依据说明", "待办事项", "现场工作负荷"], "data_gaps": ["不同风险等级与具体动作模板需要映射。"]}}, {"id": "node_8", "name": "跨角色协同提醒", "layer": "L2流程节点", "primary_roles": ["CRC", "研究者", "项目经理"], "touchpoints": ["沟通群", "协同待办", "客户协同门户"], "decision_complexity": "中", "pain_points": ["现场问题常靠CRC重复通知各角色推进。", "问题处理链路长，异常响应滞后，影响受试者和申办方体验。"], "efficiency_bottlenecks": ["风险责任归属、通知节奏和升级阈值没有被系统化编排。", "多角色任务之间缺少统一状态视图。"], "experience_improvement_space": ["减少重复通知和责任不清，让风险协同更快进入处理状态。", "让申办方看到责任、动作和进度。"], "data_foundation": {"readiness": "medium", "available_data": ["行动提醒", "责任角色", "升级规则", "截止时间"], "data_gaps": ["不同角色的任务权限、通知偏好和升级路径需要配置。"]}}, {"id": "node_9", "name": "提醒有效性反馈", "layer": "L2流程节点", "primary_roles": ["CRC", "项目经理"], "touchpoints": ["CRC Copilot", "风险看板"], "decision_complexity": "低", "pain_points": ["提醒效果缺少反馈，难以判断哪些提醒真正改善了闭环质量。", "提醒过多会造成疲劳，提醒过少又无法提前拦截风险。"], "efficiency_bottlenecks": ["任务完成、风险结果和规则命中没有形成反馈学习机制。", "误报和漏报无法快速进入规则优化。"], "experience_improvement_space": ["让智能提醒持续变准，而不是一次性规则配置。", "降低一线提醒疲劳。"], "data_foundation": {"readiness": "high", "available_data": ["提醒触达记录", "任务完成状态", "风险结果", "用户反馈"], "data_gaps": ["提醒是否有效需要定义统一标注口径。"]}}]}, {"id": "stage_4", "order": 4, "name": "临床复核与风险闭环", "objective": "对可能影响受试者安全、AE/SAE/CM上报或重大偏差的风险进行医生复核、升级、纠偏和关闭。", "nodes": [{"id": "node_10", "name": "临床异常预判与医生复核", "layer": "L2流程节点", "primary_roles": ["CRC", "研究者"], "touchpoints": ["访视记录表", "临床判断备忘", "沟通记录"], "decision_complexity": "高", "pain_points": ["受试者异常是否需要医生复核常依赖口头反复确认。", "异常响应可能延迟，记录不完整会影响合规追溯。"], "efficiency_bottlenecks": ["医生复核前的信息整理和证据汇总依赖人工。", "复核结论、后续行动和留痕记录容易断裂。"], "experience_improvement_space": ["让受试者异常响应更快，且每次判断都有证据和留痕。", "降低CRC和研究者之间的反复确认成本。"], "data_foundation": {"readiness": "medium", "available_data": ["受试者状态风险标签", "受试者监测值", "症状变化", "风险规则依据"], "data_gaps": ["医生复核结论需要结构化记录。"]}}, {"id": "node_11", "name": "AE/SAE/CM升级判断", "layer": "L2流程节点", "primary_roles": ["CRC", "项目经理", "质控专员"], "touchpoints": ["AE/SAE/CM工作台", "风险台账"], "decision_complexity": "高", "pain_points": ["AE/SAE/CM升级判断需要结合临床信息、项目规则和时限要求，人工判断压力高。", "漏报或迟报会直接影响质量合规与客户信任。"], "efficiency_bottlenecks": ["安全事件线索、上报SLA和资料准备清单没有被统一联动。", "人工判断时容易遗漏时限和材料要求。"], "experience_improvement_space": ["降低漏报、迟报和资料不完整风险。", "让项目经理、质控和申办方看到明确的升级依据与倒计时。"], "data_foundation": {"readiness": "medium", "available_data": ["医生复核确认记录", "AE/SAE/CM线索", "SLA规则", "项目上报要求"], "data_gaps": ["事件线索与上报规则之间需要精细映射。"]}}, {"id": "node_12", "name": "纠偏动作闭环跟踪", "layer": "L2流程节点", "primary_roles": ["项目经理", "质控专员"], "touchpoints": ["风险台账", "CAPA记录", "客户协同门户"], "decision_complexity": "中", "pain_points": ["风险升级后缺少自动跟踪和闭环提醒。", "风险处理容易拖延，客户难以及时感知津石的过程控制能力。"], "efficiency_bottlenecks": ["风险台账与客户同步、质控复核、CRC待办没有打通。", "关闭证据和CAPA经验条目依赖人工沉淀。"], "experience_improvement_space": ["让风险不只被发现，还能按时关闭并沉淀为组织能力。", "提升客户对津石过程控制能力的透明感。"], "data_foundation": {"readiness": "medium", "available_data": ["升级判断结论", "纠偏动作", "责任人", "关闭证据"], "data_gaps": ["关闭标准、证据模板和CAPA标签需要标准化。"]}}]}, {"id": "stage_5", "order": 5, "name": "客户价值呈现与知识回流", "objective": "把风险预测、提醒响应、纠偏结果和复盘经验转化为客户可感知的服务价值，以及内部可复用的知识资产。", "nodes": [{"id": "node_13", "name": "客户视角风险同步", "layer": "L2流程节点", "primary_roles": ["客户经理", "项目经理"], "touchpoints": ["客户协同门户", "阶段汇报"], "decision_complexity": "中", "pain_points": ["客户汇报仍依赖人工拼接多个系统状态。", "客户感知不到实时控制能力，协作体验和信任下降。"], "efficiency_bottlenecks": ["项目过程数据没有被产品化呈现。", "风险、进展、纠偏动作和关闭状态需要人工整理为客户语言。"], "experience_improvement_space": ["让申办方不仅看到结果，也看到过程控制能力。", "提升客户对津石主动预警和透明协同的感知。"], "data_foundation": {"readiness": "high", "available_data": ["风险关闭记录", "项目进度状态", "纠偏动作", "访视闭环指标"], "data_gaps": ["内部运营语言需要转换为客户可理解的汇报语言。"]}}, {"id": "node_14", "name": "风险运营指标复盘", "layer": "L2流程节点", "primary_roles": ["运营负责人", "质控负责人"], "touchpoints": ["经营看板", "质控看板"], "decision_complexity": "中", "pain_points": ["风险复盘缺少经营视角，难以转化为资源配置和培训优先级。", "培训和质控投入不够精准，核心CRC成长路径不清晰。"], "efficiency_bottlenecks": ["风险结果没有沉淀为中心画像、CRC画像和能力标签。", "复盘动作容易停留在单点案例层面。"], "experience_improvement_space": ["把单点风险处置升级为中心和人员能力治理。", "让运营负责人看到可行动的资源配置和培训建议。"], "data_foundation": {"readiness": "medium", "available_data": ["风险评分分布", "提醒触达记录", "风险关闭时效", "访视闭环结果"], "data_gaps": ["CRC画像、中心画像和能力标签需要长期沉淀。"]}}, {"id": "node_15", "name": "风险案例沉淀与训练", "layer": "L2流程节点", "primary_roles": ["培训负责人", "质控负责人"], "touchpoints": ["知识库", "学习App"], "decision_complexity": "中", "pain_points": ["经验沉淀常停留在复盘文档，不能直接进入一线执行。", "新人上手慢，同类问题在不同中心重复发生。"], "efficiency_bottlenecks": ["知识库没有与具体场景、动作和提醒规则绑定。", "案例难以转化为训练题、处置模板和规则优化建议。"], "experience_improvement_space": ["让风险管理能力从少数骨干经验扩展为一线团队可复制的标准动作。", "把客户质疑、CAPA经验和复核记录转化为训练资产。"], "data_foundation": {"readiness": "medium", "available_data": ["风险案例", "复核记录", "客户质疑记录", "CAPA经验条目"], "data_gaps": ["案例需要按风险类型、根因、动作、结果和适用项目打标签。"]}}]}], "opportunities": [{"id": "opp_01", "stage_id": "stage_1", "node_ids": ["node_1", "node_2", "node_3"], "name": "访视事件时间线与风险证据图谱", "quadrant": "high_value_high_priority", "maturity": "ready", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「项目经理/质控专员」在「风险信号采集与证据建模」下提供[跨系统访视事件抽取、时间线生成与证据图谱]能力，以「高价值高优先级」方式把分散现场事实转化为可追溯的风险判断底座。", "core_problem": "访视事实分散在CTMS、文档库、沟通群和个人记录中，风险判断缺少统一时间线和证据链。", "application_value": "降低项目经理跨系统还原事实的时间，让风险从事后发现转为访视前和访视中的前置识别。", "technical_direction": ["基于流程挖掘和事件抽取生成受试者-访视-中心三层时间线。", "用NLP从沟通记录和访视备注中抽取关键事件、责任人和时间点。", "建立受试者、访视、资料、风险、动作之间的知识图谱。"], "required_data": ["访视安排与执行记录", "资料上传与复核状态", "中心沟通记录", "受试者状态变化记录"], "expected_kpis": ["访视事实还原耗时下降50%以上", "高风险访视提前识别率提升", "关键风险证据链完整率提升"], "tech_types": ["流程挖掘", "NLP信息抽取", "知识图谱"]}, {"id": "opp_02", "stage_id": "stage_1", "node_ids": ["node_2"], "name": "资料完整性与时效风险预警", "quadrant": "high_value_high_priority", "maturity": "ready", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「CRC/质控专员」在「资料完整性信号采集」下提供[缺失、逾期、版本不一致自动识别与风险提醒]能力，以「高价值高优先级」方式把质控和申办方复核阶段的集中返工前置到访视过程中。", "core_problem": "资料清单、上传状态、复核状态和归档状态未形成自动校验链，缺失问题常在后端暴露。", "application_value": "提升关键文档准时完整率和申办方一次复核通过率，减少CRC补传和返工。", "technical_direction": ["建立项目资料期望清单与实际文件的自动匹配规则。", "用文档分类模型识别文件类型、版本和归档位置。", "按访视窗口、SLA和资料重要性生成风险等级。"], "required_data": ["访视资料清单", "文件元数据", "上传时间", "复核结果", "归档记录"], "expected_kpis": ["关键资料准时完整率提升", "资料缺失返工次数下降", "申办方一次复核通过率提升"], "tech_types": ["文档智能", "规则引擎", "异常检测"]}, {"id": "opp_03", "stage_id": "stage_1", "node_ids": ["node_3", "node_10"], "name": "受试者状态异常预判", "quadrant": "high_value_high_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「CRC/研究者」在「受试者状态风险信号采集」下提供[监测值、症状、用药变化与项目方案联动的异常预判]能力，以「高价值高优先级」方式把口头经验判断转化为结构化复核输入。", "core_problem": "受试者状态风险依赖CRC经验和口头确认，异常响应和医生复核可能延迟。", "application_value": "缩短异常发现到医生复核的时间，提升受试者安全感和合规追溯完整性。", "technical_direction": ["建立受试者监测值、症状、用药变化的纵向变化特征。", "用规则模型和机器学习模型识别异常趋势与复核触发条件。", "输出可解释的异常依据和医生复核材料包。"], "required_data": ["受试者监测值", "症状变化", "用药变化", "既往访视表现", "项目方案阈值"], "expected_kpis": ["异常到复核平均时长下降", "医生复核材料完整率提升", "受试者安全相关风险漏识别率下降"], "tech_types": ["预测模型", "临床规则引擎", "可解释AI"]}, {"id": "opp_04", "stage_id": "stage_2", "node_ids": ["node_4"], "name": "SOP语义规则匹配引擎", "quadrant": "high_value_low_priority", "maturity": "explore", "business_value_level": "high", "priority_level": "low", "scenario_summary": "「质控专员/项目经理」在「风险规则与SOP匹配」下提供[SOP、方案要求和风险信号的语义匹配与规则依据解释]能力，以「高价值低优先级」方式把专家口径沉淀为可复用规则资产。", "core_problem": "SOP和项目方案多为文档化要求，难以直接转化为机器可执行规则。", "application_value": "提升风险提示的可解释性和一线采纳率，但需要先完成知识治理和规则标准化。", "technical_direction": ["用文档解析和语义分块构建SOP知识库。", "将关键要求转化为条件、阈值、例外和动作建议。", "用RAG生成风险命中依据并保留引用来源。"], "required_data": ["SOP文档", "项目方案", "历史偏差案例", "风险命中记录"], "expected_kpis": ["风险解释生成覆盖率提升", "人工查找SOP依据时间下降", "风险提醒采纳率提升"], "tech_types": ["RAG", "规则引擎", "知识库"]}, {"id": "opp_05", "stage_id": "stage_2", "node_ids": ["node_5"], "name": "访视级风险评分与贡献因子解释", "quadrant": "high_value_high_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「项目经理/质控专员」在「访视级风险评分」下提供[多因素风险评分、贡献因子解释与优先处理清单]能力，以「高价值高优先级」方式把质控资源投向最可能影响高质量访视闭环的节点。", "core_problem": "缺少动态风险评分和贡献因子解释，质控资源难以精准投放。", "application_value": "提升高风险访视提前拦截率，降低重大偏差和客户质疑概率。", "technical_direction": ["融合资料完整性、访视窗口、受试者状态、中心表现和CRC负荷数据。", "用梯度提升、异常检测或评分卡模型生成访视风险等级。", "通过SHAP或规则贡献展示风险升高原因。"], "required_data": ["风险命中规则", "历史异常记录", "中心执行表现", "CRC负荷状态", "风险处置结果"], "expected_kpis": ["高风险访视提前识别率提升", "重大偏差提前拦截率提升", "质控资源命中率提升"], "tech_types": ["机器学习评分", "异常检测", "可解释AI"]}, {"id": "opp_06", "stage_id": "stage_2", "node_ids": ["node_6", "node_15"], "name": "相似风险案例与处理模板推荐", "quadrant": "high_value_low_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "low", "scenario_summary": "「质控专员/培训负责人」在「相似案例与处理模板推荐」下提供[风险案例检索、相似度匹配和处置模板生成]能力，以「高价值低优先级」方式把资深人员经验转化为可复用行动知识。", "core_problem": "历史偏差、CAPA和客户反馈没有按场景和动作标签沉淀，案例复用效率低。", "application_value": "降低新人处理质量波动，减少同类风险跨中心重复发生。", "technical_direction": ["构建风险案例向量库，按风险类型、根因、动作和结果进行标签化。", "用相似案例检索推荐处理模板和注意事项。", "由专家反馈校准案例标签和模板质量。"], "required_data": ["历史偏差案例", "CAPA案例", "客户质疑记录", "复核结论", "处置结果"], "expected_kpis": ["相似案例检索命中率提升", "新人风险处置一致性提升", "同类问题重复发生率下降"], "tech_types": ["向量检索", "RAG", "案例推理"]}, {"id": "opp_07", "stage_id": "stage_3", "node_ids": ["node_7"], "name": "CRC下一步动作智能提醒", "quadrant": "high_value_high_priority", "maturity": "ready", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「CRC」在「CRC下一步动作提醒」下提供[风险到行动的任务转译、优先级排序和关闭提醒]能力，以「高价值高优先级」方式减少现场判断负担并提升访视闭环效率。", "core_problem": "风险提醒如果不能转化为具体动作，CRC仍要自行判断补传、复核、沟通和更新的优先级。", "application_value": "提升一线可服务体验，让CRC获得可执行、可关闭、可追踪的行动清单。", "technical_direction": ["建立风险等级到行动模板的映射。", "按访视窗口、SLA、受试者安全和客户关注度排序任务。", "在移动端推送下一步动作、所需资料和关闭标准。"], "required_data": ["访视风险等级", "规则依据说明", "待办事项", "现场工作负荷", "任务完成记录"], "expected_kpis": ["CRC日常风险判断耗时下降", "提醒转行动率提升", "访视闭环时效提升"], "tech_types": ["任务推荐", "规则引擎", "智能通知"]}, {"id": "opp_08", "stage_id": "stage_3", "node_ids": ["node_8"], "name": "多角色协同任务编排引擎", "quadrant": "high_value_low_priority", "maturity": "explore", "business_value_level": "high", "priority_level": "low", "scenario_summary": "「CRC/研究者/项目经理」在「跨角色协同提醒」下提供[责任拆解、通知节奏、升级倒计时和状态同步]能力，以「高价值低优先级」方式重构风险协同处置链路。", "core_problem": "现场问题常靠CRC重复通知各角色推进，责任归属和升级节奏不清。", "application_value": "缩短跨角色响应链路，提升受试者和申办方对异常处理的体验。", "technical_direction": ["基于风险类型自动拆解CRC、研究者、项目经理、质控专员任务。", "配置升级阈值、提醒频率和责任人路由。", "将任务状态同步到风险看板和客户协同门户。"], "required_data": ["行动提醒", "责任角色", "升级规则", "截止时间", "任务完成状态"], "expected_kpis": ["跨角色响应时长下降", "责任不清导致的延期事件下降", "异常处理SLA达成率提升"], "tech_types": ["工作流编排", "智能通知", "规则引擎"]}, {"id": "opp_09", "stage_id": "stage_3", "node_ids": ["node_9"], "name": "提醒有效性反馈与误报漏报标注", "quadrant": "low_value_high_priority", "maturity": "ready", "business_value_level": "low", "priority_level": "high", "scenario_summary": "「CRC/项目经理」在「提醒有效性反馈」下提供[提醒采纳、任务完成、风险结果和误报漏报标注]能力，以「低价值高优先级」方式为后续风险模型和规则优化建立反馈闭环。", "core_problem": "提醒是否真正降低风险缺少反馈，规则无法持续优化。", "application_value": "单点业务价值不如风险评分高，但它是所有智能提醒持续变准的基础能力。", "technical_direction": ["记录提醒触达、点击、接受、忽略、关闭和结果状态。", "设置误报、漏报、有效、无效等轻量标注。", "将反馈样本用于规则阈值优化和模型再训练。"], "required_data": ["提醒触达记录", "任务完成状态", "风险结果", "用户反馈"], "expected_kpis": ["提醒有效性可度量率达到90%以上", "重复误报率下降", "规则迭代周期缩短"], "tech_types": ["反馈学习", "埋点分析", "模型监控"]}, {"id": "opp_10", "stage_id": "stage_4", "node_ids": ["node_10"], "name": "医生复核材料自动整理", "quadrant": "low_value_high_priority", "maturity": "ready", "business_value_level": "low", "priority_level": "high", "scenario_summary": "「CRC/研究者」在「临床异常预判与医生复核」下提供[复核证据包自动汇总和医生确认记录结构化归档]能力，以「低价值高优先级」方式减少反复口头确认和记录断层。", "core_problem": "医生复核前的信息整理和复核后的留痕依赖人工，容易遗漏证据或后续行动。", "application_value": "降低复核材料准备负担，提升复核留痕完整性，为高阶临床异常预判打基础。", "technical_direction": ["按异常类型自动汇总监测值、症状变化、规则依据和历史访视表现。", "将医生确认结论转为结构化字段和后续行动指令。", "自动归档复核时间、参与人、结论和证据。"], "required_data": ["受试者状态风险标签", "监测值", "症状变化", "医生复核记录"], "expected_kpis": ["复核材料准备时间下降", "复核留痕完整率提升", "复核后行动遗漏率下降"], "tech_types": ["文档生成", "结构化抽取", "临床规则引擎"]}, {"id": "opp_11", "stage_id": "stage_4", "node_ids": ["node_11"], "name": "AE/SAE/CM升级判断与SLA倒计时", "quadrant": "high_value_high_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「CRC/项目经理/质控专员」在「AE/SAE/CM升级判断」下提供[安全事件线索识别、上报规则匹配、SLA倒计时和材料清单生成]能力，以「高价值高优先级」方式降低漏报、迟报和资料不完整风险。", "core_problem": "AE/SAE/CM升级判断需要综合临床信息、项目规则和时限要求，人工判断压力高。", "application_value": "直接保护质量合规和客户信任，是风险预测链路中最关键的安全类场景。", "technical_direction": ["用NLP识别症状、诊断、用药变化和严重程度线索。", "匹配项目上报规则、SLA和材料要求。", "生成升级结论建议、倒计时提醒和上报准备清单。"], "required_data": ["医生复核确认记录", "AE/SAE/CM线索", "SLA规则", "项目上报要求", "历史上报结果"], "expected_kpis": ["AE/SAE/CM迟报率下降", "上报资料一次完整率提升", "安全事件线索识别召回率提升"], "tech_types": ["NLP分类", "临床规则引擎", "智能SLA提醒"]}, {"id": "opp_12", "stage_id": "stage_4", "node_ids": ["node_12"], "name": "风险闭环与CAPA自动跟踪", "quadrant": "high_value_high_priority", "maturity": "ready", "business_value_level": "high", "priority_level": "high", "scenario_summary": "「项目经理/质控专员」在「纠偏动作闭环跟踪」下提供[风险处置单自动生成、责任人催办、关闭证据校验和CAPA经验沉淀]能力，以「高价值高优先级」方式确保风险按时关闭并可被客户追溯。", "core_problem": "风险升级后缺少自动跟踪和闭环提醒，处理容易拖延。", "application_value": "提升风险关闭时效和客户透明度，把风险处置从人工追踪转为系统闭环。", "technical_direction": ["按风险等级自动生成处置单、责任人和截止时间。", "监控任务进展并触发升级催办。", "对关闭证据进行完整性校验并生成CAPA经验条目。"], "required_data": ["升级判断结论", "纠偏动作", "责任人", "关闭证据", "CAPA记录"], "expected_kpis": ["风险关闭SLA达成率提升", "逾期未关闭风险数量下降", "CAPA经验沉淀率提升"], "tech_types": ["工作流自动化", "文档智能", "智能催办"]}, {"id": "opp_13", "stage_id": "stage_5", "node_ids": ["node_13"], "name": "客户视角风险摘要自动生成", "quadrant": "high_value_low_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "low", "scenario_summary": "「客户经理/项目经理」在「客户视角风险同步」下提供[项目进度、风险、纠偏动作和关闭状态的客户语言摘要生成]能力，以「高价值低优先级」方式让申办方看到津石的过程控制能力。", "core_problem": "客户汇报依赖人工拼接多个系统状态，客户难以实时感知主动预警和过程控制价值。", "application_value": "提升客户透明协同体验和客户信任，但依赖前面风险数据和闭环数据质量。", "technical_direction": ["自动汇总风险状态、处理动作、关闭证据和访视闭环指标。", "用生成式AI转写为客户可理解的阶段汇报摘要。", "支持按客户、项目、中心和风险类型生成不同视图。"], "required_data": ["风险关闭记录", "项目进度状态", "纠偏动作", "访视闭环指标", "客户关注点"], "expected_kpis": ["阶段汇报准备时间下降", "客户风险同步及时率提升", "客户质疑响应时长下降"], "tech_types": ["生成式AI", "BI摘要", "客户门户"]}, {"id": "opp_14", "stage_id": "stage_5", "node_ids": ["node_14"], "name": "中心/CRC风险画像与运营复盘", "quadrant": "high_value_low_priority", "maturity": "growth", "business_value_level": "high", "priority_level": "low", "scenario_summary": "「运营负责人/质控负责人」在「风险运营指标复盘」下提供[中心风险画像、CRC能力标签和培训优先级建议]能力，以「高价值低优先级」方式把单点风险处置升级为组织能力治理。", "core_problem": "风险复盘缺少经营视角，难以转化为资源配置、培训优先级和核心CRC成长路径。", "application_value": "让运营和质控投入更加精准，形成中心治理和人员能力提升闭环。", "technical_direction": ["按中心、CRC、资料类型、访视节点聚合风险和闭环指标。", "构建中心风险画像、CRC能力画像和风险主题聚类。", "自动生成培训、排班和质控投入建议。"], "required_data": ["风险评分分布", "提醒触达记录", "风险关闭时效", "访视闭环结果", "人员与中心基础信息"], "expected_kpis": ["培训命中高风险主题比例提升", "重复风险发生率下降", "高风险中心改善周期缩短"], "tech_types": ["画像建模", "聚类分析", "经营分析"]}, {"id": "opp_15", "stage_id": "stage_5", "node_ids": ["node_15", "node_6"], "name": "风险案例知识库与训练题生成", "quadrant": "low_value_high_priority", "maturity": "ready", "business_value_level": "low", "priority_level": "high", "scenario_summary": "「培训负责人/质控负责人」在「风险案例沉淀与训练」下提供[典型案例结构化、训练题生成和规则优化建议]能力，以「低价值高优先级」方式把复盘文档转化为一线可训练、可执行的知识资产。", "core_problem": "经验沉淀常停留在复盘文档，不能直接进入一线执行和新人训练。", "application_value": "单次业务价值有限，但建设成本低、可快速提升知识复用，并支撑案例推荐和风险规则优化。", "technical_direction": ["从复核记录、客户质疑和CAPA经验中抽取风险场景、根因、动作和结果。", "生成训练题、处置卡片和规则优化建议。", "通过专家审核形成高质量案例库。"], "required_data": ["风险案例", "复核记录", "客户质疑记录", "CAPA经验条目"], "expected_kpis": ["典型案例结构化率提升", "新人训练题库覆盖率提升", "同类问题重复发生率下降"], "tech_types": ["NLP抽取", "生成式AI", "知识库"]}, {"id": "opp_16", "stage_id": "stage_1", "node_ids": ["node_1", "node_13"], "name": "访视风险周报自动摘要", "quadrant": "low_value_high_priority", "maturity": "ready", "business_value_level": "low", "priority_level": "high", "scenario_summary": "「项目经理/客户经理」在「访视事件时间线生成」下提供[周度风险进展、待办、关闭状态自动摘要]能力，以「低价值高优先级」方式减少例行汇报整理并提升信息同步稳定性。", "core_problem": "例行周报需要人工从时间线、风险台账和沟通记录中拼接信息。", "application_value": "实现成本低，能快速改善项目沟通效率，但不直接改变风险预测核心能力。", "technical_direction": ["按周汇总新增风险、关闭风险、逾期风险和关键动作。", "生成项目经理版、客户经理版和客户版摘要。", "保留来源链接和人工编辑入口。"], "required_data": ["访视事件时间线", "风险台账", "关闭记录", "项目进度状态"], "expected_kpis": ["周报准备时间下降", "风险同步准时率提升", "重复沟通次数下降"], "tech_types": ["生成式AI", "自动摘要", "BI报表"]}, {"id": "opp_17", "stage_id": "stage_3", "node_ids": ["node_7", "node_3"], "name": "受试者沟通话术辅助", "quadrant": "low_value_low_priority", "maturity": "explore", "business_value_level": "low", "priority_level": "low", "scenario_summary": "「CRC」在「CRC下一步动作提醒」下提供[基于风险类型的受试者沟通话术建议]能力，以「低价值低优先级」方式辅助非标准沟通但不替代临床判断。", "core_problem": "部分受试者状态确认和提醒沟通依赖CRC个人表达经验。", "application_value": "可改善少量沟通体验，但场景边界敏感、需要严格避免医疗建议越界。", "technical_direction": ["基于项目允许话术和合规边界生成沟通建议。", "按风险类型提供需要确认的问题清单。", "强制加入人工确认和免责声明。"], "required_data": ["项目沟通规范", "受试者状态标签", "风险类型", "合规话术库"], "expected_kpis": ["受试者状态确认遗漏率下降", "沟通记录完整率提升", "不合规话术触发率为零"], "tech_types": ["生成式AI", "话术推荐", "合规护栏"]}, {"id": "opp_18", "stage_id": "stage_2", "node_ids": ["node_4", "node_14"], "name": "跨项目风险规则迁移模拟器", "quadrant": "low_value_low_priority", "maturity": "explore", "business_value_level": "low", "priority_level": "low", "scenario_summary": "「质控负责人/运营负责人」在「风险规则与SOP匹配」下提供[跨项目规则迁移影响模拟]能力，以「低价值低优先级」方式辅助规则库长期治理和项目复用评估。", "core_problem": "不同项目规则差异大，跨项目复用容易引入误报或漏报。", "application_value": "适合规则库成熟后做治理优化，短期不应作为MVP重点。", "technical_direction": ["比较项目方案、SOP和历史风险分布差异。", "模拟旧规则迁移到新项目后的命中率和误报风险。", "输出需要人工复核的规则差异清单。"], "required_data": ["项目SOP", "历史规则命中记录", "风险结果标签", "项目方案差异"], "expected_kpis": ["规则迁移复核时间下降", "跨项目误报率下降", "规则库复用率提升"], "tech_types": ["规则模拟", "知识图谱", "异常检测"]}], "external_references": [{"title": "FDA AI draft guidance for drug regulatory decision-making", "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/considerations-use-artificial-intelligence-support-regulatory-decision-making-drug-biological", "relevance": "用于提示AI模型在药物研发相关场景中需要定义使用情境、可信度评估和风险控制。"}, {"title": "Risk-Based Monitoring in Clinical Trials: 2021 Update", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9829217/", "relevance": "支持集中化监查、KRI/QTL、跨数据源异常识别和前置风险监测方向。"}, {"title": "Real-time clinical note monitoring to detect conditions for rapid follow-up", "url": "https://academic.oup.com/jamia/article/28/1/126/5943222", "relevance": "提供临床文本近实时监测、自动触发研究团队复核的相似案例。"}, {"title": "AI-enabled safety monitoring in Alzheimer's disease clinical trials", "url": "https://www.sciencedirect.com/science/article/pii/S2274580724005946", "relevance": "支持AI/NLP用于AE编码、临床试验安全监测和人机协同复核方向。"}, {"title": "Scaling eTMF Completeness for a Hyper-Growth Biotech", "url": "https://www.usdm.com/resources/case-studies/scaling-etmf-completeness-for-a-hyper-growth-biotech", "relevance": "支持eTMF完整性、缺失文档可视化、任务所有权和检查就绪追踪方向。"}], "analysis_conclusion": {"coverage_statement": "本地图覆盖访视风险预测与智能提醒价值流的5个L1阶段、15个核心L2业务节点，共识别18个AI机会点。其中高价值高优先级7个，建议作为MVP主线；高价值低优先级5个，适合作为平台化能力二期建设；低价值高优先级4个，适合作为数据闭环和低成本快赢；低价值低优先级2个，建议暂缓。外部案例显示，临床试验行业正在从人工监查转向风险导向、集中化、可追溯的质量管理；NLP、规则引擎、异常检测和生成式AI可用于临床文本监测、AE辅助编码、eTMF完整性追踪和风险闭环。", "implementation_sequence": ["第一优先级：资料完整性与时效风险预警、CRC下一步动作智能提醒、风险闭环与CAPA自动跟踪。", "第二优先级：访视事件时间线与风险证据图谱、访视级风险评分与贡献因子解释、AE/SAE/CM升级判断与SLA倒计时。", "第三优先级：提醒有效性反馈、医生复核材料自动整理、风险案例知识库与训练题生成。", "第四优先级：客户视角风险摘要、中心/CRC风险画像、相似风险案例推荐和SOP语义规则匹配。"]}};
+    const state = {
+      quadrant: 'all',
+      tech: 'all',
+      stage: 'all',
+      search: '',
+      selectedKind: 'opportunity',
+      selectedId: null
+    };
+
+    const quadrantLabel = data.quadrant_definition || {};
+    const stages = data.stages || [];
+    const opportunities = data.opportunities || [];
+    const nodeMap = new Map();
+    stages.forEach(stage => {
+      (stage.nodes || []).forEach(node => {
+        node.stage_id = stage.id;
+        node.stage_name = stage.name;
+        nodeMap.set(node.id, node);
+      });
+    });
+    const opportunityMap = new Map(opportunities.map(opp => [opp.id, opp]));
+
+    function quadrantText(key) {
+      return quadrantLabel[key] || key;
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function techOptions() {
+      const set = new Set();
+      opportunities.forEach(opp => (opp.tech_types || []).forEach(item => set.add(item)));
+      return Array.from(set);
+    }
+
+    function countTotalNodes() {
+      return stages.reduce((sum, stage) => sum + (stage.nodes || []).length, 0);
+    }
+
+    function coverageRate() {
+      const covered = new Set();
+      opportunities.forEach(opp => (opp.node_ids || []).forEach(id => covered.add(id)));
+      const total = countTotalNodes();
+      return total ? Math.round((covered.size / total) * 100) : 0;
+    }
+
+    function quadrantCounts() {
+      const counts = {};
+      opportunities.forEach(opp => {
+        counts[opp.quadrant] = (counts[opp.quadrant] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function linkedOpportunities(nodeId) {
+      return opportunities.filter(opp => (opp.node_ids || []).includes(nodeId));
+    }
+
+    function linkedNodes(opp) {
+      return (opp.node_ids || []).map(id => nodeMap.get(id)).filter(Boolean);
+    }
+
+    function matchesSearch(opp) {
+      if (!state.search) return true;
+      const keyword = state.search.toLowerCase();
+      const nodeNames = linkedNodes(opp).map(node => node.name).join(' ');
+      const haystack = [
+        opp.name,
+        opp.scenario_summary,
+        opp.core_problem,
+        opp.application_value,
+        (opp.tech_types || []).join(' '),
+        (opp.technical_direction || []).join(' '),
+        nodeNames
+      ].join(' ').toLowerCase();
+      return haystack.includes(keyword);
+    }
+
+    function filteredOpportunities() {
+      return opportunities.filter(opp => {
+        if (state.quadrant !== 'all' && opp.quadrant !== state.quadrant) return false;
+        if (state.tech !== 'all' && !(opp.tech_types || []).includes(state.tech)) return false;
+        if (state.stage !== 'all' && opp.stage_id !== state.stage) return false;
+        if (!matchesSearch(opp)) return false;
+        return true;
+      });
+    }
+
+    function renderHeader() {
+      byId('hero-scope').textContent = data.analysis_scope || '';
+      byId('hero-company').textContent = `${data.company || ''} · ${data.business_flow || ''}`;
+      const counts = quadrantCounts();
+      const metrics = [
+        { label: '核心流程节点', value: countTotalNodes(), hint: `${stages.length} 个业务阶段` },
+        { label: 'AI机会点', value: opportunities.length, hint: '覆盖全周期落地场景' },
+        { label: '场景覆盖率', value: `${coverageRate()}%`, hint: '已覆盖流程关键节点' },
+        { label: '高价值高优先级', value: counts.high_value_high_priority || 0, hint: '建议优先启动' }
+      ];
+      byId('metrics').innerHTML = metrics.map(item => `
+        <div class="metric">
+          <div class="label">${item.label}</div>
+          <div class="value">${item.value}</div>
+          <div class="hint">${item.hint}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderFilters() {
+      const quadrantEl = byId('quadrantFilter');
+      const techEl = byId('techFilter');
+      const stageEl = byId('stageFilter');
+
+      quadrantEl.innerHTML = [
+        ['all', '全部机会分级'],
+        ['high_value_high_priority', quadrantText('high_value_high_priority')],
+        ['high_value_low_priority', quadrantText('high_value_low_priority')],
+        ['low_value_high_priority', quadrantText('low_value_high_priority')],
+        ['low_value_low_priority', quadrantText('low_value_low_priority')]
+      ].map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+
+      techEl.innerHTML = ['<option value="all">全部技术类型</option>']
+        .concat(techOptions().map(item => `<option value="${item}">${item}</option>`))
+        .join('');
+
+      stageEl.innerHTML = ['<option value="all">全部业务阶段</option>']
+        .concat(stages.map(stage => `<option value="${stage.id}">${stage.name}</option>`))
+        .join('');
+
+      byId('searchInput').addEventListener('input', (e) => {
+        state.search = e.target.value.trim();
+        renderAll();
+      });
+      quadrantEl.addEventListener('change', (e) => {
+        state.quadrant = e.target.value;
+        renderAll();
+      });
+      techEl.addEventListener('change', (e) => {
+        state.tech = e.target.value;
+        renderAll();
+      });
+      stageEl.addEventListener('change', (e) => {
+        state.stage = e.target.value;
+        renderAll();
+      });
+    }
+
+    function stageOpportunities(stageId) {
+      return filteredOpportunities().filter(opp => opp.stage_id === stageId);
+    }
+
+    function createNodeCard(node) {
+      const card = document.createElement('div');
+      const linked = linkedOpportunities(node.id);
+      card.className = 'node-card';
+      if (state.selectedKind === 'node' && state.selectedId === node.id) {
+        card.classList.add('active');
+      }
+      card.innerHTML = `
+        <h4>${node.name}</h4>
+        <div class="node-meta">
+          <span class="pill tech">${node.layer}</span>
+          <span class="pill maturity-${node.data_foundation.readiness}">${node.data_foundation.readiness.toUpperCase()}</span>
+          <span class="pill tech">${node.decision_complexity}</span>
+        </div>
+        <div class="muted">${node.pain_points[0] || ''}</div>
+        <div class="node-count">关联AI场景：${linked.length} 个</div>
+      `;
+      card.addEventListener('click', () => {
+        state.selectedKind = 'node';
+        state.selectedId = node.id;
+        renderAll();
+      });
+      return card;
+    }
+
+    function createOpportunityCard(opp) {
+      const card = document.createElement('div');
+      card.className = `opp-card quadrant-${opp.quadrant}`;
+      if (state.selectedKind === 'opportunity' && state.selectedId === opp.id) {
+        card.classList.add('active');
+      }
+      card.innerHTML = `
+        <h4>${opp.name}</h4>
+        <div class="opp-meta">
+          <span class="pill quadrant-${opp.quadrant}">${quadrantText(opp.quadrant)}</span>
+          <span class="pill maturity-${opp.maturity}">${opp.maturity.toUpperCase()}</span>
+          <span class="pill tech">${(opp.tech_types || []).join(' / ')}</span>
+        </div>
+        <div class="muted">${opp.scenario_summary}</div>
+      `;
+      card.addEventListener('click', () => {
+        state.selectedKind = 'opportunity';
+        state.selectedId = opp.id;
+        renderAll();
+      });
+      return card;
+    }
+
+    function renderMap() {
+      const grid = byId('stageGrid');
+      grid.innerHTML = '';
+      stages
+        .filter(stage => state.stage === 'all' || state.stage === stage.id)
+        .forEach(stage => {
+          const column = document.createElement('section');
+          column.className = 'stage-column';
+          const opps = stageOpportunities(stage.id);
+          const header = document.createElement('div');
+          header.className = 'stage-header';
+          header.innerHTML = `
+            <div class="stage-order">${stage.order}</div>
+            <h3>${stage.name}</h3>
+            <p>${stage.objective}</p>
+          `;
+          column.appendChild(header);
+
+          const nodeHead = document.createElement('div');
+          nodeHead.className = 'subhead';
+          nodeHead.textContent = '流程节点';
+          column.appendChild(nodeHead);
+          (stage.nodes || []).forEach(node => column.appendChild(createNodeCard(node)));
+
+          const oppHead = document.createElement('div');
+          oppHead.className = 'subhead';
+          oppHead.textContent = `AI机会 (${opps.length})`;
+          column.appendChild(oppHead);
+          if (opps.length) {
+            opps.forEach(opp => column.appendChild(createOpportunityCard(opp)));
+          } else {
+            const empty = document.createElement('div');
+            empty.className = 'empty';
+            empty.textContent = '当前筛选条件下暂无场景';
+            column.appendChild(empty);
+          }
+          grid.appendChild(column);
+        });
+    }
+
+    function renderNodeDetail(node) {
+      const relatedOpps = linkedOpportunities(node.id);
+      return `
+        <h3>${node.name}</h3>
+        <div class="opp-meta">
+          <span class="pill tech">${node.stage_name}</span>
+          <span class="pill tech">${node.layer}</span>
+          <span class="pill maturity-${node.data_foundation.readiness}">数据就绪度 ${node.data_foundation.readiness}</span>
+          <span class="pill tech">决策复杂度 ${node.decision_complexity}</span>
+        </div>
+        <div class="muted">${(node.primary_roles || []).join(' / ')} · ${(node.touchpoints || []).join(' / ')}</div>
+
+        <div class="section-title">核心痛点</div>
+        <ul>${(node.pain_points || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">效率瓶颈</div>
+        <ul>${(node.efficiency_bottlenecks || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">体验提升空间</div>
+        <ul>${(node.experience_improvement_space || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">数据基础</div>
+        <div class="muted"><strong>可用数据：</strong>${(node.data_foundation.available_data || []).join(' / ')}</div>
+        <ul>${(node.data_foundation.data_gaps || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">关联AI机会</div>
+        <div class="detail-actions">
+          ${relatedOpps.map(opp => `<button class="btn btn-secondary" data-opp-link="${opp.id}">${opp.name}</button>`).join('')}
+        </div>
+      `;
+    }
+
+    function renderOpportunityDetail(opp) {
+      const nodes = linkedNodes(opp);
+      return `
+        <h3>${opp.name}</h3>
+        <div class="opp-meta">
+          <span class="pill quadrant-${opp.quadrant}">${quadrantText(opp.quadrant)}</span>
+          <span class="pill maturity-${opp.maturity}">${opp.maturity.toUpperCase()}</span>
+          <span class="pill tech">${opp.business_value_level === 'high' ? '高业务价值' : '低业务价值'}</span>
+          <span class="pill tech">${opp.priority_level === 'high' ? '高实施优先级' : '低实施优先级'}</span>
+        </div>
+        <div class="muted">${opp.scenario_summary}</div>
+
+        <div class="section-title">解决的核心问题</div>
+        <div class="muted">${opp.core_problem}</div>
+
+        <div class="section-title">应用价值</div>
+        <div class="muted">${opp.application_value}</div>
+
+        <div class="section-title">技术实现方向</div>
+        <ul>${(opp.technical_direction || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">所需数据支撑</div>
+        <ul>${(opp.required_data || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">预期业务指标</div>
+        <ul>${(opp.expected_kpis || []).map(item => `<li>${item}</li>`).join('')}</ul>
+
+        <div class="section-title">技术类型</div>
+        <div class="opp-meta">${(opp.tech_types || []).map(item => `<span class="pill tech">${item}</span>`).join('')}</div>
+
+        <div class="section-title">关联业务节点</div>
+        <div class="detail-actions">
+          ${nodes.map(node => `<button class="btn btn-secondary" data-node-link="${node.id}">${node.name}</button>`).join('')}
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn btn-primary" data-doc-link="${opp.id}">跳转详细说明</button>
+        </div>
+      `;
+    }
+
+    function ensureSelected() {
+      const filtered = filteredOpportunities();
+      const visibleStageIds = new Set(
+        stages
+          .filter(stage => state.stage === 'all' || stage.id === state.stage)
+          .map(stage => stage.id)
+      );
+      const visibleNodeIds = new Set(
+        stages
+          .filter(stage => visibleStageIds.has(stage.id))
+          .flatMap(stage => stage.nodes || [])
+          .map(node => node.id)
+      );
+      if (state.selectedKind === 'opportunity' && state.selectedId && filtered.some(opp => opp.id === state.selectedId)) {
+        return;
+      }
+      if (state.selectedKind === 'node' && state.selectedId && visibleNodeIds.has(state.selectedId)) {
+        return;
+      }
+      if (filtered.length) {
+        state.selectedKind = 'opportunity';
+        state.selectedId = filtered[0].id;
+      } else {
+        const firstNode = stages
+          .filter(stage => visibleStageIds.has(stage.id))
+          .flatMap(stage => stage.nodes || [])[0];
+        state.selectedKind = firstNode ? 'node' : 'opportunity';
+        state.selectedId = firstNode ? firstNode.id : null;
+      }
+    }
+
+    function renderDetailPanel() {
+      ensureSelected();
+      const panel = byId('detailPanel');
+      if (!state.selectedId) {
+        panel.innerHTML = '<div class="detail-empty">暂无可展示内容。</div>';
+        return;
+      }
+      if (state.selectedKind === 'node') {
+        const node = nodeMap.get(state.selectedId);
+        panel.innerHTML = node ? renderNodeDetail(node) : '<div class="detail-empty">未找到节点详情。</div>';
+      } else {
+        const opp = opportunityMap.get(state.selectedId);
+        panel.innerHTML = opp ? renderOpportunityDetail(opp) : '<div class="detail-empty">未找到场景详情。</div>';
+      }
+      panel.querySelectorAll('[data-opp-link]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedKind = 'opportunity';
+          state.selectedId = btn.dataset.oppLink;
+          renderAll();
+        });
+      });
+      panel.querySelectorAll('[data-node-link]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedKind = 'node';
+          state.selectedId = btn.dataset.nodeLink;
+          renderAll();
+        });
+      });
+      panel.querySelectorAll('[data-doc-link]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = document.getElementById(`doc-${btn.dataset.docLink}`);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.style.boxShadow = '0 0 0 3px rgba(45,108,223,0.18)';
+            setTimeout(() => { target.style.boxShadow = ''; }, 1600);
+          }
+        });
+      });
+    }
+
+    function renderDocs() {
+      const grid = byId('docGrid');
+      const filtered = filteredOpportunities();
+      const base = filtered.length ? filtered : opportunities;
+      grid.innerHTML = '';
+      base.forEach(opp => {
+        const nodes = linkedNodes(opp);
+        const card = document.createElement('article');
+        card.className = 'doc-card';
+        card.id = `doc-${opp.id}`;
+        card.innerHTML = `
+          <div class="doc-head">
+            <h4 style="margin:0;">${opp.name}</h4>
+            <span class="pill quadrant-${opp.quadrant}">${quadrantText(opp.quadrant)}</span>
+            <span class="pill maturity-${opp.maturity}">${opp.maturity.toUpperCase()}</span>
+          </div>
+          <p><strong>所属阶段：</strong>${stages.find(stage => stage.id === opp.stage_id)?.name || ''}</p>
+          <p><strong>关联节点：</strong>${nodes.map(node => node.name).join(' / ')}</p>
+          <p><strong>应用价值：</strong>${opp.application_value}</p>
+          <p><strong>核心问题：</strong>${opp.core_problem}</p>
+          <p><strong>技术实现方向：</strong>${(opp.technical_direction || []).join('；')}</p>
+          <p><strong>所需数据：</strong>${(opp.required_data || []).join('；')}</p>
+          <p><strong>预期业务指标：</strong>${(opp.expected_kpis || []).join('；')}</p>
+        `;
+        card.addEventListener('click', () => {
+          state.selectedKind = 'opportunity';
+          state.selectedId = opp.id;
+          renderAll(false);
+        });
+        grid.appendChild(card);
+      });
+      byId('footnote').innerHTML = `
+        <strong>结论：</strong>${data.analysis_conclusion.coverage_statement}
+        <br />
+        <strong>建议实施顺序：</strong>${(data.analysis_conclusion.implementation_sequence || []).join('；')}
+      `;
+    }
+
+
+
+    function renderReferences() {
+      const grid = byId('referenceGrid');
+      if (!grid) return;
+      const refs = data.external_references || [];
+      if (!refs.length) {
+        grid.innerHTML = '<div class="empty">暂无外部参考。</div>';
+        return;
+      }
+      grid.innerHTML = refs.map(ref => `
+        <article class="doc-card">
+          <div class="doc-head">
+            <h4 style="margin:0;">${ref.title}</h4>
+            <span class="pill tech">参考案例</span>
+          </div>
+          <p><strong>关联价值：</strong>${ref.relevance}</p>
+          <p><strong>链接：</strong><a href="${ref.url}" target="_blank" rel="noopener noreferrer">${ref.url}</a></p>
+        </article>
+      `).join('');
+    }
+
+    function copyRawYaml() {
+      const button = byId('copyYamlButton');
+      const text = byId('rawYaml')?.textContent || '';
+      const done = () => {
+        if (button) {
+          const old = button.textContent;
+          button.textContent = '已复制';
+          setTimeout(() => { button.textContent = old; }, 1600);
+        }
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else {
+        fallbackCopy(text, done);
+      }
+    }
+
+    function fallbackCopy(text, done) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(textarea);
+    }
+
+    function renderAll(scrollTop = true) {
+      renderMap();
+      renderDetailPanel();
+      renderDocs();
+      if (scrollTop) {
+        document.querySelector('.map-area').scrollTop = 0;
+      }
+    }
+
+    renderHeader();
+    renderFilters();
+    renderReferences();
+    renderAll(false);
+  </script>
+</body>
+</html>

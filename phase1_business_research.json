@@ -1,0 +1,78 @@
+{
+  "company": "津石医药",
+  "business_scope": "SMO全生命服务流程",
+  "time_window": "2024-2025",
+  "research_summary": {
+    "positioning": "综合性一体化医学研究平台，覆盖临床研究中心执行全流程",
+    "core_value": [
+      "高质量",
+      "高效率",
+      "高核查通过率"
+    ],
+    "key_assets": [
+      "全国城市与医院网络",
+      "大规模CRC与项目管理团队",
+      "中心启动、招募、质控、带教、稽查等专职团队",
+      "CTMS、云端学习App、医院资源管理系统、AI应用"
+    ]
+  },
+  "public_metrics": {
+    "cities_2025_official": "150+",
+    "team_size_2025_official": "5300+",
+    "project_experience_2025_official": "4900+",
+    "partners_2025_official": "800+",
+    "hospital_cooperation_2025_official": "1200+",
+    "revenue_2024_platform_estimate": "13.38亿元"
+  },
+  "full_lifecycle_flow": [
+    "研究单位筛选与可行性调研",
+    "立项/伦理/遗传办/中心合同准备",
+    "中心启动",
+    "现场执行与项目管理",
+    "患者预筛/筛选/入组/访视",
+    "文件/药物/实验室/安全管理",
+    "质控/稽查/检查支持",
+    "总结报告与中心关闭"
+  ],
+  "pain_points": [
+    {
+      "stage": "中心筛选与可行性调研",
+      "pain": "资源匹配依赖经验，历史知识难复用"
+    },
+    {
+      "stage": "启动准备",
+      "pain": "材料繁杂、催办多、超期风险高"
+    },
+    {
+      "stage": "患者入组与访视",
+      "pain": "入组预测难，执行链条透明度不足"
+    },
+    {
+      "stage": "CRC现场执行",
+      "pain": "多项目并行，任务碎片化，经验依赖强"
+    },
+    {
+      "stage": "质控稽查",
+      "pain": "问题发现偏后，返工成本高"
+    },
+    {
+      "stage": "培训带教",
+      "pain": "人员扩张快，能力标准化和经验复制慢"
+    }
+  ],
+  "ai_implications": [
+    "优先做AI驱动的交付控制塔，而非孤立工具",
+    "以风险预警、任务编排、知识问答、培训带教为首批落点",
+    "围绕高质量按期交付建立统一经营与运营指标"
+  ],
+  "sources": [
+    "https://smo.wuxiapptec.com/index.html",
+    "https://smo.wuxiapptec.com/p/list.php?tid=1",
+    "https://smo.wuxiapptec.com/p/list.php?tid=3",
+    "https://smo.wuxiapptec.com/a/fuwufanwei/SMOyewu/20180131/16.html",
+    "https://cn.taimei.com/cn/6026",
+    "https://www.qcc.com/crun/dee5f6b76f9da3fe3b2142f93a92408b.html",
+    "https://companyadc.51job.com/companyads/ads/37/36919/36918140/index.htm",
+    "https://m.zhipin.com/gongsi/a6e6d57b2d72d0201nZ929u_FFs~.html"
+  ]
+}
