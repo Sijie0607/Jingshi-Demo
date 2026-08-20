@@ -1,0 +1,81 @@
+title: "Next-Gen AI Platform"
+description: "A high-performance functional architecture for the future of agentic AI."
+layers:
+  - type: "user_touchpoint"
+    name: "User Interfaces"
+    icon: "smartphone"
+    modules:
+      - name: "Mobile App"
+        status: "Core"
+        importance: "high"
+        functions:
+          - name: "Voice Interaction"
+            status: "MVP"
+            subFunctions: ["STT", "TTS", "NLP"]
+          - name: "Visual Context"
+      - name: "Web Dashboard"
+        functions:
+          - name: "Agent Configurator"
+          - name: "Workflow Designer"
+
+  - type: "business_scenario"
+    name: "AI Capability Layers"
+    icon: "zap"
+    modules:
+      - name: "Orchestration Engine"
+        importance: "high"
+        status: "MVP"
+        functions:
+          - name: "Plan & Execute"
+            subFunctions: ["Step decomposition", "Task assignment"]
+          - name: "Error Recovery"
+      - name: "Tool Execution"
+        functions:
+          - name: "API Bridge"
+          - name: "Sandbox Runtime"
+
+  - type: "business_common"
+    name: "Shared Services"
+    icon: "layers"
+    modules:
+      - name: "Context Manager"
+        functions:
+          - name: "Short-term Memory"
+          - name: "Long-term Recall"
+      - name: "Model Registry"
+        functions:
+          - name: "Version Control"
+          - name: "Benchmark Suite"
+
+  - type: "foundation"
+    name: "Infrastructure"
+    icon: "server"
+    modules:
+      - name: "Vector Storage"
+        status: "Scalable"
+        functions:
+          - name: "Elastic Search"
+          - name: "Embedding Cache"
+      - name: "Compute Cluster"
+        functions:
+          - name: "GPU Scheduler"
+          - name: "Inference Engine"
+
+  - type: "input_integration"
+    name: "External Sources"
+    modules:
+      - name: "Marketplace"
+        functions:
+          - name: "Dataset Feed"
+          - name: "Plugin Registry"
+
+  - type: "output_integration"
+    name: "Connected Apps"
+    modules:
+      - name: "Enterprise ERP"
+        functions:
+          - name: "Sync Bridge"
+      - name: "Messaging"
+        functions:
+          - name: "Slack Integration"
+          - name: "Teams Webhook"

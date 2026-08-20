@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>津石医药 CRC风险辅助Agent MVP Demo</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee8;
+      --panel: #ffffff;
+      --soft: #f5f7fa;
+      --soft-2: #eef6f4;
+      --teal: #087f75;
+      --teal-dark: #075e57;
+      --blue: #315f9f;
+      --amber: #b86b00;
+      --amber-bg: #fff4df;
+      --red: #c43d3d;
+      --red-bg: #fff0f0;
+      --green: #0f766e;
+      --shadow: 0 14px 36px rgba(20, 31, 54, 0.11);
+      --radius: 8px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      color: var(--ink);
+      background: #edf1f5;
+      letter-spacing: 0;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 292px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #102033;
+      color: #ffffff;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #16a394;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .brand-caption {
+      margin-top: 3px;
+      font-size: 12px;
+      color: #bac6d6;
+    }
+
+    .queue-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #d9e3ef;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .queue-count {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.11);
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .case-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .case-item {
+      width: 100%;
+      text-align: left;
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: var(--radius);
+      padding: 12px;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+    .case-item:hover,
+    .case-item.active {
+      background: rgba(22, 163, 148, 0.20);
+      border-color: rgba(93, 201, 188, 0.72);
+      transform: translateY(-1px);
+    }
+
+    .case-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .case-id {
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .risk-pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .risk-critical { background: var(--red-bg); color: var(--red); }
+    .risk-high { background: #fff4e8; color: var(--amber); }
+    .risk-medium { background: #e9f1ff; color: var(--blue); }
+    .risk-low { background: #e9f8f4; color: var(--green); }
+
+    .case-meta {
+      margin-top: 7px;
+      font-size: 12px;
+      color: #c7d3e1;
+      line-height: 1.45;
+    }
+
+    .side-note {
+      margin-top: auto;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.07);
+      padding: 14px;
+      font-size: 12px;
+      color: #d9e3ef;
+      line-height: 1.55;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .scenario-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px rgba(20,31,54,0.05);
+    }
+
+    .tab-btn {
+      color: var(--muted);
+      background: transparent;
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      min-height: 92px;
+      box-shadow: 0 7px 22px rgba(20,31,54,0.06);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .metric-hint {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .flow-step {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 4px solid #b9c4d2;
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 72px;
+    }
+
+    .flow-step.active {
+      border-left-color: var(--teal);
+      box-shadow: 0 8px 24px rgba(8,127,117,0.13);
+    }
+
+    .flow-title {
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .flow-state {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.95fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-head {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      background: #fbfcfd;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      margin: 0;
+      font-weight: 800;
+    }
+
+    .panel-subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .score-box {
+      flex: 0 0 auto;
+      min-width: 96px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: #f0f7f5;
+      border: 1px solid #bde0db;
+      text-align: center;
+    }
+
+    .score-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .score-value {
+      margin-top: 3px;
+      color: var(--teal-dark);
+      font-size: 23px;
+      font-weight: 850;
+    }
+
+    .case-summary {
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-cell {
+      min-height: 58px;
+      background: var(--soft);
+      border-radius: var(--radius);
+      padding: 10px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    .info-value {
+      margin-top: 5px;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .section {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child { border-bottom: 0; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 850;
+      margin: 0;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .risk-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: #fff;
+      min-height: 186px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .risk-card.primary-risk {
+      border-color: #f1b7b7;
+      background: linear-gradient(180deg, #fff7f7, #ffffff 72%);
+    }
+
+    .risk-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .risk-title {
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .confidence {
+      min-width: 44px;
+      text-align: center;
+      color: var(--teal-dark);
+      background: #e7f5f2;
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .risk-desc {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .evidence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .evidence {
+      color: #344054;
+      font-size: 12px;
+      line-height: 1.45;
+      padding-left: 10px;
+      border-left: 2px solid #cfd8e5;
+    }
+
+    .action-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .action-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: #fff;
+      min-height: 202px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-card.critical {
+      border-color: #f0abab;
+      background: var(--red-bg);
+    }
+
+    .action-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 850;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      color: #344054;
+      background: #eef2f6;
+    }
+
+    .status-accepted { background: #dff5ef; color: var(--green); }
+    .status-deferred { background: var(--amber-bg); color: var(--amber); }
+    .status-rejected { background: #f4e8e8; color: var(--red); }
+    .status-completed { background: #e7f0ff; color: var(--blue); }
+
+    .action-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn {
+      min-height: 34px;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid transparent;
+    }
+
+    .btn-main { color: #fff; background: var(--teal); }
+    .btn-main:hover { background: var(--teal-dark); }
+    .btn-outline { color: var(--ink); background: #fff; border-color: var(--line); }
+    .btn-outline:hover { background: var(--soft); }
+    .btn-warn { color: #fff; background: var(--amber); }
+
+    .right-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .packet-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 4px;
+      background: var(--soft);
+      border-radius: var(--radius);
+    }
+
+    .packet-tab {
+      flex: 1;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .packet-tab.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 2px 10px rgba(20,31,54,0.07);
+    }
+
+    .packet-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 236px;
+      background: #fff;
+      font-size: 12px;
+      color: #344054;
+      line-height: 1.55;
+      white-space: pre-line;
+    }
+
+    .packet-box.ready {
+      border-color: #9bd4cc;
+      background: #f4fbf9;
+    }
+
+    .guard-list,
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .guard,
+    .log-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: #fff;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .guard strong,
+    .log-item strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--ink);
+    }
+
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .knowledge {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .knowledge b {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .feedback-form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .feedback-form label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 82px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 20;
+      max-width: 360px;
+      color: #fff;
+      background: #102033;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(16,32,51,0.55);
+      z-index: 30;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(620px, 100%);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--red-bg);
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 17px;
+      color: var(--red);
+    }
+
+    .modal-body {
+      padding: 16px;
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 1fr; }
+      .right-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .risk-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { min-height: auto; }
+      .main { padding: 14px; }
+      .topbar { flex-direction: column; }
+      .metric-row,
+      .flow,
+      .case-summary,
+      .action-list,
+      .right-stack,
+      .knowledge-grid { grid-template-columns: 1fr; }
+      .scenario-tabs { width: 100%; overflow-x: auto; }
+      .tab-btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">CRC</div>
+        <div>
+          <div class="brand-title">风险辅助Agent MVP</div>
+          <div class="brand-caption">访视风险提醒与辅助判断</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="queue-title">
+          <span>今日访视队列</span>
+          <span class="queue-count" id="queueCount">3</span>
+        </div>
+        <div class="case-list" id="caseList"></div>
+      </div>
+
+      <div class="side-note">
+        <strong>设计边界</strong><br>
+        MVP只面向CRC直接辅助。申办方、CRC、PM、质控等角色不作为独立使用端，仅沉淀为责任边界、升级路径和处置模板知识库。
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h1>CRC访视风险智能工作台</h1>
+          <div class="subtitle">把受试者状态异常、资料缺失、AE/SAE/CM疑似线索转成CRC可执行的下一步动作、证据包和反馈闭环。</div>
+        </div>
+        <div class="scenario-tabs" aria-label="Demo场景切换">
+          <button class="tab-btn active" data-scenario="main">主流程</button>
+          <button class="tab-btn" data-scenario="exception">异常确认</button>
+          <button class="tab-btn" data-scenario="learning">反馈学习</button>
+        </div>
+      </div>
+
+      <section class="metric-row" aria-label="MVP指标">
+        <div class="metric">
+          <div class="metric-label">CRC待处理风险</div>
+          <div class="metric-value" id="metricTodo">7</div>
+          <div class="metric-hint">按任务优先级与SLA排序</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">高风险提前识别</div>
+          <div class="metric-value" id="metricHighRisk">3</div>
+          <div class="metric-hint">受试者异常预判优先置顶</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">最近SLA剩余</div>
+          <div class="metric-value" id="metricSla">3h15m</div>
+          <div class="metric-hint">进入人工确认前持续提醒</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">AI建议采纳率</div>
+          <div class="metric-value" id="metricAdoption">68%</div>
+          <div class="metric-hint">MVP核心成功指标之一</div>
+        </div>
+      </section>
+
+      <section class="flow" aria-label="Agent状态流">
+        <div class="flow-step active" data-phase="0">
+          <div class="flow-title">1. 风险识别</div>
+          <div class="flow-state">上下文就绪，异常线索已解释</div>
+        </div>
+        <div class="flow-step" data-phase="1">
+          <div class="flow-title">2. 动作提醒</div>
+          <div class="flow-state">生成CRC下一步动作和关闭标准</div>
+        </div>
+        <div class="flow-step" data-phase="2">
+          <div class="flow-title">3. 复核升级</div>
+          <div class="flow-state">证据包或AE/SAE/CM人工确认</div>
+        </div>
+        <div class="flow-step" data-phase="3">
+          <div class="flow-title">4. 反馈学习</div>
+          <div class="flow-state">采纳、修正、误报进入复核队列</div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title" id="caseTitle">访视任务</h2>
+              <div class="panel-subtitle" id="caseSubtitle">当前任务上下文</div>
+            </div>
+            <div class="score-box">
+              <div class="score-label">综合风险分</div>
+              <div class="score-value" id="riskScore">86</div>
+            </div>
+          </div>
+
+          <div class="case-summary" id="caseSummary"></div>
+
+          <div class="section">
+            <div class="section-head">
+              <h3 class="section-title">AI风险卡</h3>
+              <span class="section-note">受试者状态异常预判置顶</span>
+            </div>
+            <div class="risk-grid" id="riskGrid"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <h3 class="section-title">CRC下一步动作</h3>
+              <span class="section-note">每条建议必须包含依据与关闭标准</span>
+            </div>
+            <div class="action-list" id="actionList"></div>
+          </div>
+        </div>
+
+        <aside class="right-stack">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">复核证据包</h2>
+                <div class="panel-subtitle">只整理事实、变化和问题，不输出临床判定。</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="packet-tabs">
+                <button class="packet-tab active" data-packet-tab="summary">摘要</button>
+                <button class="packet-tab" data-packet-tab="questions">问题</button>
+                <button class="packet-tab" data-packet-tab="materials">材料</button>
+              </div>
+              <div class="packet-box" id="packetBox"></div>
+              <div class="button-row" style="margin-top:12px">
+                <button class="btn btn-main" id="generatePacketBtn">生成复核包</button>
+                <button class="btn btn-outline" id="submitReviewBtn">提交人工复核</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">边界护栏</h2>
+                <div class="panel-subtitle">来自本体设计的行动边界。</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="guard-list" id="guardList"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">知识库引用</h2>
+                <div class="panel-subtitle">多角色信息只作为CRC辅助知识。</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="knowledge-grid" id="knowledgeGrid"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">反馈闭环</h2>
+                <div class="panel-subtitle">用于规则优化候选，不直接修改线上规则。</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="feedback-form">
+                <label for="feedbackText">CRC修正原因或现场补充</label>
+                <textarea id="feedbackText">CRC已线下确认需补充体温复测记录，暂不形成最终AE判定。</textarea>
+                <div class="button-row">
+                  <button class="btn btn-main" id="saveFeedbackBtn">记录反馈</button>
+                  <button class="btn btn-outline" id="markFalseBtn">标记误报</button>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="log-list" id="logList"></div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="modal-title" id="modalTitle">AE/SAE/CM疑似线索需要人工确认</h2>
+      </div>
+      <div class="modal-body">
+        <p>Agent已检测到疑似安全事件线索，并匹配到项目上报SLA。根据本体边界，AI只能提示线索、整理材料和显示倒计时，不能自动判定AE/SAE/CM成立，也不能自动提交上报。</p>
+        <p><strong>建议动作：</strong>CRC核对原始记录，生成复核证据包，确认是否进入上报准备链路。</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="dismissModalBtn">返回处理</button>
+        <button class="btn btn-warn" id="confirmManualBtn">记录人工确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cases = [
+      {
+        id: "PV-031",
+        subject: "JSM-1024",
+        project: "JS-ONC-III",
+        center: "天津中心 A03",
+        visit: "V3 / D15",
+        window: "D15 +/- 2天",
+        status: "已到访，资料待复核",
+        risk: "critical",
+        riskLabel: "高风险",
+        score: 86,
+        sla: "3h15m",
+        owner: "CRC 张晨",
+        summary: [
+          ["任务状态", "进行中"],
+          ["访视窗口", "今日为窗口第2天"],
+          ["受试者状态", "体温升高，症状较上次增加"],
+          ["资料状态", "检测记录缺页，化验单待复核"]
+        ],
+        risks: [
+          {
+            type: "subject_abnormal",
+            title: "受试者状态异常预判",
+            severity: "critical",
+            confidence: 86,
+            desc: "体温、症状变化与既往访视趋势不一致，建议优先生成复核证据包。",
+            evidence: ["体温38.3C，较上次访视升高1.1C", "新增乏力与轻度皮疹描述", "SOP-CR-03命中复核证据包触发条件"]
+          },
+          {
+            type: "ae_sae_cm",
+            title: "AE/SAE/CM疑似线索",
+            severity: "high",
+            confidence: 78,
+            desc: "症状变化与合并检测记录调整同时出现，需进入人工确认，不自动上报。",
+            evidence: ["新增退热药记录但检测记录页未上传", "SLA剩余3h15m", "规则AE-02要求人工确认事件属性"]
+          },
+          {
+            type: "document_missing",
+            title: "关键资料缺失",
+            severity: "medium",
+            confidence: 91,
+            desc: "缺失资料会影响复核证据包完整性，建议与复核包同步补齐。",
+            evidence: ["合并检测记录第2页缺失", "化验单上传但未完成版本复核", "关闭标准要求原始资料可追溯"]
+          }
+        ],
+        actions: [
+          {
+            id: "A1",
+            title: "生成复核证据包并准备线下确认",
+            priority: "critical",
+            deadline: "今日15:30前",
+            reason: "受试者状态异常预判命中SOP-CR-03，属于MVP最高优先级。",
+            close: "CRC线下确认结论、复核时间、参与人和后续指令完成结构化记录。",
+            status: "suggested"
+          },
+          {
+            id: "A2",
+            title: "进入AE/SAE/CM人工确认",
+            priority: "high",
+            deadline: "SLA剩余3h15m",
+            reason: "疑似线索命中AE-02，但AI不得自动判定事件成立。",
+            close: "人工确认结果、材料清单状态和是否上报的依据完成留痕。",
+            status: "suggested"
+          },
+          {
+            id: "A3",
+            title: "补齐合并检测记录与化验单版本",
+            priority: "medium",
+            deadline: "提交复核包前",
+            reason: "资料缺失会阻断证据包ready状态。",
+            close: "缺失资料上传并完成版本复核。",
+            status: "suggested"
+          },
+          {
+            id: "A4",
+            title: "更新风险台账处理状态",
+            priority: "medium",
+            deadline: "复核后30分钟内",
+            reason: "风险提醒有效性需要闭环记录，用于MVP采纳率与准确率统计。",
+            close: "采纳、修正、暂缓或误报反馈被记录。",
+            status: "suggested"
+          }
+        ],
+        packet: {
+          summary: "证据包草稿待生成。\n\n点击“生成复核包”后，Agent会整理监测值变化、症状摘要、检测指标变化、SOP依据和待确认问题。",
+          readySummary: "受试者JSM-1024于V3/D15到访。当前可见异常线索包括：体温38.3C，较上次访视升高1.1C；新增乏力、轻度皮疹描述；合并检测记录出现新增退热药但检测记录页缺失。\n\n规则依据：SOP-CR-03提示出现监测值异常与新增症状组合时，应生成复核证据包；AE-02提示疑似安全事件线索需人工确认事件属性与上报路径。\n\nAI边界：本证据包只整理事实和问题，不输出临床判定。",
+          questions: "1. 当前体温升高与皮疹是否需要记录为需进一步医学判断的事件线索？\n2. 新增退热药是否与本次症状变化相关？\n3. 是否需要进入AE/SAE/CM人工确认或补充其他原始资料？\n4. 复核后CRC应优先关闭哪些资料或状态任务？",
+          materials: "必需材料：\n- 本次访视记录\n- 体温复测记录\n- 症状描述原始记录\n- 合并用药完整检测记录页\n- 化验单原始文件与版本复核记录\n- CRC线下确认结论留痕\n\n待补齐：合并用药第2页，化验单版本复核。"
+        }
+      },
+      {
+        id: "PV-019",
+        subject: "JSM-1008",
+        project: "JS-CVD-II",
+        center: "北京中心 B11",
+        visit: "V2 / D8",
+        window: "D8 +/- 1天",
+        status: "已执行，资料补传中",
+        risk: "medium",
+        riskLabel: "中风险",
+        score: 63,
+        sla: "9h40m",
+        owner: "CRC 刘敏",
+        summary: [
+          ["任务状态", "阻塞于资料补传"],
+          ["访视窗口", "已在窗口内完成"],
+          ["受试者状态", "无新增异常描述"],
+          ["资料状态", "知情同意版本不一致"]
+        ],
+        risks: [
+          {
+            type: "document_missing",
+            title: "资料版本一致性风险",
+            severity: "medium",
+            confidence: 89,
+            desc: "上传文件与模板版本不一致，可能导致返工。",
+            evidence: ["ICF版本号为v1.1，项目要求v1.2", "eTMF复核状态为待更正", "关闭标准要求版本一致"]
+          },
+          {
+            type: "visit_window",
+            title: "窗口风险已解除",
+            severity: "low",
+            confidence: 82,
+            desc: "访视在窗口内完成，后续关注资料归档。",
+            evidence: ["实际到访D8", "方案窗口D8 +/- 1天", "无超窗记录"]
+          },
+          {
+            type: "coordination",
+            title: "责任边界提示",
+            severity: "medium",
+            confidence: 76,
+            desc: "CRC只需补齐资料并更新状态，客户沟通不作为MVP直接使用端。",
+            evidence: ["角色知识库：资料补传由CRC负责", "质控复核在资料补齐后触发", "不向申办方直接推送"]
+          }
+        ],
+        actions: [
+          {
+            id: "B1",
+            title: "补传v1.2版本知情同意文件",
+            priority: "medium",
+            deadline: "今日18:00前",
+            reason: "资料版本不一致影响归档和质控复核。",
+            close: "v1.2文件上传，eTMF状态变更为已复核。",
+            status: "suggested"
+          },
+          {
+            id: "B2",
+            title: "更新CTMS资料补传状态",
+            priority: "medium",
+            deadline: "补传后15分钟内",
+            reason: "状态不一致会导致重复催办。",
+            close: "CTMS与eTMF状态一致。",
+            status: "suggested"
+          }
+        ],
+        packet: {
+          summary: "本任务暂无复核证据包需求。当前主要风险为资料版本一致性和状态同步。",
+          readySummary: "JSM-1008 V2/D8访视已在窗口内完成。当前风险集中在ICF版本不一致：上传版本v1.1，项目要求v1.2。建议CRC补传正确版本并同步CTMS状态。",
+          questions: "1. 是否已取得v1.2版本签署文件？\n2. eTMF复核是否仍需质控确认？",
+          materials: "必需材料：\n- v1.2知情同意文件\n- eTMF复核记录\n- CTMS状态更新时间"
+        }
+      },
+      {
+        id: "PV-044",
+        subject: "JSM-1120",
+        project: "JS-ONC-III",
+        center: "南京中心 C07",
+        visit: "V1 / D1",
+        window: "D1 +/- 0天",
+        status: "预约待到访",
+        risk: "low",
+        riskLabel: "低风险",
+        score: 38,
+        sla: "无临近SLA",
+        owner: "CRC 王珂",
+        summary: [
+          ["任务状态", "待到访"],
+          ["访视窗口", "今日必须到访"],
+          ["受试者状态", "无新增异常"],
+          ["资料状态", "预约确认待上传"]
+        ],
+        risks: [
+          {
+            type: "visit_window",
+            title: "到访确认提醒",
+            severity: "low",
+            confidence: 74,
+            desc: "今日为固定窗口日，建议上午完成受试者到访确认。",
+            evidence: ["D1访视无浮动窗口", "电话确认记录待上传", "无异常状态记录"]
+          },
+          {
+            type: "document_missing",
+            title: "预约确认资料待上传",
+            severity: "low",
+            confidence: 81,
+            desc: "资料未上传不影响当前安全判断，但会影响任务关闭。",
+            evidence: ["预约确认截图缺失", "关闭标准包含电话确认记录", "资料状态expected"]
+          },
+          {
+            type: "coordination",
+            title: "无需升级",
+            severity: "low",
+            confidence: 69,
+            desc: "未命中AE/SAE/CM疑似线索，不生成强提醒。",
+            evidence: ["无症状变化", "无检测指标变化", "未命中SLA规则"]
+          }
+        ],
+        actions: [
+          {
+            id: "C1",
+            title: "确认受试者今日到访",
+            priority: "low",
+            deadline: "今日11:00前",
+            reason: "D1无浮动窗口，需要提前确认。",
+            close: "电话确认记录上传，任务状态更新为已到访或待改约。",
+            status: "suggested"
+          },
+          {
+            id: "C2",
+            title: "上传预约确认记录",
+            priority: "low",
+            deadline: "到访前",
+            reason: "关闭标准要求预约确认留痕。",
+            close: "预约确认材料上传并关联任务。",
+            status: "suggested"
+          }
+        ],
+        packet: {
+          summary: "本任务暂无复核证据包需求。Agent仅提示到访确认和资料闭环。",
+          readySummary: "JSM-1120 V1/D1为固定窗口日。当前无受试者异常线索，无AE/SAE/CM疑似线索。建议CRC完成电话确认与材料上传。",
+          questions: "1. 受试者是否确认今日到访？\n2. 如无法到访，是否已按SOP记录改约原因？",
+          materials: "必需材料：\n- 电话确认记录\n- 预约确认截图\n- CTMS访视状态更新"
+        }
+      }
+    ];
+
+    const guardrails = [
+      ["AI不做临床判定", "受试者异常预判只是线索，CRC或研究者复核结论优先。"],
+      ["AI不自动上报", "AE/SAE/CM只给疑似线索、SLA和材料清单，必须人工确认。"],
+      ["AI不关闭任务", "动作完成必须由CRC提交关闭证据后才进入闭环。"],
+      ["无依据不强提醒", "缺少SOP、项目规则或原始证据时，只能提示补齐信息。"]
+    ];
+
+    const knowledge = [
+      ["SOP规则库", "访视窗口、异常阈值、资料关闭标准、项目例外条件。"],
+      ["案例模板库", "历史偏差、CAPA、相似风险处置模板，仅辅助判断。"],
+      ["角色边界库", "CRC复核证据整理、PM升级、质控复盘的责任边界，不作为多角色端。"],
+      ["AE/SAE/CM规则", "疑似线索、SLA、材料清单和人工确认入口。"]
+    ];
+
+    const state = {
+      selectedCaseId: "PV-031",
+      scenario: "main",
+      packetTab: "summary",
+      packetReady: false,
+      phase: 0,
+      logs: [
+        "09:16 Agent完成上下文汇聚，识别3类风险信号。",
+        "09:18 受试者状态异常预判被置顶。"
+      ]
+    };
+
+    function getCase() {
+      return cases.find(item => item.id === state.selectedCaseId) || cases[0];
+    }
+
+    function severityClass(level) {
+      if (level === "critical") return "risk-critical";
+      if (level === "high") return "risk-high";
+      if (level === "medium") return "risk-medium";
+      return "risk-low";
+    }
+
+    function statusLabel(status) {
+      const map = {
+        suggested: ["建议中", ""],
+        accepted: ["已接受", "status-accepted"],
+        deferred: ["已暂缓", "status-deferred"],
+        rejected: ["已驳回", "status-rejected"],
+        completed: ["已完成", "status-completed"]
+      };
+      return map[status] || map.suggested;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function renderCases() {
+      const list = document.getElementById("caseList");
+      list.innerHTML = cases.map(item => `
+        <button class="case-item ${item.id === state.selectedCaseId ? "active" : ""}" data-case-id="${item.id}">
+          <div class="case-line">
+            <span class="case-id">${item.id}</span>
+            <span class="risk-pill ${severityClass(item.risk)}">${item.riskLabel}</span>
+          </div>
+          <div class="case-meta">${item.subject} · ${item.visit}<br>${item.center}<br>${item.status}</div>
+        </button>
+      `).join("");
+      list.querySelectorAll(".case-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.selectedCaseId = btn.dataset.caseId;
+          state.packetReady = false;
+          state.packetTab = "summary";
+          state.phase = 0;
+          state.logs.unshift(`${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })} CRC切换到${btn.dataset.caseId}访视任务。`);
+          render();
+        });
+      });
+    }
+
+    function renderMetrics() {
+      const item = getCase();
+      document.getElementById("metricSla").textContent = item.sla;
+      document.getElementById("metricHighRisk").textContent = cases.filter(c => c.score >= 60).length;
+      const unfinished = cases.flatMap(c => c.actions).filter(a => a.status !== "completed").length;
+      document.getElementById("metricTodo").textContent = unfinished;
+      const actions = cases.flatMap(c => c.actions);
+      const accepted = actions.filter(a => ["accepted", "completed"].includes(a.status)).length;
+      document.getElementById("metricAdoption").textContent = Math.round((accepted / actions.length) * 100 || 68) + "%";
+    }
+
+    function renderHeader() {
+      const item = getCase();
+      document.getElementById("caseTitle").textContent = `${item.subject} · ${item.visit}`;
+      document.getElementById("caseSubtitle").textContent = `${item.project} / ${item.center} / ${item.owner}`;
+      document.getElementById("riskScore").textContent = item.score;
+      document.getElementById("caseSummary").innerHTML = item.summary.map(([label, value]) => `
+        <div class="info-cell">
+          <div class="info-label">${label}</div>
+          <div class="info-value">${value}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderRisks() {
+      const item = getCase();
+      const sorted = [...item.risks].sort((a, b) => {
+        if (a.type === "subject_abnormal") return -1;
+        if (b.type === "subject_abnormal") return 1;
+        return b.confidence - a.confidence;
+      });
+      document.getElementById("riskGrid").innerHTML = sorted.map(risk => `
+        <article class="risk-card ${risk.type === "subject_abnormal" ? "primary-risk" : ""}">
+          <div class="risk-head">
+            <div>
+              <span class="risk-pill ${severityClass(risk.severity)}">${risk.severity}</span>
+              <div class="risk-title" style="margin-top:8px">${risk.title}</div>
+            </div>
+            <div class="confidence">${risk.confidence}%</div>
+          </div>
+          <div class="risk-desc">${risk.desc}</div>
+          <div class="evidence-list">
+            ${risk.evidence.map(e => `<div class="evidence">${e}</div>`).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderActions() {
+      const item = getCase();
+      document.getElementById("actionList").innerHTML = item.actions.map(action => {
+        const [label, cls] = statusLabel(action.status);
+        return `
+          <article class="action-card ${action.priority === "critical" ? "critical" : ""}">
+            <div class="action-title">
+              <span>${action.title}</span>
+              <span class="status-tag ${cls}">${label}</span>
+            </div>
+            <div class="action-meta"><strong>截止：</strong>${action.deadline}</div>
+            <div class="action-meta"><strong>依据：</strong>${action.reason}</div>
+            <div class="action-meta"><strong>关闭标准：</strong>${action.close}</div>
+            <div class="button-row">
+              <button class="btn btn-main" data-action="accept" data-action-id="${action.id}">接受</button>
+              <button class="btn btn-outline" data-action="defer" data-action-id="${action.id}">暂缓</button>
+              <button class="btn btn-outline" data-action="reject" data-action-id="${action.id}">误报</button>
+              ${action.title.includes("AE/SAE/CM") ? `<button class="btn btn-warn" data-action="manual" data-action-id="${action.id}">人工确认</button>` : ""}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.getElementById("actionList").querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => handleAction(btn.dataset.action, btn.dataset.actionId));
+      });
+    }
+
+    function renderPacket() {
+      const item = getCase();
+      const tabs = document.querySelectorAll(".packet-tab");
+      tabs.forEach(btn => btn.classList.toggle("active", btn.dataset.packetTab === state.packetTab));
+      const box = document.getElementById("packetBox");
+      box.classList.toggle("ready", state.packetReady);
+      if (state.packetTab === "summary") {
+        box.textContent = state.packetReady ? item.packet.readySummary : item.packet.summary;
+      } else if (state.packetTab === "questions") {
+        box.textContent = item.packet.questions;
+      } else {
+        box.textContent = item.packet.materials;
+      }
+    }
+
+    function renderStaticPanels() {
+      document.getElementById("guardList").innerHTML = guardrails.map(([title, desc]) => `
+        <div class="guard"><strong>${title}</strong>${desc}</div>
+      `).join("");
+      document.getElementById("knowledgeGrid").innerHTML = knowledge.map(([title, desc]) => `
+        <div class="knowledge"><b>${title}</b>${desc}</div>
+      `).join("");
+    }
+
+    function renderFlow() {
+      document.querySelectorAll(".flow-step").forEach(step => {
+        step.classList.toggle("active", Number(step.dataset.phase) <= state.phase);
+      });
+    }
+
+    function renderLogs() {
+      document.getElementById("logList").innerHTML = state.logs.slice(0, 6).map(log => `
+        <div class="log-item"><strong>操作留痕</strong>${escapeHtml(log)}</div>
+      `).join("");
+    }
+
+    function renderScenarioTabs() {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.scenario === state.scenario);
+      });
+    }
+
+    function render() {
+      renderCases();
+      renderMetrics();
+      renderHeader();
+      renderRisks();
+      renderActions();
+      renderPacket();
+      renderStaticPanels();
+      renderFlow();
+      renderLogs();
+      renderScenarioTabs();
+    }
+
+    function nowText() {
+      return new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function findAction(actionId) {
+      for (const item of cases) {
+        const action = item.actions.find(a => a.id === actionId);
+        if (action) return action;
+      }
+      return null;
+    }
+
+    function handleAction(type, actionId) {
+      const action = findAction(actionId);
+      if (!action) return;
+
+      if (type === "accept") {
+        action.status = "accepted";
+        state.phase = Math.max(state.phase, 1);
+        state.logs.unshift(`${nowText()} CRC接受建议：${action.title}。`);
+        showToast("已记录CRC接受动作，仍需提交关闭证据。");
+      }
+
+      if (type === "defer") {
+        action.status = "deferred";
+        state.phase = Math.max(state.phase, 1);
+        state.logs.unshift(`${nowText()} CRC暂缓建议：${action.title}，系统保留后续提醒。`);
+        showToast("已暂缓，Agent将在SLA临近或资料补齐后再次提醒。");
+      }
+
+      if (type === "reject") {
+        action.status = "rejected";
+        state.phase = 3;
+        state.logs.unshift(`${nowText()} CRC标记疑似误报：${action.title}，进入规则优化候选。`);
+        showToast("误报反馈已记录，需人工复核后才可影响规则。");
+      }
+
+      if (type === "manual") {
+        document.getElementById("confirmModal").classList.add("open");
+      }
+
+      render();
+    }
+
+    function generatePacket() {
+      state.packetReady = true;
+      state.packetTab = "summary";
+      state.phase = Math.max(state.phase, 2);
+      state.logs.unshift(`${nowText()} Agent生成复核证据包草稿。`);
+      showToast("复核证据包已生成，请CRC确认后提交人工复核。");
+      render();
+    }
+
+    function submitReview() {
+      if (!state.packetReady) {
+        showToast("请先生成证据包，再提交人工复核。");
+        return;
+      }
+      state.phase = Math.max(state.phase, 2);
+      const item = getCase();
+      const firstAction = item.actions.find(a => a.title.includes("生成复核证据包"));
+      if (firstAction) firstAction.status = "completed";
+      state.logs.unshift(`${nowText()} CRC提交复核证据包，等待人工结论回填。`);
+      showToast("已提交人工复核，AI不会代写CRC结论。");
+      render();
+    }
+
+    function saveFeedback(markFalsePositive) {
+      const text = document.getElementById("feedbackText").value.trim();
+      state.phase = 3;
+      const prefix = markFalsePositive ? "误报反馈" : "CRC反馈";
+      state.logs.unshift(`${nowText()} ${prefix}：${text || "未填写补充说明"}。`);
+      showToast(markFalsePositive ? "误报样本已进入复核队列。" : "反馈已记录，进入闭环统计。");
+      render();
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.scenario = btn.dataset.scenario;
+        if (state.scenario === "exception") {
+          state.selectedCaseId = "PV-031";
+          state.phase = 2;
+          document.getElementById("confirmModal").classList.add("open");
+        } else if (state.scenario === "learning") {
+          state.phase = 3;
+          state.logs.unshift(`${nowText()} 进入反馈学习演示，单次反馈不会直接修改规则。`);
+          showToast("当前视图展示CRC反馈如何进入规则优化候选。");
+        } else {
+          state.phase = 0;
+          showToast("已切换到主流程演示。");
+        }
+        render();
+      });
+    });
+
+    document.querySelectorAll(".packet-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.packetTab = btn.dataset.packetTab;
+        renderPacket();
+      });
+    });
+
+    document.getElementById("generatePacketBtn").addEventListener("click", generatePacket);
+    document.getElementById("submitReviewBtn").addEventListener("click", submitReview);
+    document.getElementById("saveFeedbackBtn").addEventListener("click", () => saveFeedback(false));
+    document.getElementById("markFalseBtn").addEventListener("click", () => saveFeedback(true));
+    document.getElementById("dismissModalBtn").addEventListener("click", () => {
+      document.getElementById("confirmModal").classList.remove("open");
+    });
+    document.getElementById("confirmManualBtn").addEventListener("click", () => {
+      const item = getCase();
+      const action = item.actions.find(a => a.title.includes("AE/SAE/CM"));
+      if (action) action.status = "accepted";
+      state.phase = 2;
+      state.logs.unshift(`${nowText()} CRC记录AE/SAE/CM人工确认入口，等待CRC或项目规则确认结果。`);
+      document.getElementById("confirmModal").classList.remove("open");
+      showToast("人工确认入口已记录，AI未自动判定或提交上报。");
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

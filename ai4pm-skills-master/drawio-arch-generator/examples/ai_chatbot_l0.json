@@ -1,0 +1,51 @@
+{
+  "level": "l0",
+  "title": "AI Chatbot 智能客服架构",
+  "layout": "landscape",
+  "actors": [
+    { "id": "u1", "label": "👤 C端用户" },
+    { "id": "u2", "label": "👤 企业客户" },
+    { "id": "u3", "label": "👤 客服人员" }
+  ],
+  "left_panel": {
+    "title": "集成与数据源",
+    "items": [
+      "← OpenAI / Claude",
+      "← Milvus 向量库",
+      "← 企业知识库",
+      "← CRM 系统",
+      "→ 客户反馈平台"
+    ]
+  },
+  "right_panel": {
+    "title": "AI 技术栈",
+    "items": [
+      "LangChain / LlamaIndex",
+      "Python / FastAPI",
+      "PostgreSQL / Vector",
+      "Redis Cluster",
+      "Docker / K8s"
+    ]
+  },
+  "center": {
+    "app_layer": {
+      "title": "应用与接入层",
+      "nodes": [
+        { "id": "app_1", "label": "Web 客服门户", "type": "app" },
+        { "id": "app_2", "label": "微信小程序", "type": "app" },
+        { "id": "app_8", "label": "API 网关", "type": "bff" }
+      ]
+    },
+    "service_layer": {
+      "title": "核心 AI 服务层",
+      "nodes": [
+        { "id": "ms_1", "label": "对话编排引擎", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_2", "label": "RAG 检索服务", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_3", "label": "向量搜索引擎", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_4", "label": "意图识别服务", "type": "svc", "color": "#D6EAF8" },
+        { "id": "ms_6", "label": "提示词工程", "type": "svc", "color": "#D6EAF8" },
+        { "id": "ms_7", "label": "工具调用服务", "type": "svc", "color": "#D6EAF8" }
+      ]
+    }
+  }
+}

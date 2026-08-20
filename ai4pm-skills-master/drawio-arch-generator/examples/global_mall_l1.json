@@ -1,0 +1,18 @@
+{
+  "level": "l1",
+  "title": "GlobalMall System Context",
+  "nodes": [
+    { "id": "actor_1", "label": "海外买家", "type": "person", "layer": "actor", "description": "浏览、下单、支付" },
+    { "id": "actor_2", "label": "跨境商家", "type": "person", "layer": "actor", "description": "管理商品、订单、发货" },
+    { "id": "actor_3", "label": "平台运营", "type": "person", "layer": "actor", "description": "审核、营销、监控" },
+    { "id": "core", "label": "GlobalMall 核心平台", "type": "system", "layer": "core", "description": "出海电商核心平台" },
+    { "id": "ext_1", "label": "国际支付网关", "type": "external", "layer": "external", "description": "PayPal, Stripe, Visa" },
+    { "id": "ext_5", "label": "跨境物流服务商", "type": "external", "layer": "external", "description": "3PL, DHL, 菜鸟国际" },
+    { "id": "infra_3", "label": "云基础设施", "type": "infra", "layer": "data", "description": "多区域部署" }
+  ],
+  "edges": [
+    { "from": "actor_1", "to": "core", "label": "使用" },
+    { "from": "core", "to": "ext_1", "label": "支付请求" },
+    { "from": "core", "to": "ext_5", "label": "物流调度" }
+  ]
+}

@@ -1,1066 +1,876 @@
-title: "津石医药-访视风险预测与智能提醒AI机会地图"
-company: "津石医药"
-business_flow: "访视风险预测与智能提醒价值流"
-analysis_scope: "基于《津石医药-可服务体验提升业务流程深度分析.html》中的访视风险预测与智能提醒价值流，围绕风险信号采集、规则评分解释、智能提醒编排、临床复核闭环、客户价值与知识回流五个阶段，识别可应用人工智能技术的场景机会。"
-
+title: 津石医药-访视风险预测与智能提醒AI机会地图
+company: 津石医药
+business_flow: 访视风险预测与智能提醒价值流
+analysis_scope: 基于《津石医药-可服务体验提升业务流程深度分析.html》中的访视风险预测与智能提醒价值流，围绕风险信号采集、规则评分解释、智能提醒编排、临床复核闭环、客户价值与知识回流五个阶段，识别可应用人工智能技术的场景机会。
 quadrant_definition:
-  high_value_high_priority: "高价值高优先级"
-  high_value_low_priority: "高价值低优先级"
-  low_value_high_priority: "低价值高优先级"
-  low_value_low_priority: "低价值低优先级"
-
+  high_value_high_priority: CRC核心事务（高价值·易落地）
+  high_value_low_priority: 医院系统依赖（高价值·难落地）
+  low_value_high_priority: CRC事务性工作（低价值·易落地）
+  low_value_low_priority: 避免（低价值·难落地）
 stages:
-  - id: "stage_1"
-    order: 1
-    name: "风险信号采集与证据建模"
-    objective: "将访视计划、执行记录、资料上传、受试者状态和沟通记录转化为可计算、可追溯的风险证据。"
-    nodes:
-      - id: "node_1"
-        name: "访视事件时间线生成"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "项目经理"
-        touchpoints:
-          - "CTMS"
-          - "风险台账"
-          - "进度看板"
-          - "中心沟通记录"
-        decision_complexity: "中"
-        pain_points:
-          - "访视事实分散在CTMS、文档库、沟通群和个人记录中，难以形成统一时间线。"
-          - "风险通常在问题显性化后才被发现，错过访视前或访视中的干预窗口。"
-        efficiency_bottlenecks:
-          - "项目经理需要人工跨系统还原预约、到访、采样、资料上传、复核和沟通动作。"
-          - "节点状态口径不统一，导致现场事实确认和风险判断耗时。"
-        experience_improvement_space:
-          - "让项目经理和质控人员看到一条统一的访视事件链。"
-          - "让CRC减少重复汇报，让客户感知津石对过程风险的主动掌控。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "访视安排"
-            - "执行记录"
-            - "资料上传状态"
-            - "中心沟通记录"
-          data_gaps:
-            - "跨系统事件ID和时间戳尚未统一。"
-            - "沟通记录中的关键事件需要语义抽取和结构化。"
-
-      - id: "node_2"
-        name: "资料完整性信号采集"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "质控专员"
-        touchpoints:
-          - "eTMF"
-          - "文档库"
-          - "自动归档模块"
-        decision_complexity: "中"
-        pain_points:
-          - "资料完整性问题通常在质控或申办方复核时才暴露。"
-          - "关键文档准时完整率不稳定，影响申办方复核一次通过率。"
-        efficiency_bottlenecks:
-          - "资料清单、上传状态、复核状态和归档状态需要人工比对。"
-          - "缺失、过期、版本不一致等问题缺少实时提醒。"
-        experience_improvement_space:
-          - "把检查前集中返工提前到访视过程内处理。"
-          - "让申办方看到实时完整性状态，而不是事后追问。"
-        data_foundation:
-          readiness: "high"
-          available_data:
-            - "访视资料清单"
-            - "已上传文件"
-            - "复核状态"
-            - "导出归档记录"
-          data_gaps:
-            - "不同项目资料模板和命名规则需要标准化映射。"
-
-      - id: "node_3"
-        name: "受试者状态风险信号采集"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "研究者"
-        touchpoints:
-          - "访视记录表"
-          - "临床判断备忘"
-          - "AE工作台"
-        decision_complexity: "高"
-        pain_points:
-          - "临床状态预判依赖个人经验和口头反复确认，缺少结构化证据。"
-          - "异常响应可能延迟，受试者体验、安全感和合规追溯都受到影响。"
-        efficiency_bottlenecks:
-          - "症状变化、用药变化和检查数值变化需要人工汇总后再请医生判断。"
-          - "AE/SAE/CM线索容易散落在访视记录和沟通记录中。"
-        experience_improvement_space:
-          - "把依赖CRC经验的口头预判变成可留痕的结构化风险输入。"
-          - "让研究者更快获得需要复核的关键信息。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "受试者监测值"
-            - "症状变化"
-            - "用药变化"
-            - "既往访视表现"
-          data_gaps:
-            - "临床异常阈值和项目方案要求需要结构化。"
-            - "非结构化症状描述需要标准化术语映射。"
-
-  - id: "stage_2"
-    order: 2
-    name: "风险规则匹配与评分解释"
-    objective: "将风险信号与项目SOP、历史偏差、AE/SAE/CM规则和中心执行表现匹配，形成可解释的风险等级。"
-    nodes:
-      - id: "node_4"
-        name: "风险规则与SOP匹配"
-        layer: "L2流程节点"
-        primary_roles:
-          - "质控专员"
-          - "项目经理"
-        touchpoints:
-          - "风险规则库"
-          - "SOP知识库"
-        decision_complexity: "高"
-        pain_points:
-          - "风险提示缺少规则依据时，一线很难判断是否需要立即处理。"
-          - "提醒容易被忽略，或者造成过度升级，降低现场使用体验。"
-        efficiency_bottlenecks:
-          - "SOP、方案要求和历史偏差没有被拆成机器可匹配的规则。"
-          - "风险命中依据和下一步动作需要质控专员人工解释。"
-        experience_improvement_space:
-          - "让提醒不仅告诉一线有风险，还解释为什么有风险。"
-          - "让风险判断从专家口径转为可复用的规则资产。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "访视事件时间线"
-            - "资料缺失清单"
-            - "受试者状态风险标签"
-            - "SOP要求"
-          data_gaps:
-            - "SOP和方案要求需要结构化为规则、阈值和例外条件。"
-
-      - id: "node_5"
-        name: "访视级风险评分"
-        layer: "L2流程节点"
-        primary_roles:
-          - "项目经理"
-          - "质控专员"
-        touchpoints:
-          - "风险评分模型"
-          - "质控看板"
-        decision_complexity: "高"
-        pain_points:
-          - "当前缺少对访视级风险的动态评分和贡献因子解释。"
-          - "质控资源无法精准投向高风险访视，重大偏差更难提前拦截。"
-        efficiency_bottlenecks:
-          - "过程数据没有被连续监测。"
-          - "风险等级与现场动作之间没有形成闭环。"
-        experience_improvement_space:
-          - "帮助项目经理和质控团队把资源优先投向最可能影响高质量闭环的访视。"
-          - "让风险评分具备可解释性，便于一线接受。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "风险命中规则"
-            - "历史异常记录"
-            - "中心执行表现"
-            - "CRC负荷状态"
-          data_gaps:
-            - "历史异常样本需要统一标签。"
-            - "风险评分结果需要与后续处置成效回流。"
-
-      - id: "node_6"
-        name: "相似案例与处理模板推荐"
-        layer: "L2流程节点"
-        primary_roles:
-          - "质控专员"
-          - "培训负责人"
-        touchpoints:
-          - "案例知识库"
-          - "学习App"
-        decision_complexity: "中"
-        pain_points:
-          - "风险处置建议依赖资深人员记忆，案例复用效率低。"
-          - "同类风险在不同中心重复发生，新人处理质量波动大。"
-        efficiency_bottlenecks:
-          - "偏差、CAPA和客户反馈没有按场景和动作标签沉淀。"
-          - "新人难以快速找到相似处置模板。"
-        experience_improvement_space:
-          - "把资深CRC和质控人员经验变成新人也能调用的行动知识。"
-          - "降低跨中心处理质量波动。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "风险贡献因子"
-            - "历史偏差案例"
-            - "CAPA案例"
-            - "客户质疑记录"
-          data_gaps:
-            - "历史案例缺少统一分类和动作标签。"
-
-  - id: "stage_3"
-    order: 3
-    name: "智能提醒与任务编排"
-    objective: "将风险评分和规则依据转化为CRC、项目经理、研究者、质控专员可执行的任务提醒。"
-    nodes:
-      - id: "node_7"
-        name: "CRC下一步动作提醒"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-        touchpoints:
-          - "CRC Copilot"
-          - "移动端提醒"
-        decision_complexity: "中"
-        pain_points:
-          - "提醒如果只停留在风险提示，不能转化为具体动作。"
-          - "CRC仍需自己判断下一步，智能提醒对体验改善有限。"
-        efficiency_bottlenecks:
-          - "风险模型和现场任务编排没有形成一一对应关系。"
-          - "高压现场中CRC需要同时处理补传、沟通、复核和状态更新。"
-        experience_improvement_space:
-          - "减少CRC在高压现场中自行判断优先级的负担。"
-          - "把风险提醒变成可执行、可关闭的行动清单。"
-        data_foundation:
-          readiness: "high"
-          available_data:
-            - "访视风险等级"
-            - "规则依据说明"
-            - "待办事项"
-            - "现场工作负荷"
-          data_gaps:
-            - "不同风险等级与具体动作模板需要映射。"
-
-      - id: "node_8"
-        name: "跨角色协同提醒"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "研究者"
-          - "项目经理"
-        touchpoints:
-          - "沟通群"
-          - "协同待办"
-          - "客户协同门户"
-        decision_complexity: "中"
-        pain_points:
-          - "现场问题常靠CRC重复通知各角色推进。"
-          - "问题处理链路长，异常响应滞后，影响受试者和申办方体验。"
-        efficiency_bottlenecks:
-          - "风险责任归属、通知节奏和升级阈值没有被系统化编排。"
-          - "多角色任务之间缺少统一状态视图。"
-        experience_improvement_space:
-          - "减少重复通知和责任不清，让风险协同更快进入处理状态。"
-          - "让申办方看到责任、动作和进度。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "行动提醒"
-            - "责任角色"
-            - "升级规则"
-            - "截止时间"
-          data_gaps:
-            - "不同角色的任务权限、通知偏好和升级路径需要配置。"
-
-      - id: "node_9"
-        name: "提醒有效性反馈"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "项目经理"
-        touchpoints:
-          - "CRC Copilot"
-          - "风险看板"
-        decision_complexity: "低"
-        pain_points:
-          - "提醒效果缺少反馈，难以判断哪些提醒真正改善了闭环质量。"
-          - "提醒过多会造成疲劳，提醒过少又无法提前拦截风险。"
-        efficiency_bottlenecks:
-          - "任务完成、风险结果和规则命中没有形成反馈学习机制。"
-          - "误报和漏报无法快速进入规则优化。"
-        experience_improvement_space:
-          - "让智能提醒持续变准，而不是一次性规则配置。"
-          - "降低一线提醒疲劳。"
-        data_foundation:
-          readiness: "high"
-          available_data:
-            - "提醒触达记录"
-            - "任务完成状态"
-            - "风险结果"
-            - "用户反馈"
-          data_gaps:
-            - "提醒是否有效需要定义统一标注口径。"
-
-  - id: "stage_4"
-    order: 4
-    name: "临床复核与风险闭环"
-    objective: "对可能影响受试者安全、AE/SAE/CM上报或重大偏差的风险进行医生复核、升级、纠偏和关闭。"
-    nodes:
-      - id: "node_10"
-        name: "临床异常预判与医生复核"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "研究者"
-        touchpoints:
-          - "访视记录表"
-          - "临床判断备忘"
-          - "沟通记录"
-        decision_complexity: "高"
-        pain_points:
-          - "受试者异常是否需要医生复核常依赖口头反复确认。"
-          - "异常响应可能延迟，记录不完整会影响合规追溯。"
-        efficiency_bottlenecks:
-          - "医生复核前的信息整理和证据汇总依赖人工。"
-          - "复核结论、后续行动和留痕记录容易断裂。"
-        experience_improvement_space:
-          - "让受试者异常响应更快，且每次判断都有证据和留痕。"
-          - "降低CRC和研究者之间的反复确认成本。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "受试者状态风险标签"
-            - "受试者监测值"
-            - "症状变化"
-            - "风险规则依据"
-          data_gaps:
-            - "医生复核结论需要结构化记录。"
-
-      - id: "node_11"
-        name: "AE/SAE/CM升级判断"
-        layer: "L2流程节点"
-        primary_roles:
-          - "CRC"
-          - "项目经理"
-          - "质控专员"
-        touchpoints:
-          - "AE/SAE/CM工作台"
-          - "风险台账"
-        decision_complexity: "高"
-        pain_points:
-          - "AE/SAE/CM升级判断需要结合临床信息、项目规则和时限要求，人工判断压力高。"
-          - "漏报或迟报会直接影响质量合规与客户信任。"
-        efficiency_bottlenecks:
-          - "安全事件线索、上报SLA和资料准备清单没有被统一联动。"
-          - "人工判断时容易遗漏时限和材料要求。"
-        experience_improvement_space:
-          - "降低漏报、迟报和资料不完整风险。"
-          - "让项目经理、质控和申办方看到明确的升级依据与倒计时。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "医生复核确认记录"
-            - "AE/SAE/CM线索"
-            - "SLA规则"
-            - "项目上报要求"
-          data_gaps:
-            - "事件线索与上报规则之间需要精细映射。"
-
-      - id: "node_12"
-        name: "纠偏动作闭环跟踪"
-        layer: "L2流程节点"
-        primary_roles:
-          - "项目经理"
-          - "质控专员"
-        touchpoints:
-          - "风险台账"
-          - "CAPA记录"
-          - "客户协同门户"
-        decision_complexity: "中"
-        pain_points:
-          - "风险升级后缺少自动跟踪和闭环提醒。"
-          - "风险处理容易拖延，客户难以及时感知津石的过程控制能力。"
-        efficiency_bottlenecks:
-          - "风险台账与客户同步、质控复核、CRC待办没有打通。"
-          - "关闭证据和CAPA经验条目依赖人工沉淀。"
-        experience_improvement_space:
-          - "让风险不只被发现，还能按时关闭并沉淀为组织能力。"
-          - "提升客户对津石过程控制能力的透明感。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "升级判断结论"
-            - "纠偏动作"
-            - "责任人"
-            - "关闭证据"
-          data_gaps:
-            - "关闭标准、证据模板和CAPA标签需要标准化。"
-
-  - id: "stage_5"
-    order: 5
-    name: "客户价值呈现与知识回流"
-    objective: "把风险预测、提醒响应、纠偏结果和复盘经验转化为客户可感知的服务价值，以及内部可复用的知识资产。"
-    nodes:
-      - id: "node_13"
-        name: "客户视角风险同步"
-        layer: "L2流程节点"
-        primary_roles:
-          - "客户经理"
-          - "项目经理"
-        touchpoints:
-          - "客户协同门户"
-          - "阶段汇报"
-        decision_complexity: "中"
-        pain_points:
-          - "客户汇报仍依赖人工拼接多个系统状态。"
-          - "客户感知不到实时控制能力，协作体验和信任下降。"
-        efficiency_bottlenecks:
-          - "项目过程数据没有被产品化呈现。"
-          - "风险、进展、纠偏动作和关闭状态需要人工整理为客户语言。"
-        experience_improvement_space:
-          - "让申办方不仅看到结果，也看到过程控制能力。"
-          - "提升客户对津石主动预警和透明协同的感知。"
-        data_foundation:
-          readiness: "high"
-          available_data:
-            - "风险关闭记录"
-            - "项目进度状态"
-            - "纠偏动作"
-            - "访视闭环指标"
-          data_gaps:
-            - "内部运营语言需要转换为客户可理解的汇报语言。"
-
-      - id: "node_14"
-        name: "风险运营指标复盘"
-        layer: "L2流程节点"
-        primary_roles:
-          - "运营负责人"
-          - "质控负责人"
-        touchpoints:
-          - "经营看板"
-          - "质控看板"
-        decision_complexity: "中"
-        pain_points:
-          - "风险复盘缺少经营视角，难以转化为资源配置和培训优先级。"
-          - "培训和质控投入不够精准，核心CRC成长路径不清晰。"
-        efficiency_bottlenecks:
-          - "风险结果没有沉淀为中心画像、CRC画像和能力标签。"
-          - "复盘动作容易停留在单点案例层面。"
-        experience_improvement_space:
-          - "把单点风险处置升级为中心和人员能力治理。"
-          - "让运营负责人看到可行动的资源配置和培训建议。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "风险评分分布"
-            - "提醒触达记录"
-            - "风险关闭时效"
-            - "访视闭环结果"
-          data_gaps:
-            - "CRC画像、中心画像和能力标签需要长期沉淀。"
-
-      - id: "node_15"
-        name: "风险案例沉淀与训练"
-        layer: "L2流程节点"
-        primary_roles:
-          - "培训负责人"
-          - "质控负责人"
-        touchpoints:
-          - "知识库"
-          - "学习App"
-        decision_complexity: "中"
-        pain_points:
-          - "经验沉淀常停留在复盘文档，不能直接进入一线执行。"
-          - "新人上手慢，同类问题在不同中心重复发生。"
-        efficiency_bottlenecks:
-          - "知识库没有与具体场景、动作和提醒规则绑定。"
-          - "案例难以转化为训练题、处置模板和规则优化建议。"
-        experience_improvement_space:
-          - "让风险管理能力从少数骨干经验扩展为一线团队可复制的标准动作。"
-          - "把客户质疑、CAPA经验和复核记录转化为训练资产。"
-        data_foundation:
-          readiness: "medium"
-          available_data:
-            - "风险案例"
-            - "复核记录"
-            - "客户质疑记录"
-            - "CAPA经验条目"
-          data_gaps:
-            - "案例需要按风险类型、根因、动作、结果和适用项目打标签。"
-
+- id: stage_1
+  order: 1
+  name: 风险信号采集与证据建模
+  objective: 将访视计划、执行记录、资料上传、受试者状态和沟通记录转化为可计算、可追溯的风险证据。
+  nodes:
+  - id: node_1
+    name: 访视事件时间线生成
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 项目经理
+    touchpoints:
+    - CTMS
+    - 风险台账
+    - 进度看板
+    - 中心沟通记录
+    decision_complexity: 中
+    pain_points:
+    - 访视事实分散在CTMS、文档库、沟通群和个人记录中，难以形成统一时间线。
+    - 风险通常在问题显性化后才被发现，错过访视前或访视中的干预窗口。
+    efficiency_bottlenecks:
+    - 项目经理需要人工跨系统还原预约、到访、采样、资料上传、复核和沟通动作。
+    - 节点状态口径不统一，导致现场事实确认和风险判断耗时。
+    experience_improvement_space:
+    - 让项目经理和质控人员看到一条统一的访视事件链。
+    - 让CRC减少重复汇报，让客户感知津石对过程风险的主动掌控。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 访视安排
+      - 执行记录
+      - 资料上传状态
+      - 中心沟通记录
+      data_gaps:
+      - 跨系统事件ID和时间戳尚未统一。
+      - 沟通记录中的关键事件需要语义抽取和结构化。
+  - id: node_2
+    name: 资料完整性信号采集
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 质控专员
+    touchpoints:
+    - eTMF
+    - 文档库
+    - 自动归档模块
+    decision_complexity: 中
+    pain_points:
+    - 资料完整性问题通常在质控或申办方复核时才暴露。
+    - 关键文档准时完整率不稳定，影响申办方复核一次通过率。
+    efficiency_bottlenecks:
+    - 资料清单、上传状态、复核状态和归档状态需要人工比对。
+    - 缺失、过期、版本不一致等问题缺少实时提醒。
+    experience_improvement_space:
+    - 把检查前集中返工提前到访视过程内处理。
+    - 让申办方看到实时完整性状态，而不是事后追问。
+    data_foundation:
+      readiness: high
+      available_data:
+      - 访视资料清单
+      - 已上传文件
+      - 复核状态
+      - 导出归档记录
+      data_gaps:
+      - 不同项目资料模板和命名规则需要标准化映射。
+  - id: node_3
+    name: 受试者状态风险信号采集
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 研究者
+    touchpoints:
+    - 访视记录表
+    - 临床判断备忘
+    - AE工作台
+    decision_complexity: 高
+    pain_points:
+    - 临床状态预判依赖个人经验和口头反复确认，缺少结构化证据。
+    - 异常响应可能延迟，受试者体验、安全感和合规追溯都受到影响。
+    efficiency_bottlenecks:
+    - 症状变化、用药变化和检查数值变化需要人工汇总后再请CRC复核证据整理。
+    - AE/SAE/CM线索容易散落在访视记录和沟通记录中。
+    experience_improvement_space:
+    - 把依赖CRC经验的口头预判变成可留痕的结构化风险输入。
+    - 让研究者更快获得需要复核的关键信息。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 受试者监测值
+      - 症状变化
+      - 用药变化
+      - 既往访视表现
+      data_gaps:
+      - 临床异常阈值和项目方案要求需要结构化。
+      - 非结构化症状描述需要标准化术语映射。
+- id: stage_2
+  order: 2
+  name: 风险规则匹配与评分解释
+  objective: 将风险信号与项目SOP、历史偏差、AE/SAE/CM规则和中心执行表现匹配，形成可解释的风险等级。
+  nodes:
+  - id: node_4
+    name: 风险规则与SOP匹配
+    layer: L2流程节点
+    primary_roles:
+    - 质控专员
+    - 项目经理
+    touchpoints:
+    - 风险规则库
+    - SOP知识库
+    decision_complexity: 高
+    pain_points:
+    - 风险提示缺少规则依据时，一线很难判断是否需要立即处理。
+    - 提醒容易被忽略，或者造成过度升级，降低现场使用体验。
+    efficiency_bottlenecks:
+    - SOP、方案要求和历史偏差没有被拆成机器可匹配的规则。
+    - 风险命中依据和下一步动作需要质控专员人工解释。
+    experience_improvement_space:
+    - 让提醒不仅告诉一线有风险，还解释为什么有风险。
+    - 让风险判断从专家口径转为可复用的规则资产。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 访视事件时间线
+      - 资料缺失清单
+      - 受试者状态风险标签
+      - SOP要求
+      data_gaps:
+      - SOP和方案要求需要结构化为规则、阈值和例外条件。
+  - id: node_5
+    name: 访视级风险评分
+    layer: L2流程节点
+    primary_roles:
+    - 项目经理
+    - 质控专员
+    touchpoints:
+    - 风险评分模型
+    - 质控看板
+    decision_complexity: 高
+    pain_points:
+    - 当前缺少对访视级风险的动态评分和贡献因子解释。
+    - 质控资源无法精准投向高风险访视，重大偏差更难提前拦截。
+    efficiency_bottlenecks:
+    - 过程数据没有被连续监测。
+    - 风险等级与现场动作之间没有形成闭环。
+    experience_improvement_space:
+    - 帮助项目经理和质控团队把资源优先投向最可能影响高质量闭环的访视。
+    - 让风险评分具备可解释性，便于一线接受。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 风险命中规则
+      - 历史异常记录
+      - 中心执行表现
+      - CRC负荷状态
+      data_gaps:
+      - 历史异常样本需要统一标签。
+      - 风险评分结果需要与后续处置成效回流。
+  - id: node_6
+    name: 相似案例与处理模板推荐
+    layer: L2流程节点
+    primary_roles:
+    - 质控专员
+    - 培训负责人
+    touchpoints:
+    - 案例知识库
+    - 学习App
+    decision_complexity: 中
+    pain_points:
+    - 风险处置建议依赖资深人员记忆，案例复用效率低。
+    - 同类风险在不同中心重复发生，新人处理质量波动大。
+    efficiency_bottlenecks:
+    - 偏差、CAPA和客户反馈没有按场景和动作标签沉淀。
+    - 新人难以快速找到相似处置模板。
+    experience_improvement_space:
+    - 把资深CRC和质控人员经验变成新人也能调用的行动知识。
+    - 降低跨中心处理质量波动。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 风险贡献因子
+      - 历史偏差案例
+      - CAPA案例
+      - 客户质疑记录
+      data_gaps:
+      - 历史案例缺少统一分类和动作标签。
+- id: stage_3
+  order: 3
+  name: 智能提醒与任务编排
+  objective: 将风险评分和规则依据转化为CRC、项目经理、研究者、质控专员可执行的任务提醒。
+  nodes:
+  - id: node_7
+    name: CRC下一步动作提醒
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    touchpoints:
+    - CRC Copilot
+    - 移动端提醒
+    decision_complexity: 中
+    pain_points:
+    - 提醒如果只停留在风险提示，不能转化为具体动作。
+    - CRC仍需自己判断下一步，智能提醒对体验改善有限。
+    efficiency_bottlenecks:
+    - 风险模型和现场任务编排没有形成一一对应关系。
+    - 高压现场中CRC需要同时处理补传、沟通、复核和状态更新。
+    experience_improvement_space:
+    - 减少CRC在高压现场中自行判断优先级的负担。
+    - 把风险提醒变成可执行、可关闭的行动清单。
+    data_foundation:
+      readiness: high
+      available_data:
+      - 访视风险等级
+      - 规则依据说明
+      - 待办事项
+      - 现场工作负荷
+      data_gaps:
+      - 不同风险等级与具体动作模板需要映射。
+  - id: node_8
+    name: 跨角色协同提醒
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 项目经理
+    touchpoints:
+    - 沟通群
+    - 协同待办
+    - 客户协同门户
+    decision_complexity: 中
+    pain_points:
+    - 现场问题常靠CRC重复通知各角色推进。
+    - 问题处理链路长，异常响应滞后，影响受试者和申办方体验。
+    efficiency_bottlenecks:
+    - 风险责任归属、通知节奏和升级阈值没有被系统化编排。
+    - 多角色任务之间缺少统一状态视图。
+    experience_improvement_space:
+    - 减少重复通知和责任不清，让风险协同更快进入处理状态。
+    - 让申办方看到责任、动作和进度。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 行动提醒
+      - 责任角色
+      - 升级规则
+      - 截止时间
+      data_gaps:
+      - 不同角色的任务权限、通知偏好和升级路径需要配置。
+  - id: node_9
+    name: 提醒有效性反馈
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 项目经理
+    touchpoints:
+    - CRC Copilot
+    - 风险看板
+    decision_complexity: 低
+    pain_points:
+    - 提醒效果缺少反馈，难以判断哪些提醒真正改善了闭环质量。
+    - 提醒过多会造成疲劳，提醒过少又无法提前拦截风险。
+    efficiency_bottlenecks:
+    - 任务完成、风险结果和规则命中没有形成反馈学习机制。
+    - 误报和漏报无法快速进入规则优化。
+    experience_improvement_space:
+    - 让智能提醒持续变准，而不是一次性规则配置。
+    - 降低一线提醒疲劳。
+    data_foundation:
+      readiness: high
+      available_data:
+      - 提醒触达记录
+      - 任务完成状态
+      - 风险结果
+      - 用户反馈
+      data_gaps:
+      - 提醒是否有效需要定义统一标注口径。
+- id: stage_4
+  order: 4
+  name: 临床复核与风险闭环
+  objective: 对可能影响受试者安全、AE/SAE/CM上报或重大偏差的风险进行CRC线下复核确认、升级、纠偏和关闭。
+  nodes:
+  - id: node_10
+    name: 临床异常预判与CRC复核证据整理
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    touchpoints:
+    - 访视记录表
+    - 临床判断备忘
+    - 沟通记录
+    decision_complexity: 高
+    pain_points:
+    - 受试者异常是否需要CRC复核证据整理常依赖口头反复确认。
+    - 异常响应可能延迟，记录不完整会影响合规追溯。
+    efficiency_bottlenecks:
+    - CRC复核证据整理前的信息整理和证据汇总依赖人工。
+    - 复核结论、后续行动和留痕记录容易断裂。
+    experience_improvement_space:
+    - 让受试者异常响应更快，且每次判断都有证据和留痕。
+    - 降低CRC和研究者之间的反复确认成本。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 受试者状态风险标签
+      - 受试者监测值
+      - 症状变化
+      - 风险规则依据
+      data_gaps:
+      - CRC复核证据结论需要结构化记录。
+  - id: node_11
+    name: AE/SAE/CM升级判断
+    layer: L2流程节点
+    primary_roles:
+    - CRC
+    - 项目经理
+    - 质控专员
+    touchpoints:
+    - AE/SAE/CM工作台
+    - 风险台账
+    decision_complexity: 高
+    pain_points:
+    - AE/SAE/CM升级判断需要结合临床信息、项目规则和时限要求，人工判断压力高。
+    - 漏报或迟报会直接影响质量合规与客户信任。
+    efficiency_bottlenecks:
+    - 安全事件线索、上报SLA和资料准备清单没有被统一联动。
+    - 人工判断时容易遗漏时限和材料要求。
+    experience_improvement_space:
+    - 降低漏报、迟报和资料不完整风险。
+    - 让项目经理、质控和申办方看到明确的升级依据与倒计时。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - CRC复核证据确认记录
+      - AE/SAE/CM线索
+      - SLA规则
+      - 项目上报要求
+      data_gaps:
+      - 事件线索与上报规则之间需要精细映射。
+  - id: node_12
+    name: 纠偏动作闭环跟踪
+    layer: L2流程节点
+    primary_roles:
+    - 项目经理
+    - 质控专员
+    touchpoints:
+    - 风险台账
+    - CAPA记录
+    - 客户协同门户
+    decision_complexity: 中
+    pain_points:
+    - 风险升级后缺少自动跟踪和闭环提醒。
+    - 风险处理容易拖延，客户难以及时感知津石的过程控制能力。
+    efficiency_bottlenecks:
+    - 风险台账与客户同步、质控复核、CRC待办没有打通。
+    - 关闭证据和CAPA经验条目依赖人工沉淀。
+    experience_improvement_space:
+    - 让风险不只被发现，还能按时关闭并沉淀为组织能力。
+    - 提升客户对津石过程控制能力的透明感。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 升级判断结论
+      - 纠偏动作
+      - 责任人
+      - 关闭证据
+      data_gaps:
+      - 关闭标准、证据模板和CAPA标签需要标准化。
+- id: stage_5
+  order: 5
+  name: 客户价值呈现与知识回流
+  objective: 把风险预测、提醒响应、纠偏结果和复盘经验转化为客户可感知的服务价值，以及内部可复用的知识资产。
+  nodes:
+  - id: node_13
+    name: 项目风险汇报（本轮暂缓：客户/申办方侧）
+    layer: L2流程节点
+    primary_roles:
+    - 项目经理
+    touchpoints:
+    - 客户协同门户
+    - 阶段汇报
+    decision_complexity: 中
+    pain_points:
+    - 客户汇报依赖人工拼接多个系统状态。
+    - 客户感知不到实时控制能力，协作体验和信任下降。
+    efficiency_bottlenecks:
+    - 项目过程数据没有被产品化呈现。
+    - 风险、进展、纠偏动作和关闭状态需要人工整理为客户语言。
+    experience_improvement_space:
+    - 本轮MVP不优先建设客户协同门户，待CRC闭环数据稳定后再评估。
+    data_foundation:
+      readiness: high
+      available_data:
+      - 风险关闭记录
+      - 项目进度状态
+      - 纠偏动作
+      - 访视闭环指标
+      data_gaps:
+      - 内部运营语言需要转换为客户可理解的汇报语言。
+  - id: node_14
+    name: 风险运营指标复盘
+    layer: L2流程节点
+    primary_roles:
+    - 运营负责人
+    - 质控负责人
+    touchpoints:
+    - 经营看板
+    - 质控看板
+    decision_complexity: 中
+    pain_points:
+    - 风险复盘缺少经营视角，难以转化为资源配置和培训优先级。
+    - 培训和质控投入不够精准，核心CRC成长路径不清晰。
+    efficiency_bottlenecks:
+    - 风险结果没有沉淀为中心画像、CRC画像和能力标签。
+    - 复盘动作容易停留在单点案例层面。
+    experience_improvement_space:
+    - 把单点风险处置升级为中心和人员能力治理。
+    - 让运营负责人看到可行动的资源配置和培训建议。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 风险评分分布
+      - 提醒触达记录
+      - 风险关闭时效
+      - 访视闭环结果
+      data_gaps:
+      - CRC画像、中心画像和能力标签需要长期沉淀。
+  - id: node_15
+    name: 风险案例沉淀与训练
+    layer: L2流程节点
+    primary_roles:
+    - 培训负责人
+    - 质控负责人
+    touchpoints:
+    - 知识库
+    - 学习App
+    decision_complexity: 中
+    pain_points:
+    - 经验沉淀常停留在复盘文档，不能直接进入一线执行。
+    - 新人上手慢，同类问题在不同中心重复发生。
+    efficiency_bottlenecks:
+    - 知识库没有与具体场景、动作和提醒规则绑定。
+    - 案例难以转化为训练题、处置模板和规则优化建议。
+    experience_improvement_space:
+    - 让风险管理能力从少数骨干经验扩展为一线团队可复制的标准动作。
+    - 把客户质疑、CAPA经验和复核记录转化为训练资产。
+    data_foundation:
+      readiness: medium
+      available_data:
+      - 风险案例
+      - 复核记录
+      - 客户质疑记录
+      - CAPA经验条目
+      data_gaps:
+      - 案例需要按风险类型、根因、动作、结果和适用项目打标签。
 opportunities:
-  - id: "opp_01"
-    stage_id: "stage_1"
-    node_ids:
-      - "node_1"
-      - "node_2"
-      - "node_3"
-    name: "访视事件时间线与风险证据图谱"
-    quadrant: "high_value_high_priority"
-    maturity: "ready"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「项目经理/质控专员」在「风险信号采集与证据建模」下提供[跨系统访视事件抽取、时间线生成与证据图谱]能力，以「高价值高优先级」方式把分散现场事实转化为可追溯的风险判断底座。"
-    core_problem: "访视事实分散在CTMS、文档库、沟通群和个人记录中，风险判断缺少统一时间线和证据链。"
-    application_value: "降低项目经理跨系统还原事实的时间，让风险从事后发现转为访视前和访视中的前置识别。"
-    technical_direction:
-      - "基于流程挖掘和事件抽取生成受试者-访视-中心三层时间线。"
-      - "用NLP从沟通记录和访视备注中抽取关键事件、责任人和时间点。"
-      - "建立受试者、访视、资料、风险、动作之间的知识图谱。"
-    required_data:
-      - "访视安排与执行记录"
-      - "资料上传与复核状态"
-      - "中心沟通记录"
-      - "受试者状态变化记录"
-    expected_kpis:
-      - "访视事实还原耗时下降50%以上"
-      - "高风险访视提前识别率提升"
-      - "关键风险证据链完整率提升"
-    tech_types:
-      - "流程挖掘"
-      - "NLP信息抽取"
-      - "知识图谱"
-
-  - id: "opp_02"
-    stage_id: "stage_1"
-    node_ids:
-      - "node_2"
-    name: "资料完整性与时效风险预警"
-    quadrant: "high_value_high_priority"
-    maturity: "ready"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「CRC/质控专员」在「资料完整性信号采集」下提供[缺失、逾期、版本不一致自动识别与风险提醒]能力，以「高价值高优先级」方式把质控和申办方复核阶段的集中返工前置到访视过程中。"
-    core_problem: "资料清单、上传状态、复核状态和归档状态未形成自动校验链，缺失问题常在后端暴露。"
-    application_value: "提升关键文档准时完整率和申办方一次复核通过率，减少CRC补传和返工。"
-    technical_direction:
-      - "建立项目资料期望清单与实际文件的自动匹配规则。"
-      - "用文档分类模型识别文件类型、版本和归档位置。"
-      - "按访视窗口、SLA和资料重要性生成风险等级。"
-    required_data:
-      - "访视资料清单"
-      - "文件元数据"
-      - "上传时间"
-      - "复核结果"
-      - "归档记录"
-    expected_kpis:
-      - "关键资料准时完整率提升"
-      - "资料缺失返工次数下降"
-      - "申办方一次复核通过率提升"
-    tech_types:
-      - "文档智能"
-      - "规则引擎"
-      - "异常检测"
-
-  - id: "opp_03"
-    stage_id: "stage_1"
-    node_ids:
-      - "node_3"
-      - "node_10"
-    name: "受试者状态异常预判"
-    quadrant: "high_value_high_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「CRC/研究者」在「受试者状态风险信号采集」下提供[监测值、症状、用药变化与项目方案联动的异常预判]能力，以「高价值高优先级」方式把口头经验判断转化为结构化复核输入。"
-    core_problem: "受试者状态风险依赖CRC经验和口头确认，异常响应和医生复核可能延迟。"
-    application_value: "缩短异常发现到医生复核的时间，提升受试者安全感和合规追溯完整性。"
-    technical_direction:
-      - "建立受试者监测值、症状、用药变化的纵向变化特征。"
-      - "用规则模型和机器学习模型识别异常趋势与复核触发条件。"
-      - "输出可解释的异常依据和医生复核材料包。"
-    required_data:
-      - "受试者监测值"
-      - "症状变化"
-      - "用药变化"
-      - "既往访视表现"
-      - "项目方案阈值"
-    expected_kpis:
-      - "异常到复核平均时长下降"
-      - "医生复核材料完整率提升"
-      - "受试者安全相关风险漏识别率下降"
-    tech_types:
-      - "预测模型"
-      - "临床规则引擎"
-      - "可解释AI"
-
-  - id: "opp_04"
-    stage_id: "stage_2"
-    node_ids:
-      - "node_4"
-    name: "SOP语义规则匹配引擎"
-    quadrant: "high_value_low_priority"
-    maturity: "explore"
-    business_value_level: "high"
-    priority_level: "low"
-    scenario_summary: "「质控专员/项目经理」在「风险规则与SOP匹配」下提供[SOP、方案要求和风险信号的语义匹配与规则依据解释]能力，以「高价值低优先级」方式把专家口径沉淀为可复用规则资产。"
-    core_problem: "SOP和项目方案多为文档化要求，难以直接转化为机器可执行规则。"
-    application_value: "提升风险提示的可解释性和一线采纳率，但需要先完成知识治理和规则标准化。"
-    technical_direction:
-      - "用文档解析和语义分块构建SOP知识库。"
-      - "将关键要求转化为条件、阈值、例外和动作建议。"
-      - "用RAG生成风险命中依据并保留引用来源。"
-    required_data:
-      - "SOP文档"
-      - "项目方案"
-      - "历史偏差案例"
-      - "风险命中记录"
-    expected_kpis:
-      - "风险解释生成覆盖率提升"
-      - "人工查找SOP依据时间下降"
-      - "风险提醒采纳率提升"
-    tech_types:
-      - "RAG"
-      - "规则引擎"
-      - "知识库"
-
-  - id: "opp_05"
-    stage_id: "stage_2"
-    node_ids:
-      - "node_5"
-    name: "访视级风险评分与贡献因子解释"
-    quadrant: "high_value_high_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「项目经理/质控专员」在「访视级风险评分」下提供[多因素风险评分、贡献因子解释与优先处理清单]能力，以「高价值高优先级」方式把质控资源投向最可能影响高质量访视闭环的节点。"
-    core_problem: "缺少动态风险评分和贡献因子解释，质控资源难以精准投放。"
-    application_value: "提升高风险访视提前拦截率，降低重大偏差和客户质疑概率。"
-    technical_direction:
-      - "融合资料完整性、访视窗口、受试者状态、中心表现和CRC负荷数据。"
-      - "用梯度提升、异常检测或评分卡模型生成访视风险等级。"
-      - "通过SHAP或规则贡献展示风险升高原因。"
-    required_data:
-      - "风险命中规则"
-      - "历史异常记录"
-      - "中心执行表现"
-      - "CRC负荷状态"
-      - "风险处置结果"
-    expected_kpis:
-      - "高风险访视提前识别率提升"
-      - "重大偏差提前拦截率提升"
-      - "质控资源命中率提升"
-    tech_types:
-      - "机器学习评分"
-      - "异常检测"
-      - "可解释AI"
-
-  - id: "opp_06"
-    stage_id: "stage_2"
-    node_ids:
-      - "node_6"
-      - "node_15"
-    name: "相似风险案例与处理模板推荐"
-    quadrant: "high_value_low_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "low"
-    scenario_summary: "「质控专员/培训负责人」在「相似案例与处理模板推荐」下提供[风险案例检索、相似度匹配和处置模板生成]能力，以「高价值低优先级」方式把资深人员经验转化为可复用行动知识。"
-    core_problem: "历史偏差、CAPA和客户反馈没有按场景和动作标签沉淀，案例复用效率低。"
-    application_value: "降低新人处理质量波动，减少同类风险跨中心重复发生。"
-    technical_direction:
-      - "构建风险案例向量库，按风险类型、根因、动作和结果进行标签化。"
-      - "用相似案例检索推荐处理模板和注意事项。"
-      - "由专家反馈校准案例标签和模板质量。"
-    required_data:
-      - "历史偏差案例"
-      - "CAPA案例"
-      - "客户质疑记录"
-      - "复核结论"
-      - "处置结果"
-    expected_kpis:
-      - "相似案例检索命中率提升"
-      - "新人风险处置一致性提升"
-      - "同类问题重复发生率下降"
-    tech_types:
-      - "向量检索"
-      - "RAG"
-      - "案例推理"
-
-  - id: "opp_07"
-    stage_id: "stage_3"
-    node_ids:
-      - "node_7"
-    name: "CRC下一步动作智能提醒"
-    quadrant: "high_value_high_priority"
-    maturity: "ready"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「CRC」在「CRC下一步动作提醒」下提供[风险到行动的任务转译、优先级排序和关闭提醒]能力，以「高价值高优先级」方式减少现场判断负担并提升访视闭环效率。"
-    core_problem: "风险提醒如果不能转化为具体动作，CRC仍要自行判断补传、复核、沟通和更新的优先级。"
-    application_value: "提升一线可服务体验，让CRC获得可执行、可关闭、可追踪的行动清单。"
-    technical_direction:
-      - "建立风险等级到行动模板的映射。"
-      - "按访视窗口、SLA、受试者安全和客户关注度排序任务。"
-      - "在移动端推送下一步动作、所需资料和关闭标准。"
-    required_data:
-      - "访视风险等级"
-      - "规则依据说明"
-      - "待办事项"
-      - "现场工作负荷"
-      - "任务完成记录"
-    expected_kpis:
-      - "CRC日常风险判断耗时下降"
-      - "提醒转行动率提升"
-      - "访视闭环时效提升"
-    tech_types:
-      - "任务推荐"
-      - "规则引擎"
-      - "智能通知"
-
-  - id: "opp_08"
-    stage_id: "stage_3"
-    node_ids:
-      - "node_8"
-    name: "多角色协同任务编排引擎"
-    quadrant: "high_value_low_priority"
-    maturity: "explore"
-    business_value_level: "high"
-    priority_level: "low"
-    scenario_summary: "「CRC/研究者/项目经理」在「跨角色协同提醒」下提供[责任拆解、通知节奏、升级倒计时和状态同步]能力，以「高价值低优先级」方式重构风险协同处置链路。"
-    core_problem: "现场问题常靠CRC重复通知各角色推进，责任归属和升级节奏不清。"
-    application_value: "缩短跨角色响应链路，提升受试者和申办方对异常处理的体验。"
-    technical_direction:
-      - "基于风险类型自动拆解CRC、研究者、项目经理、质控专员任务。"
-      - "配置升级阈值、提醒频率和责任人路由。"
-      - "将任务状态同步到风险看板和客户协同门户。"
-    required_data:
-      - "行动提醒"
-      - "责任角色"
-      - "升级规则"
-      - "截止时间"
-      - "任务完成状态"
-    expected_kpis:
-      - "跨角色响应时长下降"
-      - "责任不清导致的延期事件下降"
-      - "异常处理SLA达成率提升"
-    tech_types:
-      - "工作流编排"
-      - "智能通知"
-      - "规则引擎"
-
-  - id: "opp_09"
-    stage_id: "stage_3"
-    node_ids:
-      - "node_9"
-    name: "提醒有效性反馈与误报漏报标注"
-    quadrant: "low_value_high_priority"
-    maturity: "ready"
-    business_value_level: "low"
-    priority_level: "high"
-    scenario_summary: "「CRC/项目经理」在「提醒有效性反馈」下提供[提醒采纳、任务完成、风险结果和误报漏报标注]能力，以「低价值高优先级」方式为后续风险模型和规则优化建立反馈闭环。"
-    core_problem: "提醒是否真正降低风险缺少反馈，规则无法持续优化。"
-    application_value: "单点业务价值不如风险评分高，但它是所有智能提醒持续变准的基础能力。"
-    technical_direction:
-      - "记录提醒触达、点击、接受、忽略、关闭和结果状态。"
-      - "设置误报、漏报、有效、无效等轻量标注。"
-      - "将反馈样本用于规则阈值优化和模型再训练。"
-    required_data:
-      - "提醒触达记录"
-      - "任务完成状态"
-      - "风险结果"
-      - "用户反馈"
-    expected_kpis:
-      - "提醒有效性可度量率达到90%以上"
-      - "重复误报率下降"
-      - "规则迭代周期缩短"
-    tech_types:
-      - "反馈学习"
-      - "埋点分析"
-      - "模型监控"
-
-  - id: "opp_10"
-    stage_id: "stage_4"
-    node_ids:
-      - "node_10"
-    name: "医生复核材料自动整理"
-    quadrant: "low_value_high_priority"
-    maturity: "ready"
-    business_value_level: "low"
-    priority_level: "high"
-    scenario_summary: "「CRC/研究者」在「临床异常预判与医生复核」下提供[复核证据包自动汇总和医生确认记录结构化归档]能力，以「低价值高优先级」方式减少反复口头确认和记录断层。"
-    core_problem: "医生复核前的信息整理和复核后的留痕依赖人工，容易遗漏证据或后续行动。"
-    application_value: "降低复核材料准备负担，提升复核留痕完整性，为高阶临床异常预判打基础。"
-    technical_direction:
-      - "按异常类型自动汇总监测值、症状变化、规则依据和历史访视表现。"
-      - "将医生确认结论转为结构化字段和后续行动指令。"
-      - "自动归档复核时间、参与人、结论和证据。"
-    required_data:
-      - "受试者状态风险标签"
-      - "监测值"
-      - "症状变化"
-      - "医生复核记录"
-    expected_kpis:
-      - "复核材料准备时间下降"
-      - "复核留痕完整率提升"
-      - "复核后行动遗漏率下降"
-    tech_types:
-      - "文档生成"
-      - "结构化抽取"
-      - "临床规则引擎"
-
-  - id: "opp_11"
-    stage_id: "stage_4"
-    node_ids:
-      - "node_11"
-    name: "AE/SAE/CM升级判断与SLA倒计时"
-    quadrant: "high_value_high_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「CRC/项目经理/质控专员」在「AE/SAE/CM升级判断」下提供[安全事件线索识别、上报规则匹配、SLA倒计时和材料清单生成]能力，以「高价值高优先级」方式降低漏报、迟报和资料不完整风险。"
-    core_problem: "AE/SAE/CM升级判断需要综合临床信息、项目规则和时限要求，人工判断压力高。"
-    application_value: "直接保护质量合规和客户信任，是风险预测链路中最关键的安全类场景。"
-    technical_direction:
-      - "用NLP识别症状、诊断、用药变化和严重程度线索。"
-      - "匹配项目上报规则、SLA和材料要求。"
-      - "生成升级结论建议、倒计时提醒和上报准备清单。"
-    required_data:
-      - "医生复核确认记录"
-      - "AE/SAE/CM线索"
-      - "SLA规则"
-      - "项目上报要求"
-      - "历史上报结果"
-    expected_kpis:
-      - "AE/SAE/CM迟报率下降"
-      - "上报资料一次完整率提升"
-      - "安全事件线索识别召回率提升"
-    tech_types:
-      - "NLP分类"
-      - "临床规则引擎"
-      - "智能SLA提醒"
-
-  - id: "opp_12"
-    stage_id: "stage_4"
-    node_ids:
-      - "node_12"
-    name: "风险闭环与CAPA自动跟踪"
-    quadrant: "high_value_high_priority"
-    maturity: "ready"
-    business_value_level: "high"
-    priority_level: "high"
-    scenario_summary: "「项目经理/质控专员」在「纠偏动作闭环跟踪」下提供[风险处置单自动生成、责任人催办、关闭证据校验和CAPA经验沉淀]能力，以「高价值高优先级」方式确保风险按时关闭并可被客户追溯。"
-    core_problem: "风险升级后缺少自动跟踪和闭环提醒，处理容易拖延。"
-    application_value: "提升风险关闭时效和客户透明度，把风险处置从人工追踪转为系统闭环。"
-    technical_direction:
-      - "按风险等级自动生成处置单、责任人和截止时间。"
-      - "监控任务进展并触发升级催办。"
-      - "对关闭证据进行完整性校验并生成CAPA经验条目。"
-    required_data:
-      - "升级判断结论"
-      - "纠偏动作"
-      - "责任人"
-      - "关闭证据"
-      - "CAPA记录"
-    expected_kpis:
-      - "风险关闭SLA达成率提升"
-      - "逾期未关闭风险数量下降"
-      - "CAPA经验沉淀率提升"
-    tech_types:
-      - "工作流自动化"
-      - "文档智能"
-      - "智能催办"
-
-  - id: "opp_13"
-    stage_id: "stage_5"
-    node_ids:
-      - "node_13"
-    name: "客户视角风险摘要自动生成"
-    quadrant: "high_value_low_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "low"
-    scenario_summary: "「客户经理/项目经理」在「客户视角风险同步」下提供[项目进度、风险、纠偏动作和关闭状态的客户语言摘要生成]能力，以「高价值低优先级」方式让申办方看到津石的过程控制能力。"
-    core_problem: "客户汇报依赖人工拼接多个系统状态，客户难以实时感知主动预警和过程控制价值。"
-    application_value: "提升客户透明协同体验和客户信任，但依赖前面风险数据和闭环数据质量。"
-    technical_direction:
-      - "自动汇总风险状态、处理动作、关闭证据和访视闭环指标。"
-      - "用生成式AI转写为客户可理解的阶段汇报摘要。"
-      - "支持按客户、项目、中心和风险类型生成不同视图。"
-    required_data:
-      - "风险关闭记录"
-      - "项目进度状态"
-      - "纠偏动作"
-      - "访视闭环指标"
-      - "客户关注点"
-    expected_kpis:
-      - "阶段汇报准备时间下降"
-      - "客户风险同步及时率提升"
-      - "客户质疑响应时长下降"
-    tech_types:
-      - "生成式AI"
-      - "BI摘要"
-      - "客户门户"
-
-  - id: "opp_14"
-    stage_id: "stage_5"
-    node_ids:
-      - "node_14"
-    name: "中心/CRC风险画像与运营复盘"
-    quadrant: "high_value_low_priority"
-    maturity: "growth"
-    business_value_level: "high"
-    priority_level: "low"
-    scenario_summary: "「运营负责人/质控负责人」在「风险运营指标复盘」下提供[中心风险画像、CRC能力标签和培训优先级建议]能力，以「高价值低优先级」方式把单点风险处置升级为组织能力治理。"
-    core_problem: "风险复盘缺少经营视角，难以转化为资源配置、培训优先级和核心CRC成长路径。"
-    application_value: "让运营和质控投入更加精准，形成中心治理和人员能力提升闭环。"
-    technical_direction:
-      - "按中心、CRC、资料类型、访视节点聚合风险和闭环指标。"
-      - "构建中心风险画像、CRC能力画像和风险主题聚类。"
-      - "自动生成培训、排班和质控投入建议。"
-    required_data:
-      - "风险评分分布"
-      - "提醒触达记录"
-      - "风险关闭时效"
-      - "访视闭环结果"
-      - "人员与中心基础信息"
-    expected_kpis:
-      - "培训命中高风险主题比例提升"
-      - "重复风险发生率下降"
-      - "高风险中心改善周期缩短"
-    tech_types:
-      - "画像建模"
-      - "聚类分析"
-      - "经营分析"
-
-  - id: "opp_15"
-    stage_id: "stage_5"
-    node_ids:
-      - "node_15"
-      - "node_6"
-    name: "风险案例知识库与训练题生成"
-    quadrant: "low_value_high_priority"
-    maturity: "ready"
-    business_value_level: "low"
-    priority_level: "high"
-    scenario_summary: "「培训负责人/质控负责人」在「风险案例沉淀与训练」下提供[典型案例结构化、训练题生成和规则优化建议]能力，以「低价值高优先级」方式把复盘文档转化为一线可训练、可执行的知识资产。"
-    core_problem: "经验沉淀常停留在复盘文档，不能直接进入一线执行和新人训练。"
-    application_value: "单次业务价值有限，但建设成本低、可快速提升知识复用，并支撑案例推荐和风险规则优化。"
-    technical_direction:
-      - "从复核记录、客户质疑和CAPA经验中抽取风险场景、根因、动作和结果。"
-      - "生成训练题、处置卡片和规则优化建议。"
-      - "通过专家审核形成高质量案例库。"
-    required_data:
-      - "风险案例"
-      - "复核记录"
-      - "客户质疑记录"
-      - "CAPA经验条目"
-    expected_kpis:
-      - "典型案例结构化率提升"
-      - "新人训练题库覆盖率提升"
-      - "同类问题重复发生率下降"
-    tech_types:
-      - "NLP抽取"
-      - "生成式AI"
-      - "知识库"
-
-  - id: "opp_16"
-    stage_id: "stage_1"
-    node_ids:
-      - "node_1"
-      - "node_13"
-    name: "访视风险周报自动摘要"
-    quadrant: "low_value_high_priority"
-    maturity: "ready"
-    business_value_level: "low"
-    priority_level: "high"
-    scenario_summary: "「项目经理/客户经理」在「访视事件时间线生成」下提供[周度风险进展、待办、关闭状态自动摘要]能力，以「低价值高优先级」方式减少例行汇报整理并提升信息同步稳定性。"
-    core_problem: "例行周报需要人工从时间线、风险台账和沟通记录中拼接信息。"
-    application_value: "实现成本低，能快速改善项目沟通效率，但不直接改变风险预测核心能力。"
-    technical_direction:
-      - "按周汇总新增风险、关闭风险、逾期风险和关键动作。"
-      - "生成项目经理版、客户经理版和客户版摘要。"
-      - "保留来源链接和人工编辑入口。"
-    required_data:
-      - "访视事件时间线"
-      - "风险台账"
-      - "关闭记录"
-      - "项目进度状态"
-    expected_kpis:
-      - "周报准备时间下降"
-      - "风险同步准时率提升"
-      - "重复沟通次数下降"
-    tech_types:
-      - "生成式AI"
-      - "自动摘要"
-      - "BI报表"
-
-  - id: "opp_17"
-    stage_id: "stage_3"
-    node_ids:
-      - "node_7"
-      - "node_3"
-    name: "受试者沟通话术辅助"
-    quadrant: "low_value_low_priority"
-    maturity: "explore"
-    business_value_level: "low"
-    priority_level: "low"
-    scenario_summary: "「CRC」在「CRC下一步动作提醒」下提供[基于风险类型的受试者沟通话术建议]能力，以「低价值低优先级」方式辅助非标准沟通但不替代临床判断。"
-    core_problem: "部分受试者状态确认和提醒沟通依赖CRC个人表达经验。"
-    application_value: "可改善少量沟通体验，但场景边界敏感、需要严格避免医疗建议越界。"
-    technical_direction:
-      - "基于项目允许话术和合规边界生成沟通建议。"
-      - "按风险类型提供需要确认的问题清单。"
-      - "强制加入人工确认和免责声明。"
-    required_data:
-      - "项目沟通规范"
-      - "受试者状态标签"
-      - "风险类型"
-      - "合规话术库"
-    expected_kpis:
-      - "受试者状态确认遗漏率下降"
-      - "沟通记录完整率提升"
-      - "不合规话术触发率为零"
-    tech_types:
-      - "生成式AI"
-      - "话术推荐"
-      - "合规护栏"
-
-  - id: "opp_18"
-    stage_id: "stage_2"
-    node_ids:
-      - "node_4"
-      - "node_14"
-    name: "跨项目风险规则迁移模拟器"
-    quadrant: "low_value_low_priority"
-    maturity: "explore"
-    business_value_level: "low"
-    priority_level: "low"
-    scenario_summary: "「质控负责人/运营负责人」在「风险规则与SOP匹配」下提供[跨项目规则迁移影响模拟]能力，以「低价值低优先级」方式辅助规则库长期治理和项目复用评估。"
-    core_problem: "不同项目规则差异大，跨项目复用容易引入误报或漏报。"
-    application_value: "适合规则库成熟后做治理优化，短期不应作为MVP重点。"
-    technical_direction:
-      - "比较项目方案、SOP和历史风险分布差异。"
-      - "模拟旧规则迁移到新项目后的命中率和误报风险。"
-      - "输出需要人工复核的规则差异清单。"
-    required_data:
-      - "项目SOP"
-      - "历史规则命中记录"
-      - "风险结果标签"
-      - "项目方案差异"
-    expected_kpis:
-      - "规则迁移复核时间下降"
-      - "跨项目误报率下降"
-      - "规则库复用率提升"
-    tech_types:
-      - "规则模拟"
-      - "知识图谱"
-      - "异常检测"
+- id: opp_01
+  mvp: roadmap
+  stage_id: stage_1
+  node_ids:
+  - node_1
+  - node_2
+  - node_3
+  name: 访视事件时间线与风险证据图谱
+  quadrant: high_value_high_priority
+  maturity: ready
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「项目经理/质控专员」在「风险信号采集与证据建模」下提供[跨系统访视事件抽取、时间线生成与证据图谱]能力，以「高价值高优先级」方式把分散现场事实转化为可追溯的风险判断底座。
+  core_problem: 访视事实分散在CTMS、文档库、沟通群和个人记录中，风险判断缺少统一时间线和证据链。
+  application_value: 降低项目经理跨系统还原事实的时间，让风险从事后发现转为访视前和访视中的前置识别。
+  technical_direction:
+  - 基于流程挖掘和事件抽取生成受试者-访视-中心三层时间线。
+  - 用NLP从沟通记录和访视备注中抽取关键事件、责任人和时间点。
+  - 建立受试者、访视、资料、风险、动作之间的知识图谱。
+  required_data:
+  - 访视安排与执行记录
+  - 资料上传与复核状态
+  - 中心沟通记录
+  - 受试者状态变化记录
+  expected_kpis:
+  - 访视事实还原耗时下降50%以上
+  - 高风险访视提前识别率提升
+  - 关键风险证据链完整率提升
+  tech_types:
+  - 流程挖掘
+  - NLP信息抽取
+  - 知识图谱
+- id: opp_02
+  mvp: backup
+  stage_id: stage_1
+  node_ids:
+  - node_2
+  name: 资料完整性与时效风险预警
+  quadrant: high_value_high_priority
+  maturity: ready
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「CRC/质控专员」在「资料完整性信号采集」下提供[缺失、逾期、版本不一致自动识别与风险提醒]能力，以「高价值高优先级」方式把质控和申办方复核阶段的集中返工前置到访视过程中。
+  core_problem: 资料清单、上传状态、复核状态和归档状态未形成自动校验链，缺失问题常在后端暴露。
+  application_value: 提升关键文档准时完整率和申办方一次复核通过率，减少CRC补传和返工。
+  technical_direction:
+  - 建立项目资料期望清单与实际文件的自动匹配规则。
+  - 用文档分类模型识别文件类型、版本和归档位置。
+  - 按访视窗口、SLA和资料重要性生成风险等级。
+  required_data:
+  - 访视资料清单
+  - 文件元数据
+  - 上传时间
+  - 复核结果
+  - 归档记录
+  expected_kpis:
+  - 关键资料准时完整率提升
+  - 资料缺失返工次数下降
+  - 申办方一次复核通过率提升
+  tech_types:
+  - 文档智能
+  - 规则引擎
+  - 异常检测
+- id: opp_03
+  mvp: primary
+  stage_id: stage_1
+  node_ids:
+  - node_3
+  - node_10
+  name: 受试者状态异常预判
+  quadrant: high_value_high_priority
+  maturity: growth
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「CRC/研究者」在「受试者状态风险信号采集」下提供[监测值、症状、用药变化与项目方案联动的异常预判]能力，以「高价值高优先级」方式把口头经验判断转化为结构化复核输入。
+  core_problem: 受试者状态风险依赖CRC经验和口头确认，异常响应和复核证据可能延迟。
+  application_value: 缩短异常发现到CRC复核证据整理的时间，提升受试者安全感和合规追溯完整性。
+  technical_direction:
+  - 建立受试者监测值、症状、用药变化的纵向变化特征。
+  - 用规则模型和机器学习模型识别异常趋势与复核触发条件。
+  - 输出可解释的异常依据和CRC复核证据材料包。
+  required_data:
+  - 受试者监测值
+  - 症状变化
+  - 用药变化
+  - 既往访视表现
+  - 项目方案阈值
+  expected_kpis:
+  - 异常到复核平均时长下降
+  - CRC复核证据材料完整率提升
+  - 受试者安全相关风险漏识别率下降
+  tech_types:
+  - 预测模型
+  - 临床规则引擎
+  - 可解释AI
+- id: opp_04
+  mvp: roadmap
+  stage_id: stage_2
+  node_ids:
+  - node_4
+  name: SOP语义规则匹配引擎
+  quadrant: low_value_high_priority
+  maturity: explore
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「质控专员/项目经理」在「风险规则与SOP匹配」下提供[SOP、方案要求和风险信号的语义匹配与规则依据解释]能力，以「高价值低优先级」方式把专家口径沉淀为可复用规则资产。
+  core_problem: SOP和项目方案多为文档化要求，难以直接转化为机器可执行规则。
+  application_value: 提升风险提示的可解释性和一线采纳率，但需要先完成知识治理和规则标准化。
+  technical_direction:
+  - 用文档解析和语义分块构建SOP知识库。
+  - 将关键要求转化为条件、阈值、例外和动作建议。
+  - 用RAG生成风险命中依据并保留引用来源。
+  required_data:
+  - SOP文档
+  - 项目方案
+  - 历史偏差案例
+  - 风险命中记录
+  expected_kpis:
+  - 风险解释生成覆盖率提升
+  - 人工查找SOP依据时间下降
+  - 风险提醒采纳率提升
+  tech_types:
+  - RAG
+  - 规则引擎
+  - 知识库
+- id: opp_05
+  mvp: roadmap
+  stage_id: stage_2
+  node_ids:
+  - node_5
+  name: 访视级风险评分与贡献因子解释
+  quadrant: high_value_high_priority
+  maturity: growth
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「项目经理/质控专员」在「访视级风险评分」下提供[多因素风险评分、贡献因子解释与优先处理清单]能力，以「高价值高优先级」方式把质控资源投向最可能影响高质量访视闭环的节点。
+  core_problem: 缺少动态风险评分和贡献因子解释，质控资源难以精准投放。
+  application_value: 提升高风险访视提前拦截率，降低重大偏差和客户质疑概率。
+  technical_direction:
+  - 融合资料完整性、访视窗口、受试者状态、中心表现和CRC负荷数据。
+  - 用梯度提升、异常检测或评分卡模型生成访视风险等级。
+  - 通过SHAP或规则贡献展示风险升高原因。
+  required_data:
+  - 风险命中规则
+  - 历史异常记录
+  - 中心执行表现
+  - CRC负荷状态
+  - 风险处置结果
+  expected_kpis:
+  - 高风险访视提前识别率提升
+  - 重大偏差提前拦截率提升
+  - 质控资源命中率提升
+  tech_types:
+  - 机器学习评分
+  - 异常检测
+  - 可解释AI
+- id: opp_06
+  mvp: roadmap
+  stage_id: stage_2
+  node_ids:
+  - node_6
+  - node_15
+  name: 相似风险案例与处理模板推荐
+  quadrant: low_value_high_priority
+  maturity: growth
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「质控专员/培训负责人」在「相似案例与处理模板推荐」下提供[风险案例检索、相似度匹配和处置模板生成]能力，以「高价值低优先级」方式把资深人员经验转化为可复用行动知识。
+  core_problem: 历史偏差、CAPA和客户反馈没有按场景和动作标签沉淀，案例复用效率低。
+  application_value: 降低新人处理质量波动，减少同类风险跨中心重复发生。
+  technical_direction:
+  - 构建风险案例向量库，按风险类型、根因、动作和结果进行标签化。
+  - 用相似案例检索推荐处理模板和注意事项。
+  - 由专家反馈校准案例标签和模板质量。
+  required_data:
+  - 历史偏差案例
+  - CAPA案例
+  - 客户质疑记录
+  - 复核结论
+  - 处置结果
+  expected_kpis:
+  - 相似案例检索命中率提升
+  - 新人风险处置一致性提升
+  - 同类问题重复发生率下降
+  tech_types:
+  - 向量检索
+  - RAG
+  - 案例推理
+- id: opp_07
+  mvp: support
+  stage_id: stage_3
+  node_ids:
+  - node_7
+  name: CRC下一步动作智能提醒
+  quadrant: high_value_high_priority
+  maturity: ready
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「CRC」在「CRC下一步动作提醒」下提供[风险到行动的任务转译、优先级排序和关闭提醒]能力，以「高价值高优先级」方式减少现场判断负担并提升访视闭环效率。
+  core_problem: 风险提醒如果不能转化为具体动作，CRC仍要自行判断补传、复核、沟通和更新的优先级。
+  application_value: 提升一线可服务体验，让CRC获得可执行、可关闭、可追踪的行动清单。
+  technical_direction:
+  - 建立风险等级到行动模板的映射。
+  - 按访视窗口、SLA、受试者安全和客户关注度排序任务。
+  - 在移动端推送下一步动作、所需资料和关闭标准。
+  required_data:
+  - 访视风险等级
+  - 规则依据说明
+  - 待办事项
+  - 现场工作负荷
+  - 任务完成记录
+  expected_kpis:
+  - CRC日常风险判断耗时下降
+  - 提醒转行动率提升
+  - 访视闭环时效提升
+  tech_types:
+  - 任务推荐
+  - 规则引擎
+  - 智能通知
+- id: opp_09
+  mvp: roadmap
+  stage_id: stage_3
+  node_ids:
+  - node_9
+  name: 提醒有效性反馈与误报漏报标注
+  quadrant: low_value_high_priority
+  maturity: ready
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「CRC/项目经理」在「提醒有效性反馈」下提供[提醒采纳、任务完成、风险结果和误报漏报标注]能力，以「低价值高优先级」方式为后续风险模型和规则优化建立反馈闭环。
+  core_problem: 提醒是否真正降低风险缺少反馈，规则无法持续优化。
+  application_value: 单点业务价值不如风险评分高，但它是所有智能提醒持续变准的基础能力。
+  technical_direction:
+  - 记录提醒触达、点击、接受、忽略、关闭和结果状态。
+  - 设置误报、漏报、有效、无效等轻量标注。
+  - 将反馈样本用于规则阈值优化和模型再训练。
+  required_data:
+  - 提醒触达记录
+  - 任务完成状态
+  - 风险结果
+  - 用户反馈
+  expected_kpis:
+  - 提醒有效性可度量率达到90%以上
+  - 重复误报率下降
+  - 规则迭代周期缩短
+  tech_types:
+  - 反馈学习
+  - 埋点分析
+  - 模型监控
+- id: opp_10
+  mvp: support
+  stage_id: stage_4
+  node_ids:
+  - node_10
+  name: EDC录入辅助与复核证据包整理
+  quadrant: low_value_high_priority
+  maturity: ready
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「CRC」在「EDC录入辅助/复核证据包整理」下提供[检测报告预识别标注、复核证据包自动汇总和EDC字段回填建议]能力，以「CRC事务性工作」方式减少人工判读和记录断层。
+  core_problem: CRC需人工判读检测报告、整理复核证据并回填EDC，易遗漏关键字段或后续行动。
+  application_value: 降低CRC在检测报告解读、EDC字段填写和复核材料整理上的时间成本，提升CRC线下确认后的录入完整率。
+  technical_direction:
+  - CRC手动上传或Excel导入检测报告、访视记录。
+  - AI基于CTCAE和医学知识库输出预识别标注与复核建议。
+  - 按异常类型自动汇总监测值、症状变化、规则依据和历史访视表现，生成EDC回填建议。
+  required_data:
+  - 受试者状态风险标签
+  - 监测值
+  - 症状变化
+  - CTCAE规则库
+  - 项目方案阈值
+  expected_kpis:
+  - EDC字段回填准备时间下降
+  - 复核留痕完整率提升
+  - 复核后行动遗漏率下降
+  tech_types:
+  - OCR/文档解析
+  - CTCAE规则引擎
+  - 结构化抽取
+- id: opp_11
+  mvp: primary
+  stage_id: stage_4
+  node_ids:
+  - node_11
+  name: AE/SAE/CM升级判断与SLA倒计时
+  quadrant: high_value_high_priority
+  maturity: growth
+  business_value_level: high
+  priority_level: high
+  scenario_summary: 「CRC/项目经理/质控专员」在「AE/SAE/CM升级判断」下提供[安全事件线索识别、上报规则匹配、SLA倒计时和材料清单生成]能力，以「高价值高优先级」方式降低漏报、迟报和资料不完整风险。
+  core_problem: AE/SAE/CM升级判断需要综合临床信息、项目规则和时限要求，人工判断压力高。
+  application_value: 直接保护质量合规和客户信任，是风险预测链路中最关键的安全类场景。
+  technical_direction:
+  - 用NLP识别症状、诊断、用药变化和严重程度线索。
+  - 匹配项目上报规则、SLA和材料要求。
+  - 生成升级结论建议、倒计时提醒和上报准备清单。
+  required_data:
+  - CRC复核证据确认记录
+  - AE/SAE/CM线索
+  - SLA规则
+  - 项目上报要求
+  - 历史上报结果
+  expected_kpis:
+  - AE/SAE/CM迟报率下降
+  - 上报资料一次完整率提升
+  - 安全事件线索识别召回率提升
+  tech_types:
+  - NLP分类
+  - 临床规则引擎
+  - 智能SLA提醒
+- id: opp_15
+  mvp: roadmap
+  stage_id: stage_5
+  node_ids:
+  - node_15
+  - node_6
+  name: 风险案例知识库与训练题生成
+  quadrant: low_value_high_priority
+  maturity: ready
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「培训负责人/质控负责人」在「风险案例沉淀与训练」下提供[典型案例结构化、训练题生成和规则优化建议]能力，以「低价值高优先级」方式把复盘文档转化为一线可训练、可执行的知识资产。
+  core_problem: 经验沉淀常停留在复盘文档，不能直接进入一线执行和新人训练。
+  application_value: 单次业务价值有限，但建设成本低、可快速提升知识复用，并支撑案例推荐和风险规则优化。
+  technical_direction:
+  - 从复核记录、客户质疑和CAPA经验中抽取风险场景、根因、动作和结果。
+  - 生成训练题、处置卡片和规则优化建议。
+  - 通过专家审核形成高质量案例库。
+  required_data:
+  - 风险案例
+  - 复核记录
+  - 客户质疑记录
+  - CAPA经验条目
+  expected_kpis:
+  - 典型案例结构化率提升
+  - 新人训练题库覆盖率提升
+  - 同类问题重复发生率下降
+  tech_types:
+  - NLP抽取
+  - 生成式AI
+  - 知识库
+- id: opp_17
+  mvp: roadmap
+  stage_id: stage_3
+  node_ids:
+  - node_7
+  - node_3
+  name: 受试者沟通话术辅助
+  quadrant: low_value_high_priority
+  maturity: explore
+  business_value_level: low
+  priority_level: high
+  scenario_summary: 「CRC」在「CRC下一步动作提醒」下提供[基于风险类型的受试者沟通话术建议]能力，以「低价值低优先级」方式辅助非标准沟通但不替代临床判断。
+  core_problem: 部分受试者状态确认和提醒沟通依赖CRC个人表达经验。
+  application_value: 可改善少量沟通体验，但场景边界敏感、需要严格避免医疗建议越界。
+  technical_direction:
+  - 基于项目允许话术和合规边界生成沟通建议。
+  - 按风险类型提供需要确认的问题清单。
+  - 强制加入人工确认和免责声明。
+  required_data:
+  - 项目沟通规范
+  - 受试者状态标签
+  - 风险类型
+  - 合规话术库
+  expected_kpis:
+  - 受试者状态确认遗漏率下降
+  - 沟通记录完整率提升
+  - 不合规话术触发率为零
+  tech_types:
+  - 生成式AI
+  - 话术推荐
+  - 合规护栏
+mvp_scope:
+  summary: 本轮PoC/MVP只保留1个端到端主场景与2个支撑能力，其余机会全部进入路线图，避免本体对象与演示分支膨胀。
+  main_scenario: 受试者状态异常预判 → 复核证据包 → AE/SAE/CM升级判断 → 动作闭环（opp_03 + opp_11 串联，即原型PV-031主链）
+  supporting:
+  - opp_07: 下一步动作智能提醒（主场景上的动作转译能力）
+  - opp_10: EDC录入辅助与复核证据包整理（主场景上的预识别标注与回填建议能力）
+  backup_scenario: opp_02 资料完整性与时效预警（对应原型侧栏PV-019，可作第2演示分支）
+  roadmap:
+  - opp_01: 访视事件时间线与风险证据图谱
+  - opp_04: SOP语义规则匹配引擎
+  - opp_05: 访视级风险评分与贡献因子解释
+  - opp_06: 相似风险案例与处理模板推荐
+  - opp_09: 提醒有效性反馈与误报漏报标注
+  - opp_15: 风险案例知识库与训练题生成
+  - opp_17: 受试者沟通话术辅助
 
 external_references:
-  - title: "FDA AI draft guidance for drug regulatory decision-making"
-    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/considerations-use-artificial-intelligence-support-regulatory-decision-making-drug-biological"
-    relevance: "用于提示AI模型在药物研发相关场景中需要定义使用情境、可信度评估和风险控制。"
-  - title: "Risk-Based Monitoring in Clinical Trials: 2021 Update"
-    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9829217/"
-    relevance: "支持集中化监查、KRI/QTL、跨数据源异常识别和前置风险监测方向。"
-  - title: "Real-time clinical note monitoring to detect conditions for rapid follow-up"
-    url: "https://academic.oup.com/jamia/article/28/1/126/5943222"
-    relevance: "提供临床文本近实时监测、自动触发研究团队复核的相似案例。"
-  - title: "AI-enabled safety monitoring in Alzheimer's disease clinical trials"
-    url: "https://www.sciencedirect.com/science/article/pii/S2274580724005946"
-    relevance: "支持AI/NLP用于AE编码、临床试验安全监测和人机协同复核方向。"
-  - title: "Scaling eTMF Completeness for a Hyper-Growth Biotech"
-    url: "https://www.usdm.com/resources/case-studies/scaling-etmf-completeness-for-a-hyper-growth-biotech"
-    relevance: "支持eTMF完整性、缺失文档可视化、任务所有权和检查就绪追踪方向。"
-
+- title: FDA AI draft guidance for drug regulatory decision-making
+  url: https://www.fda.gov/regulatory-information/search-fda-guidance-documents/considerations-use-artificial-intelligence-support-regulatory-decision-making-drug-biological
+  relevance: 用于提示AI模型在药物研发相关场景中需要定义使用情境、可信度评估和风险控制。
+- title: 'Risk-Based Monitoring in Clinical Trials: 2021 Update'
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9829217/
+  relevance: 支持集中化监查、KRI/QTL、跨数据源异常识别和前置风险监测方向。
+- title: Real-time clinical note monitoring to detect conditions for rapid follow-up
+  url: https://academic.oup.com/jamia/article/28/1/126/5943222
+  relevance: 提供临床文本近实时监测、自动触发研究团队复核的相似案例。
+- title: AI-enabled safety monitoring in Alzheimer's disease clinical trials
+  url: https://www.sciencedirect.com/science/article/pii/S2274580724005946
+  relevance: 支持AI/NLP用于AE编码、临床试验安全监测和人机协同复核方向。
+- title: Scaling eTMF Completeness for a Hyper-Growth Biotech
+  url: https://www.usdm.com/resources/case-studies/scaling-etmf-completeness-for-a-hyper-growth-biotech
+  relevance: 支持eTMF完整性、缺失文档可视化、任务所有权和检查就绪追踪方向。
 analysis_conclusion:
-  coverage_statement: "本地图覆盖访视风险预测与智能提醒价值流的5个L1阶段、15个核心L2业务节点，共识别18个AI机会点。其中高价值高优先级7个，建议作为MVP主线；高价值低优先级5个，适合作为平台化能力二期建设；低价值高优先级4个，适合作为数据闭环和低成本快赢；低价值低优先级2个，建议暂缓。外部案例显示，临床试验行业正在从人工监查转向风险导向、集中化、可追溯的质量管理；NLP、规则引擎、异常检测和生成式AI可用于临床文本监测、AE辅助编码、eTMF完整性追踪和风险闭环。"
+  coverage_statement: 本地图基于'医院系统接口封闭、商务周期长'的约束重构：剔除面向医生/医院系统的辅助诊疗和流程优化场景，聚焦CRC行政与数据效率提升。保留的12个AI机会点全部落在无需系统对接的CRC独立工具侧，其中CRC核心事务6个、CRC事务性工作6个，无落点留在医院系统依赖象限。
   implementation_sequence:
-    - "第一优先级：资料完整性与时效风险预警、CRC下一步动作智能提醒、风险闭环与CAPA自动跟踪。"
-    - "第二优先级：访视事件时间线与风险证据图谱、访视级风险评分与贡献因子解释、AE/SAE/CM升级判断与SLA倒计时。"
-    - "第三优先级：提醒有效性反馈、医生复核材料自动整理、风险案例知识库与训练题生成。"
-    - "第四优先级：客户视角风险摘要、中心/CRC风险画像、相似风险案例推荐和SOP语义规则匹配。"
+  - 第一优先级（CRC核心事务）：资料完整性与时效风险预警、CRC下一步动作智能提醒、受试者状态异常预判、AE/SAE/CM升级判断与SLA倒计时。
+  - 第二优先级（CRC核心事务+事务性辅助）：访视事件时间线与风险证据图谱、访视级风险评分与贡献因子解释。
+  - 第三优先级（CRC事务性工作）：提醒有效性反馈、EDC录入辅助与复核证据包整理、相似风险案例与处理模板推荐、风险案例知识库与训练题生成、SOP语义规则匹配引擎、受试者沟通话术辅助。
+  - 核心结论：高价值机会全部落在无需医院HIS/EMR对接的CRC独立工具侧；任何需医生决策或医院系统集成的方向因商务周期长、接口封闭，本轮暂缓。
+  mvp_statement: 本轮MVP仅保留1条主场景链（opp_03受试者状态异常预判→opp_11 AE/SAE/CM升级判断），由opp_07动作提醒与opp_10 EDC录入辅助作为支撑能力；opp_02资料完整性作为备选第2分支；其余机会点（事件时间线/风险评分/SOP语义匹配/相似案例/反馈标注/训练题/沟通话术）全部列入路线图，待主场景数据与反馈稳定后再评估。

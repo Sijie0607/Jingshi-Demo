@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2024-01-01T00:00:00.000Z" agent="5.0" etag="xxx" version="22.1.2" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1422" dy="798" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="backend" value="Microservices Cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;fontColor=#64748b;strokeColor=#cbd5e1;strokeWidth=2;dashed=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="1000" height="600" as="geometry" />
+        </mxCell>
+        <object label="Buyer App&lt;br/&gt;&lt;i&gt;(Flutter)&lt;/i&gt;" id="app">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;fontColor=#FFFFFF;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="100" y="100" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Web Store&lt;br/&gt;&lt;i&gt;(Next.js)&lt;/i&gt;" id="web">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;fontColor=#FFFFFF;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="380" y="100" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="API Gateway&lt;br/&gt;&lt;i&gt;(Spring Cloud Gateway)&lt;/i&gt;" id="gateway">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B8CADD;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="100" y="300" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Order Service&lt;br/&gt;&lt;i&gt;(Java)&lt;/i&gt;" id="order">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EACBCB;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="backend">
+            <mxGeometry x="100" y="500" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Product Service&lt;br/&gt;&lt;i&gt;(Java)&lt;/i&gt;" id="product">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EACBCB;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="backend">
+            <mxGeometry x="380" y="500" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="User Service&lt;br/&gt;&lt;i&gt;(Node.js)&lt;/i&gt;" id="user">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B8CADD;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="backend">
+            <mxGeometry x="660" y="500" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Payment Service&lt;br/&gt;&lt;i&gt;(Java)&lt;/i&gt;" id="pay_svc">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B8CADD;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="backend">
+            <mxGeometry x="940" y="500" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Order DB&lt;br/&gt;&lt;i&gt;(MySQL)&lt;/i&gt;" id="db_order">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE0;fontColor=#2C3E50;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="100" y="700" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Product DB&lt;br/&gt;&lt;i&gt;(PostgreSQL)&lt;/i&gt;" id="db_prod">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE0;fontColor=#2C3E50;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="380" y="700" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Redis Cluster&lt;br/&gt;&lt;i&gt;(Cache)&lt;/i&gt;" id="redis">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE0;fontColor=#2C3E50;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="660" y="700" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Message Queue&lt;br/&gt;&lt;i&gt;(RocketMQ)&lt;/i&gt;" id="mq">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE0;fontColor=#2C3E50;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="940" y="700" width="180" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="HTTPS" id="edge_0">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="app" target="gateway">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="HTTPS" id="edge_1">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="web" target="gateway">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Route" id="edge_2">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="gateway" target="order">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Route" id="edge_3">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="gateway" target="product">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Route" id="edge_4">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="gateway" target="user">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Route" id="edge_5">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="gateway" target="pay_svc">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="R/W" id="edge_6">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="order" target="db_order">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Async Event" id="edge_7">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="order" target="mq">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="R/W" id="edge_8">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="product" target="db_prod">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Cache" id="edge_9">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="product" target="redis">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRC访视风险助手</title>
+  <style>
+    :root {
+      --color-primary: #10213E;
+      --color-accent: #5DB2E2;
+      --color-secondary: #625D9C;
+      --color-success: #00524C;
+      --color-info: #6FB1C8;
+      --color-warning: #F59E0B;
+      --color-destructive: #EF4444;
+      --color-background: #FFFFFF;
+      --color-bg-alt: #F5F5F6;
+      --color-foreground: #10213E;
+      --color-text-muted: #64748B;
+      --color-border: #E2E8F0;
+      --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+      --radius-md: 8px;
+      --font-family: "MiSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg-alt);
+      padding: 32px;
+      color: var(--color-foreground);
+      line-height: 1.5;
+    }
+
+    .canvas-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: var(--color-background);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 800px;
+    }
+
+    /* Standardized Header */
+    .page-header {
+      padding: 32px 40px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-header h1::before {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 24px;
+      background: var(--color-accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+      padding-left: 16px;
+    }
+
+    .header-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+    .btn-secondary:hover { background: var(--color-bg-alt); }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--color-primary); color: #fff;
+      padding: 12px 24px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none; z-index: 1000;
+    }
+
+    .canvas-body {
+      padding: 24px 40px 40px 40px;
+      display: flex;
+      flex: 1;
+      gap: 16px;
+      overflow-x: auto;
+    }
+
+    /* 5 columns Grid */
+    .column {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Card Base */
+    .card {
+      background: var(--color-background);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      transition: transform 0.15s ease-out;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-alt);
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-header-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 6px;
+      background: rgba(16, 33, 62, 0.05);
+      color: var(--color-primary);
+    }
+
+    .card-header-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .card-body {
+      padding: 20px;
+      font-size: 14px;
+      color: var(--color-foreground);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card-body ul, .card-body ol {
+      list-style: none;
+    }
+
+    .card-body li {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .card-body li:last-child {
+      margin-bottom: 0;
+    }
+
+    .bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    
+    .number-bullet {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* Color Overrides for specific cards */
+    .theme-roles { border-left: 4px solid var(--color-secondary); }
+    .theme-pains { border-left: 4px solid var(--color-destructive); }
+    .theme-input { border-left: 4px solid var(--color-accent); }
+    .theme-data { border-left: 4px solid var(--color-info); }
+    .theme-workflow { border-left: 4px solid var(--color-primary); }
+    .theme-cap { border-left: 4px solid var(--color-secondary); }
+    .theme-output { border-left: 4px solid var(--color-accent); }
+    .theme-tools { border-left: 4px solid var(--color-info); }
+    .theme-product { border-left: 4px solid var(--color-success); }
+    .theme-gains { border-left: 4px solid var(--color-success); }
+
+  </style>
+</head>
+<body>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <div class="canvas-container">
+    <header class="page-header">
+      <div class="header-left">
+        <h1>CRC访视风险助手</h1>
+      </div>
+      <div class="header-right">
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="window.print()">导出 PDF / 打印</button>
+          <button class="btn-primary" onclick="copyYAML()">复制原始 YAML</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="canvas-body">
+      
+      <!-- Col 1: userRoles & userPains -->
+      <div class="column">
+        <!-- userRoles -->
+        <div class="card theme-roles">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">用户角色</div>
+              <div class="card-subtitle">使用该AI场景的用户角色和群体</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC</li>
+              
+                <li><span class="bullet"></span>CRC组长</li>
+              
+            </ul>
+          </div>
+        </div>
+        <!-- userPains -->
+        <div class="card theme-pains">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">用户痛点</div>
+              <div class="card-subtitle">用户当前面临的问题 and 挑战</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2v1"/><path d="M12 6a6 6 0 0 1 6 6c0 1.66-.67 3.16-1.76 4.25a2.99 2.99 0 0 0-.88 2.12v.63h-6v-.63c0-.8-.31-1.55-.88-2.12A5.99 5.99 0 0 1 6 12a6 6 0 0 1 6-6Z"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC在现场同时处理访视执行、资料补传、复核证据整理、AE/SAE/CM线索确认和状态更新，容易遗漏下一步动作。</li>
+              
+                <li><span class="bullet"></span>受试者状态异常预判依赖个人经验和口头确认，缺少结构化证据，异常响应可能延迟。</li>
+              
+                <li><span class="bullet"></span>风险提醒如果只提示有风险但不给出动作、依据和关闭标准，CRC仍需自行判断优先级。</li>
+              
+                <li><span class="bullet"></span>研究者复核前的监测值、症状变化、检测指标变化和规则依据需要人工整理，复核后留痕容易断裂。</li>
+              
+                <li><span class="bullet"></span>AE/SAE/CM升级判断涉及临床信息、项目规则和SLA时限，人工判断压力高，漏报或迟报风险高。</li>
+              
+                <li><span class="bullet"></span>多角色协同暂不做直接使用端，但CRC仍需要知道其他角色责任边界、升级规则和处置模板。</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2: aiInput & dataKnowledge -->
+      <div class="column">
+        <div class="card theme-input">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">AI 场景输入</div>
+              <div class="card-subtitle">AI系统需要的输入数据和格式</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC打开今日访视任务或选中某个受试者访视记录。</li>
+              
+                <li><span class="bullet"></span>系统带入受试者监测值、症状变化、检测指标变化、既往访视表现和资料上传状态。</li>
+              
+                <li><span class="bullet"></span>系统带入访视风险等级、风险命中规则、SOP依据和待办事项。</li>
+              
+                <li><span class="bullet"></span>CRC补充现场观察、沟通记录、CRC线下确认结论或需要判断的问题。</li>
+              
+                <li><span class="bullet"></span>系统带入AE/SAE/CM线索、项目上报规则、SLA时限和材料准备要求。</li>
+              
+            </ul>
+          </div>
+        </div>
+        <div class="card theme-data">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">数据/知识</div>
+              <div class="card-subtitle">AI系统需要的数据 and 领域知识</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>项目方案、SOP、高频风险规则、访视窗口规则和例外条件。</li>
+              
+                <li><span class="bullet"></span>受试者访视时间线、执行记录、资料上传状态、复核状态和关闭记录。</li>
+              
+                <li><span class="bullet"></span>历史偏差案例、CAPA案例、客户质疑记录、相似风险处置模板。</li>
+              
+                <li><span class="bullet"></span>AE/SAE/CM判断规则、上报SLA、材料清单和历史上报结果。</li>
+              
+                <li><span class="bullet"></span>研究者复核记录、症状描述标准化词表、检测指标变化记录和临床异常阈值。</li>
+              
+                <li><span class="bullet"></span>角色责任知识库、升级路径、责任边界和多角色处置模板。</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3: workflow & modelUsage (Core Capabilities) -->
+      <div class="column">
+        <div class="card theme-workflow">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">AI 处理 WORKFLOW</div>
+              <div class="card-subtitle">AI系统的工作流程和步骤</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="2" y="2" rx="2"/><path d="M14 2c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2"/><path d="M20 2c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2"/><path d="M10 18H5c-1.7 0-3-1.3-3-3v-1"/><polyline points="7 21 10 18 7 15"/><rect width="8" height="8" x="14" y="14" rx="2"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ol>
+              
+                <li><span class="number-bullet">1.</span>汇聚上下文：按受试者、访视、中心和项目自动汇总时间线、资料状态、受试者状态和历史风险。</li>
+              
+                <li><span class="number-bullet">2.</span>识别风险信号：抽取资料缺失、访视超窗、症状变化、检测指标变化、异常监测值和AE/SAE/CM线索。</li>
+              
+                <li><span class="number-bullet">3.</span>匹配规则依据：检索项目SOP、风险规则、上报SLA和相似案例，形成可追溯的风险解释。</li>
+              
+                <li><span class="number-bullet">4.</span>生成辅助判断：输出异常预判、研究者复核触发建议、AE/SAE/CM升级提示和置信度说明。</li>
+              
+                <li><span class="number-bullet">5.</span>转译下一步动作：把风险判断转为CRC可执行任务、优先级、截止时间、所需资料和关闭标准。</li>
+              
+                <li><span class="number-bullet">6.</span>生成复核证据包：自动整理研究者复核材料、关键指标变化、症状摘要、规则依据和待确认问题清单。</li>
+              
+                <li><span class="number-bullet">7.</span>记录反馈闭环：采集CRC采纳、忽略、修正、误报、漏报和任务关闭结果，用于规则和模型迭代。</li>
+              
+            </ol>
+          </div>
+        </div>
+        <div class="card theme-cap">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">核心能力</div>
+              <div class="card-subtitle">场景所需的关键 AI 及工程能力</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 2-2"/><path d="m19 11-2-2"/><path d="M12 2v2"/><path d="m18 6 1-1"/><path d="m6 6-1-1"/><path d="M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/><path d="M7 14a5 5 0 0 0 10 0"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>文本大模型用于访视记录、沟通记录、SOP条款和历史案例的语义理解与摘要生成。</li>
+              
+                <li><span class="bullet"></span>RAG检索用于从项目方案、SOP、AE/SAE/CM规则和案例知识库中返回可引用依据。</li>
+              
+                <li><span class="bullet"></span>规则引擎用于访视窗口、资料完整性、SLA倒计时、升级条件和关闭标准判断。</li>
+              
+                <li><span class="bullet"></span>预测模型或评分卡用于受试者状态异常预判、访视级风险评分和贡献因子解释。</li>
+              
+                <li><span class="bullet"></span>信息抽取模型用于识别症状、检测指标变化、检查数值、AE/SAE/CM线索和责任角色。</li>
+              
+                <li><span class="bullet"></span>人机协同护栏用于限制AI只做提示、证据整理和建议，不替代CRC临床判断或最终合规结论。</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 4: aiOutput & tools -->
+      <div class="column">
+        <div class="card theme-output">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">AI 输出</div>
+              <div class="card-subtitle">AI系统产生的输出结果 and 格式</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC今日风险待办清单，包含优先级、原因、下一步动作、截止时间和关闭标准。</li>
+              
+                <li><span class="bullet"></span>受试者状态异常预判卡，包含异常线索、规则依据、建议复核对象和置信度说明。</li>
+              
+                <li><span class="bullet"></span>复核证据包，包含监测值变化、症状变化、检测指标变化、历史访视对比和待确认问题。</li>
+              
+                <li><span class="bullet"></span>AE/SAE/CM升级提示卡，包含疑似事件线索、SLA倒计时、材料清单和人工确认入口。</li>
+              
+                <li><span class="bullet"></span>资料完整性提醒，包含缺失文件、版本不一致、逾期风险和补传建议。</li>
+              
+                <li><span class="bullet"></span>相似案例与处置模板，包含历史案例、推荐动作、注意事项和适用边界。</li>
+              
+                <li><span class="bullet"></span>反馈标注结果，包含提醒是否有效、是否误报漏报、CRC修正原因和后续优化线索。</li>
+              
+            </ul>
+          </div>
+        </div>
+        <div class="card theme-tools">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">工具调用</div>
+              <div class="card-subtitle">AI系统需要调用的内外部 API</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC手动上传或Excel导入检测报告、访视记录和源资料。</li>
+              
+                <li><span class="bullet"></span>本地Web工具接入CTCAE知识库、医学专业知识库和项目SOP规则库。</li>
+              
+                <li><span class="bullet"></span>CTMS读取访视计划、访视窗口、执行状态和中心任务（可选，不影响核心MVP）。</li>
+              
+                <li><span class="bullet"></span>eTMF或文档库读取资料清单、上传文件、复核状态和归档记录（可选）。</li>
+              
+                <li><span class="bullet"></span>风险台账写入风险等级、提醒记录、处置状态、关闭证据和反馈标签。</li>
+              
+                <li><span class="bullet"></span>SOP知识库和案例知识库提供规则检索、条款引用、相似案例和处置模板。</li>
+              
+                <li><span class="bullet"></span>移动端或CRC Copilot推送待办卡片、复核证据包和一键反馈。</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 5: productType & userGains -->
+      <div class="column">
+        <div class="card theme-product">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">产品形态</div>
+              <div class="card-subtitle">AI系统的产品形式 and 交互方式</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>本地Web工具或嵌入CRC Copilot/CTMS侧边栏的访视风险助手，CRC手动上传受试者检测资料即可看到风险卡和下一步动作。</li>
+              
+                <li><span class="bullet"></span>移动端轻量待办卡片，支持确认、修正、暂缓、生成复核证据包和标注误报漏报。</li>
+              
+                <li><span class="bullet"></span>后台知识库配置台，仅供CRC组长维护规则、案例和角色责任知识，不面向多角色直接协同。</li>
+              
+            </ul>
+          </div>
+        </div>
+        <div class="card theme-gains">
+          <div class="card-header">
+            <div class="header-text">
+              <div class="card-title">用户收益</div>
+              <div class="card-subtitle">用户通过使用该AI场景获得的好处</div>
+            </div>
+            <div class="card-header-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              
+                <li><span class="bullet"></span>CRC下一步动作判断耗时下降40%以上。</li>
+              
+                <li><span class="bullet"></span>高风险访视提前识别率提升30%以上。</li>
+              
+                <li><span class="bullet"></span>研究者复核材料准备时间下降50%以上。</li>
+              
+                <li><span class="bullet"></span>资料缺失和补传返工次数下降30%以上。</li>
+              
+                <li><span class="bullet"></span>AE/SAE/CM疑似线索进入人工确认的及时率提升至95%以上。</li>
+              
+                <li><span class="bullet"></span>风险提醒有效性可度量率达到90%以上。</li>
+              
+                <li><span class="bullet"></span>MVP阶段不以客户/申办方门户体验为主要指标，优先衡量CRC采纳率、任务关闭率和辅助判断准确性。</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 16px; font-size: 12px; color: var(--color-text-muted); max-width: 1440px; margin-left: auto; margin-right: auto; padding: 16px 0 8px;">
+    Generated by ai-canvas-generator &middot; &copy; 2026 Inspire AI4PM
+  </div>
+
+  <div class="toast" id="toast">已成功复制 YAML 数据</div>
+  
+  <script type="application/yaml" id="raw-yaml">
+title: CRC访视风险助手
+description: 面向CRC的一线访视风险提醒与EDC录入辅助MVP：CRC手动上传或Excel导入检测报告后，平台后端接入CTCAE和医学专业知识知识库，AI输出预识别标注与复核证据包，辅助CRC完成线下标注和EDC回填。
+userRoles:
+- CRC
+- CRC组长
+userPains:
+- CRC在现场同时处理访视执行、资料补传、复核证据整理、AE/SAE/CM线索确认和状态更新，容易遗漏下一步动作。
+- 受试者状态异常预判依赖个人经验和口头确认，缺少结构化证据，异常响应可能延迟。
+- 风险提醒如果只提示有风险但不给出动作、依据和关闭标准，CRC仍需自行判断优先级。
+- 研究者复核前的监测值、症状变化、检测指标变化和规则依据需要人工整理，复核后留痕容易断裂。
+- AE/SAE/CM升级判断涉及临床信息、项目规则和SLA时限，人工判断压力高，漏报或迟报风险高。
+- 多角色协同暂不做直接使用端，但CRC仍需要知道其他角色责任边界、升级规则和处置模板。
+aiInput:
+- CRC打开今日访视任务或选中某个受试者访视记录。
+- 系统带入受试者监测值、症状变化、检测指标变化、既往访视表现和资料上传状态。
+- 系统带入访视风险等级、风险命中规则、SOP依据和待办事项。
+- CRC补充现场观察、沟通记录、CRC线下确认结论或需要判断的问题。
+- 系统带入AE/SAE/CM线索、项目上报规则、SLA时限和材料准备要求。
+dataKnowledge:
+- 项目方案、SOP、高频风险规则、访视窗口规则和例外条件。
+- 受试者访视时间线、执行记录、资料上传状态、复核状态和关闭记录。
+- 历史偏差案例、CAPA案例、客户质疑记录、相似风险处置模板。
+- AE/SAE/CM判断规则、上报SLA、材料清单和历史上报结果。
+- 研究者复核记录、症状描述标准化词表、检测指标变化记录和临床异常阈值。
+- 角色责任知识库、升级路径、责任边界和多角色处置模板。
+workflow:
+- 汇聚上下文：按受试者、访视、中心和项目自动汇总时间线、资料状态、受试者状态和历史风险。
+- 识别风险信号：抽取资料缺失、访视超窗、症状变化、检测指标变化、异常监测值和AE/SAE/CM线索。
+- 匹配规则依据：检索项目SOP、风险规则、上报SLA和相似案例，形成可追溯的风险解释。
+- 生成辅助判断：输出异常预判、研究者复核触发建议、AE/SAE/CM升级提示和置信度说明。
+- 转译下一步动作：把风险判断转为CRC可执行任务、优先级、截止时间、所需资料和关闭标准。
+- 生成复核证据包：自动整理研究者复核材料、关键指标变化、症状摘要、规则依据和待确认问题清单。
+- 记录反馈闭环：采集CRC采纳、忽略、修正、误报、漏报和任务关闭结果，用于规则和模型迭代。
+modelUsage:
+- 文本大模型用于访视记录、沟通记录、SOP条款和历史案例的语义理解与摘要生成。
+- RAG检索用于从项目方案、SOP、AE/SAE/CM规则和案例知识库中返回可引用依据。
+- 规则引擎用于访视窗口、资料完整性、SLA倒计时、升级条件和关闭标准判断。
+- 预测模型或评分卡用于受试者状态异常预判、访视级风险评分和贡献因子解释。
+- 信息抽取模型用于识别症状、检测指标变化、检查数值、AE/SAE/CM线索和责任角色。
+- 人机协同护栏用于限制AI只做提示、证据整理和建议，不替代CRC临床判断或最终合规结论。
+aiOutput:
+- CRC今日风险待办清单，包含优先级、原因、下一步动作、截止时间和关闭标准。
+- 受试者状态异常预判卡，包含异常线索、规则依据、建议复核对象和置信度说明。
+- 复核证据包，包含监测值变化、症状变化、检测指标变化、历史访视对比和待确认问题。
+- AE/SAE/CM升级提示卡，包含疑似事件线索、SLA倒计时、材料清单和人工确认入口。
+- 资料完整性提醒，包含缺失文件、版本不一致、逾期风险和补传建议。
+- 相似案例与处置模板，包含历史案例、推荐动作、注意事项和适用边界。
+- 反馈标注结果，包含提醒是否有效、是否误报漏报、CRC修正原因和后续优化线索。
+tools:
+- CRC手动上传或Excel导入检测报告、访视记录和源资料。
+- 本地Web工具接入CTCAE知识库、医学专业知识库和项目SOP规则库。
+- CTMS读取访视计划、访视窗口、执行状态和中心任务（可选，不影响核心MVP）。
+- eTMF或文档库读取资料清单、上传文件、复核状态和归档记录（可选）。
+- 风险台账写入风险等级、提醒记录、处置状态、关闭证据和反馈标签。
+- SOP知识库和案例知识库提供规则检索、条款引用、相似案例和处置模板。
+- 移动端或CRC Copilot推送待办卡片、复核证据包和一键反馈。
+productType:
+- 本地Web工具或嵌入CRC Copilot/CTMS侧边栏的访视风险助手，CRC手动上传受试者检测资料即可看到风险卡和下一步动作。
+- 移动端轻量待办卡片，支持确认、修正、暂缓、生成复核证据包和标注误报漏报。
+- 后台知识库配置台，仅供CRC组长维护规则、案例和角色责任知识，不面向多角色直接协同。
+userGains:
+- CRC下一步动作判断耗时下降40%以上。
+- 高风险访视提前识别率提升30%以上。
+- 研究者复核材料准备时间下降50%以上。
+- 资料缺失和补传返工次数下降30%以上。
+- AE/SAE/CM疑似线索进入人工确认的及时率提升至95%以上。
+- 风险提醒有效性可度量率达到90%以上。
+- MVP阶段不以客户/申办方门户体验为主要指标，优先衡量CRC采纳率、任务关闭率和辅助判断准确性。
+  </script>
+
+  <script>
+    function copyYAML() {
+      const yaml = document.getElementById('raw-yaml').textContent.trim();
+      navigator.clipboard.writeText(yaml).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>

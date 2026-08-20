@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2024-01-01T00:00:00.000Z" agent="5.0" etag="xxx" version="22.1.2" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1422" dy="798" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+<object label="海外买家" id="actor_1"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;fontColor=#FFFFFF;strokeColor=none;arcSize=4;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="100" y="100" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="跨境商家" id="actor_2"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;fontColor=#FFFFFF;strokeColor=none;arcSize=4;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="380" y="100" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="平台运营" id="actor_3"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;fontColor=#FFFFFF;strokeColor=none;arcSize=4;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="660" y="100" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="国际支付网关" id="ext_1"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;fontColor=#606F7B;strokeColor=#E1E8ED;arcSize=6;fontSize=14;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="100" y="400.0" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="跨境物流服务商" id="ext_5"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;fontColor=#606F7B;strokeColor=#E1E8ED;arcSize=6;fontSize=14;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="380" y="400.0" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="GlobalMall 核心平台" id="core"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EACBCB;fontColor=#2C3E50;strokeColor=none;arcSize=6;fontSize=14;" vertex="1" parent="1"><mxGeometry x="100" y="500" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="云基础设施" id="infra_3"><mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE0;fontColor=#2C3E50;strokeColor=none;arcSize=4;fontSize=14;" vertex="1" parent="1"><mxGeometry x="100" y="700" width="180" height="80" as="geometry" /></mxCell></object>
+<object label="使用" id="edge_0"><mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="actor_1" target="core"><mxGeometry relative="1" as="geometry" /></mxCell></object>
+<object label="支付请求" id="edge_1"><mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="core" target="ext_1"><mxGeometry relative="1" as="geometry" /></mxCell></object>
+<object label="物流调度" id="edge_2"><mxCell style="endArrow=blockThin;html=1;fontSize=11;fontColor=#606F7B;strokeWidth=1;endFill=1;strokeColor=#B0BEC5;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;endSize=6;jumpStyle=line;" edge="1" parent="1" source="core" target="ext_5"><mxGeometry relative="1" as="geometry" /></mxCell></object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

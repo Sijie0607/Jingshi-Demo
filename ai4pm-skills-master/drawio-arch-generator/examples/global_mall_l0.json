@@ -1,0 +1,58 @@
+{
+  "level": "l0",
+  "title": "GlobalMall 出海电商架构",
+  "layout": "landscape",
+  "actors": [
+    { "id": "user_1", "label": "🌍 海外买家" },
+    { "id": "user_2", "label": "🏪 跨境商家" },
+    { "id": "user_3", "label": "👨‍💻 平台运营" }
+  ],
+  "left_panel": {
+    "title": "上游/外部集成",
+    "items": [
+      "← 国际支付网关",
+      "← 跨境物流服务",
+      "← 税务申报系统",
+      "→ 卖家 ERP/WMS",
+      "→ 营销广告渠道"
+    ]
+  },
+  "right_panel": {
+    "title": "技术栈",
+    "items": [
+      "Spring Cloud / Java",
+      "Go / Node.js",
+      "React / Flutter",
+      "Kubernetes",
+      "MySQL / Redis",
+      "RocketMQ"
+    ]
+  },
+  "center": {
+    "app_layer": {
+      "title": "应用与网关层",
+      "nodes": [
+        { "id": "app_1", "label": "买家端 App", "type": "app" },
+        { "id": "app_2", "label": "商家中心", "type": "app" },
+        { "id": "app_3", "label": "运营后台", "type": "app" },
+        { "id": "bff_1", "label": "买家 BFF", "type": "bff" },
+        { "id": "bff_2", "label": "商家 BFF", "type": "bff" },
+        { "id": "bff_3", "label": "管理 BFF", "type": "bff" },
+        { "id": "bff_4", "label": "OpenAPI", "type": "bff" }
+      ]
+    },
+    "service_layer": {
+      "title": "核心微服务",
+      "nodes": [
+        { "id": "ms_1", "label": "商品服务", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_2", "label": "订单服务", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_3", "label": "库存服务", "type": "svc", "color": "#FADBD8" },
+        { "id": "ms_4", "label": "支付服务", "type": "svc", "color": "#D6EAF8" },
+        { "id": "ms_5", "label": "物流服务", "type": "svc", "color": "#D6EAF8" },
+        { "id": "ms_6", "label": "用户服务", "type": "svc", "color": "#D6EAF8" },
+        { "id": "ms_7", "label": "风控服务", "type": "svc", "color": "#D1F2EB" },
+        { "id": "ms_8", "label": "数据报表", "type": "svc", "color": "#D1F2EB" }
+      ]
+    }
+  }
+}

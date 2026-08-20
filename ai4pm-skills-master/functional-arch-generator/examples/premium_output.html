@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen AI Platform - Functional Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #fcfcfd;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-soft: rgba(226, 232, 240, 0.8);
+            
+            /* High-end HSL Palette */
+            --h-tp: 226; --s-tp: 80%; --l-tp: 60%; /* Touchpoint: Blue */
+            --h-sc: 142; --s-sc: 70%; --l-sc: 45%; /* Scenario: Green */
+            --h-cm: 270; --s-cm: 70%; --l-cm: 60%; /* Common: Purple */
+            --h-fd: 215; --s-fd: 20%; --l-fd: 50%; /* Foundation: Slate */
+            --h-in: 45;  --s-in: 90%; --l-in: 45%; /* Input: Gold */
+            --h-ot: 190; --s-ot: 80%; --l-ot: 45%; /* Output: Cyan */
+
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 60px 40px;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        header {
+            margin-bottom: 60px;
+            text-align: center;
+            animation: fadeInDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+        }
+
+        .description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .architecture-grid {
+            display: flex;
+            gap: 32px;
+            align-items: stretch;
+            perspective: 1000px;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-canvas {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Layer Container */
+        .layer {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-premium);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: fadeSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        .layer:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .layer-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            background: linear-gradient(to right, rgba(var(--h), var(--s), var(--l), 0.1), transparent);
+            color: hsl(var(--h), var(--s), calc(var(--l) * 0.6));
+        }
+
+        .layer-header i { width: 20px; height: 20px; }
+
+        .layer-content {
+            padding: 28px;
+            display: grid;
+            gap: 24px;
+        }
+
+        /* Layer Theming */
+        .layer-user_touchpoint { --h: var(--h-tp); --s: var(--s-tp); --l: var(--l-tp); }
+        .layer-business_scenario { --h: var(--h-sc); --s: var(--s-sc); --l: var(--l-sc); }
+        .layer-business_common { --h: var(--h-cm); --s: var(--s-cm); --l: var(--l-cm); }
+        .layer-foundation { --h: var(--h-fd); --s: var(--s-fd); --l: var(--l-fd); }
+        .layer-input_integration { --h: var(--h-in); --s: var(--s-in); --l: var(--l-in); }
+        .layer-output_integration { --h: var(--h-ot); --s: var(--s-ot); --l: var(--l-ot); }
+
+        /* Module Card */
+        .module-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .module-card:hover {
+            background: white;
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--h), var(--s), var(--l), 0.3);
+        }
+
+        .module-card.high-importance {
+            border-left: 4px solid hsl(var(--h), var(--s), var(--l));
+        }
+
+        .module-header {
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            background: rgba(var(--h), var(--s), var(--l), 0.02);
+        }
+
+        .module-status {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: hsl(var(--h), var(--s), var(--l), 0.1);
+            color: hsl(var(--h), var(--s), calc(var(--l) * 0.7));
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .module-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Function Item */
+        .function-item {
+            background-color: #fff;
+            border: 1px solid #f1f5f9;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .function-item:hover {
+            transform: translateX(4px);
+            border-color: hsl(var(--h), var(--s), var(--l), 0.2);
+        }
+
+        .function-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .function-name { font-weight: 600; color: #1e293b; }
+
+        .sub-functions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-top: 10px;
+            border-top: 1px dashed #f1f5f9;
+        }
+
+        .sub-function-tag {
+            font-size: 0.75rem;
+            background-color: #f8fafc;
+            color: #64748b;
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Integration Arrows */
+        .sidebar-input::after, .sidebar-output::before {
+            font-family: 'Outfit';
+            font-size: 32px;
+            opacity: 0.3;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .sidebar-input::after { content: "→"; right: -24px; color: hsl(var(--h-in), 80%, 50%); }
+        .sidebar-output::before { content: "←"; left: -24px; color: hsl(var(--h-ot), 80%, 50%); }
+
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+
+        .footer-note {
+            margin-top: 80px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 1200px) {
+            .architecture-grid { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .sidebar-input::after, .sidebar-output::before { display: none; }
+        }
+
+        @media print {
+            body { padding: 20px; background: white; }
+            .layer { box-shadow: none; break-inside: avoid; }
+            .module-card { backdrop-filter: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Next-Gen AI Platform</h1>
+            
+            <p class="description">A high-performance functional architecture for the future of agentic AI.</p>
+            
+        </header>
+
+        <div class="architecture-grid">
+            <!-- Left Sidebar (Input Integration) -->
+            
+            <div class="sidebar sidebar-input">
+                
+                <div class="layer layer-input_integration stagger-1">
+                    <div class="layer-header">
+                        <i data-lucide="arrow-right-circle"></i>
+                        <span>External Sources</span>
+                    </div>
+                    <div class="layer-content">
+                        
+                        <div class="module-card ">
+                            <div class="module-header">
+                                <span>Marketplace</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Dataset Feed</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Plugin Registry</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+            
+
+            <!-- Central Content -->
+            <div class="main-canvas">
+                
+                <div class="layer layer-user_touchpoint stagger-2">
+                    <div class="layer-header">
+                        <i data-lucide="smartphone"></i>
+                        <span>User Interfaces</span>
+                    </div>
+                    <div class="layer-content" style="grid-template-columns: repeat(4, 1fr);">
+                        
+                        <div class="module-card high-importance" style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Mobile App</span>
+                                
+                                <span class="module-status">Core</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Voice Interaction</span>
+                                        
+                                        <span class="module-status" style="font-size: 0.6rem;">MVP</span>
+                                        
+                                    </div>
+                                    
+                                    <div class="sub-functions">
+                                        
+                                        <span class="sub-function-tag">STT</span>
+                                        
+                                        <span class="sub-function-tag">TTS</span>
+                                        
+                                        <span class="sub-function-tag">NLP</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Visual Context</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Web Dashboard</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Agent Configurator</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Workflow Designer</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="layer layer-business_scenario stagger-3">
+                    <div class="layer-header">
+                        <i data-lucide="zap"></i>
+                        <span>AI Capability Layers</span>
+                    </div>
+                    <div class="layer-content" style="grid-template-columns: repeat(4, 1fr);">
+                        
+                        <div class="module-card high-importance" style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Orchestration Engine</span>
+                                
+                                <span class="module-status">MVP</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Plan & Execute</span>
+                                        
+                                    </div>
+                                    
+                                    <div class="sub-functions">
+                                        
+                                        <span class="sub-function-tag">Step decomposition</span>
+                                        
+                                        <span class="sub-function-tag">Task assignment</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Error Recovery</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Tool Execution</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">API Bridge</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Sandbox Runtime</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="layer layer-business_common stagger-4">
+                    <div class="layer-header">
+                        <i data-lucide="layers"></i>
+                        <span>Shared Services</span>
+                    </div>
+                    <div class="layer-content" style="grid-template-columns: repeat(4, 1fr);">
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Context Manager</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Short-term Memory</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Long-term Recall</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Model Registry</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Version Control</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Benchmark Suite</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+
+                <!-- Bottom Layer (Foundation) -->
+                
+                
+                <div class="layer layer-foundation stagger-5">
+                    <div class="layer-header">
+                        <i data-lucide="server"></i>
+                        <span>Infrastructure</span>
+                    </div>
+                    <div class="layer-content" style="grid-template-columns: repeat(4, 1fr);">
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Vector Storage</span>
+                                
+                                <span class="module-status">Scalable</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Elastic Search</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Embedding Cache</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="module-card " style="grid-column: span 2;">
+                            <div class="module-header">
+                                <span>Compute Cluster</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">GPU Scheduler</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Inference Engine</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+
+            <!-- Right Sidebar (Output Integration) -->
+            
+            <div class="sidebar sidebar-output">
+                
+                <div class="layer layer-output_integration stagger-1">
+                    <div class="layer-header">
+                        <i data-lucide="arrow-left-circle"></i>
+                        <span>Connected Apps</span>
+                    </div>
+                    <div class="layer-content">
+                        
+                        <div class="module-card ">
+                            <div class="module-header">
+                                <span>Enterprise ERP</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Sync Bridge</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="module-card ">
+                            <div class="module-header">
+                                <span>Messaging</span>
+                                
+                            </div>
+                            <div class="module-body">
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Slack Integration</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">Teams Webhook</span>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+
+        <div class="footer-note">
+            Architectural Excellence &bull; AIProdArch Engine &bull; Next-Gen AI Platform
+        </div>
+    </div>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

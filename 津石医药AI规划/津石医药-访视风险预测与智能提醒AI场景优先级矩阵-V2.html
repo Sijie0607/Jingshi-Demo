@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>津石医药访视风险预测与智能提醒 AI 场景优先级矩阵 V2（CRC直接辅助MVP版）</title>
+    <style>
+        :root {
+            /* Inspire Design System Tokens */
+            --color-primary: #10213E;        /* Starry Blues */
+            --color-accent: #5DB2E2;         /* Creative Blue */
+            --color-secondary: #625D9C;      /* Amethyst */
+            --color-success: #00524C;        /* Myrtle Deep Green */
+            --color-info: #6FB1C8;           /* Cerulean Frost */
+            --color-warning: #F59E0B;
+            --color-destructive: #EF4444;
+            --color-background: #FFFFFF;
+            --color-bg-alt: #F5F5F6;         /* Tech Gray */
+            --color-foreground: #10213E;
+            --color-text-muted: #64748B;
+            --color-border: #E2E8F0;
+            
+            --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+            --shadow-md: 0 4px 12px rgba(16, 33, 62, 0.12);
+            --font-family: "MiSans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg-alt);
+            color: var(--color-foreground);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Standardized Header */
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-primary);
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .page-header h1::before {
+            content: "";
+            display: block;
+            width: 4px;
+            height: 24px;
+            background: var(--color-accent);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--color-text-muted);
+            font-weight: 500;
+            padding-left: 16px;
+            margin: 0;
+        }
+
+        .header-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .meta-info {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: white;
+            color: var(--color-primary);
+            border: 1px solid var(--color-border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary:hover { background: var(--color-bg-alt); }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--color-background);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid var(--color-border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 2px;
+        }
+
+        /* --- Formula & Standards --- */
+        .formula-box {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--color-border);
+        }
+
+        .formula-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .formula-content {
+            font-family: "JetBrains Mono", "Menlo", monospace;
+            font-size: 15px;
+            color: var(--color-foreground);
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-secondary);
+        }
+
+        .standards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 32px;
+        }
+
+        .dimension-group {
+            margin-bottom: 24px;
+        }
+
+        .dimension-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--color-primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--color-bg-alt);
+        }
+
+        .score-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .score-item {
+            font-size: 14px;
+            color: var(--color-foreground);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: var(--color-bg-alt);
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .score-item:hover {
+            background: #eef2f6;
+        }
+
+        .score-num {
+            font-weight: 800;
+            color: var(--color-accent);
+            width: 20px;
+        }
+
+        /* --- Table Styles --- */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--color-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        th {
+            background: var(--color-primary);
+            color: #fff;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+        }
+
+        tr:nth-child(even) td {
+            background-color: var(--color-bg-alt);
+        }
+
+        tr:hover td {
+            background-color: rgba(93, 178, 226, 0.05);
+        }
+
+        .col-id { width: 60px; text-align: center; }
+        .col-name { font-weight: 700; color: var(--color-primary); min-width: 240px; }
+        .col-score { text-align: center; width: 100px; }
+        .col-priority {
+            text-align: center;
+            width: 120px;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--color-primary);
+            background-color: rgba(93, 178, 226, 0.1) !important;
+        }
+
+        .id-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 2px 4px rgba(16, 33, 62, 0.15);
+        }
+
+        .qual-label {
+            display: block;
+            font-size: 11px;
+            color: var(--color-text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* --- Matrix Visualization --- */
+        .matrix-container {
+            position: relative;
+            margin: 40px 0 20px 40px;
+        }
+
+        .matrix-axis-y {
+            position: absolute;
+            left: -80px;
+            top: 50%;
+            transform: rotate(-90deg) translate(50%, 0);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 140px repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .y-label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-text-muted);
+            text-align: right;
+            min-height: 120px;
+        }
+
+        .grid-cell {
+            position: relative;
+            min-height: 140px;
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .grid-cell:hover {
+            z-index: 10;
+            transform: scale(1.03);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-accent);
+        }
+
+        .cell-items {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .cell-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px 12px 12px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(16, 33, 62, 0.08);
+            border: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .cell-id-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .cell-id-badge[data-bg] {
+            border-color: #fff;
+        }
+
+        .cell-name-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-primary);
+            line-height: 1.4;
+        }
+
+        .matrix-axis-title-x {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-top: 32px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .x-labels-row {
+            display: grid;
+            grid-template-columns: 140px repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .x-label {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-text-muted);
+        }
+
+        .matrix-legend {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 40px;
+            padding: 20px;
+            background: var(--color-bg-alt);
+            border-radius: var(--radius);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* --- Insights & Roadmap --- */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+
+        .insight-card {
+            height: 100%;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-bg-alt);
+        }
+
+        .rank-num {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--color-accent);
+            width: 32px;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-weight: 700;
+            color: var(--color-primary);
+            font-size: 15px;
+        }
+
+        .rank-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .score-badge {
+            font-size: 11px;
+            background: var(--color-primary);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .type-tag {
+            font-size: 11px;
+            background: var(--color-bg-alt);
+            color: var(--color-text-muted);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .roadmap-item {
+            margin-bottom: 24px;
+        }
+
+        .roadmap-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .roadmap-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-primary);
+        }
+
+        .roadmap-stats {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            background: var(--color-bg-alt);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-accent), var(--color-info));
+            border-radius: 5px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .insight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .insight-item {
+            position: relative;
+            padding-left: 24px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .insight-item::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-weight: 900;
+        }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--color-primary);
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(16, 33, 62, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1100px) {
+            .insights-grid { grid-template-columns: 1fr; }
+            .standards-grid { grid-template-columns: 1fr; }
+        }
+
+        @media print {
+            body { background: #fff; }
+            .container { padding: 0; }
+            .page-header, .btn-group, .btn-toggle { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #eee; break-inside: avoid; }
+            .grid-cell { border: 1px solid #eee; }
+            #standards-panel { display: block !important; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+      <div class="header-left">
+        <h1>津石医药访视风险预测与智能提醒 AI 场景优先级矩阵 V2（CRC直接辅助MVP版）</h1>
+      </div>
+      <div class="header-right">
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="window.print()">导出 PDF / 打印</button>
+          <button class="btn-primary" onclick="copyYAML()">复制原始 YAML</button>
+        </div>
+      </div>
+    </header>
+
+        <!-- Scoring Standards -->
+        <div class="card">
+            <div class="section-header">
+                <div class="section-title">评分说明与标准</div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleStandards()">
+                    <span id="standards-toggle-text">隐藏说明</span>
+                </button>
+            </div>
+            
+            <div id="standards-panel">
+                <div class="formula-box">
+                    <span class="formula-title">优先级计算公式 (Priority Score)</span>
+                    <div class="formula-content">Priority = (User × Frequency × Value) / [Feasibility × 0.7 + (Data + AI + Knowledge)/3 × 0.3]</div>
+                </div>
+
+                <div class="standards-grid">
+                    <div class="dimension-col">
+                        <div class="dimension-group">
+                            <div class="dimension-title">用户数量 (User Count)</div>
+                            <ul class="score-list">
+                                <li class="score-item"><span class="score-num">1:</span> 极少用户 (&lt;10)</li>
+                                <li class="score-item"><span class="score-num">2:</span> 小用户群体 (10-50)</li>
+                                <li class="score-item"><span class="score-num">3:</span> 中等用户群体 (50-200)</li>
+                                <li class="score-item"><span class="score-num">4:</span> 大用户群体 (200-1000)</li>
+                                <li class="score-item"><span class="score-num">5:</span> 极大用户群体 (&gt;1000)</li>
+                            </ul>
+                        </div>
+                        <div class="dimension-group">
+                            <div class="dimension-title">业务收益 (Business Value)</div>
+                            <ul class="score-list">
+                                <li class="score-item"><span class="score-num">1:</span> 最小影响 (收益/节省 ¥0-10)</li>
+                                <li class="score-item"><span class="score-num">2:</span> 低影响 (收益/节省 ¥10-20)</li>
+                                <li class="score-item"><span class="score-num">3:</span> 中等影响 (收益/节省 ¥20-50)</li>
+                                <li class="score-item"><span class="score-num">4:</span> 高影响 (收益/节省 ¥50-100)</li>
+                                <li class="score-item"><span class="score-num">5:</span> 关键影响 (收益/节省 &gt;¥100)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dimension-col">
+                        <div class="dimension-group">
+                            <div class="dimension-title">使用频度 (Usage Frequency)</div>
+                            <ul class="score-list">
+                                <li class="score-item"><span class="score-num">1:</span> 极少使用 (每年几次)</li>
+                                <li class="score-item"><span class="score-num">2:</span> 偶尔使用 (每月)</li>
+                                <li class="score-item"><span class="score-num">3:</span> 定期使用 (每周)</li>
+                                <li class="score-item"><span class="score-num">4:</span> 频繁使用 (每天)</li>
+                                <li class="score-item"><span class="score-num">5:</span> 持续使用 (每天多次)</li>
+                            </ul>
+                        </div>
+                        <div class="dimension-group">
+                            <div class="dimension-title">落地可行性 (Feasibility) — 权重70%</div>
+                            <ul class="score-list">
+                                <li class="score-item"><span class="score-num">1-2:</span> 低接入成本：CRC手动上传/Excel导入即可</li>
+                                <li class="score-item"><span class="score-num">3:</span> 中等成本：需对接津石内部系统</li>
+                                <li class="score-item"><span class="score-num">4-5:</span> 高成本：需医院HIS/EMR系统对接，商务周期长</li>
+                            </ul>
+                            <div class="dimension-title" style="margin-top:16px">技术复杂度 (Data + AI + Knowledge) — 权重30%</div>
+                            <ul class="score-list">
+                                <li class="score-item"><span class="score-num">1-2:</span> 低复杂度：规则清晰，数据易获取</li>
+                                <li class="score-item"><span class="score-num">3:</span> 中等复杂度：定制化模型，混合数据</li>
+                                <li class="score-item"><span class="score-num">4-5:</span> 高复杂度：前沿技术，深专医学知识</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Case Table -->
+        <div class="card">
+            <div class="section-header">
+                <div class="section-title">使用场景评估明细</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-id">#</th>
+                            <th class="col-name">场景名称</th>
+                            <th class="col-score">用户</th>
+                            <th class="col-score">频度</th>
+                            <th class="col-score">收益</th>
+                            <th class="col-score">数据</th>
+                            <th class="col-score">AI</th>
+                            <th class="col-score">集成</th>
+                            <th class="col-score">知识</th>
+                            <th class="col-priority">得分</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        
+                        
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">7</span></td>
+                            <td class="col-name">CRC下一步动作智能提醒</td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-priority">59.52</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">3</span></td>
+                            <td class="col-name">受试者状态异常预判</td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-priority">50.0</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">9</span></td>
+                            <td class="col-name">提醒有效性反馈与误报漏报标注</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-priority">40.0</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">2</span></td>
+                            <td class="col-name">资料完整性与时效风险预警</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-priority">36.36</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">10</span></td>
+                            <td class="col-name">EDC录入辅助与复核证据包整理</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-priority">36.36</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">6</span></td>
+                            <td class="col-name">相似风险案例与处理模板推荐</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-priority">29.09</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">5</span></td>
+                            <td class="col-name">访视级风险评分与贡献因子解释</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-priority">25.6</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">11</span></td>
+                            <td class="col-name">AE/SAE/CM升级判断与SLA倒计时</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-priority">23.53</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">15</span></td>
+                            <td class="col-name">风险案例知识库与训练题生成</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-priority">22.86</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">1</span></td>
+                            <td class="col-name">访视事件时间线与风险证据图谱</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-priority">20.0</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">4</span></td>
+                            <td class="col-name">SOP语义规则匹配引擎</td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-priority">19.2</td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-id"><span class="id-badge">17</span></td>
+                            <td class="col-name">受试者沟通话术辅助</td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">4<span class="qual-label">高</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">3<span class="qual-label">中</span></td>
+                            <td class="col-score">2<span class="qual-label">低</span></td>
+                            <td class="col-score">5<span class="qual-label">极高</span></td>
+                            <td class="col-priority">19.2</td>
+                        </tr>
+
+                    
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Priority Matrix -->
+        <div class="card">
+            <div class="section-header">
+                <div class="section-title">5×5 优先级象限矩阵</div>
+            </div>
+            
+            <div class="matrix-container">
+                <div class="matrix-axis-y">业务价值 (Benefit)</div>
+                <div class="matrix-grid">
+                    
+                    
+                    
+
+                    <div class="y-label">5: 极高收益</div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+                            <div class="cell-card">
+                                <div class="cell-id-badge">7</div>
+                                <div class="cell-name-text">CRC下一步动作智能提醒</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">3</div>
+                                <div class="cell-name-text">受试者状态异常预判</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+                            <div class="cell-card">
+                                <div class="cell-id-badge">11</div>
+                                <div class="cell-name-text">AE/SAE/CM升级判断与SLA倒计时</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#f0fdf4">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#f0fdf4">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="y-label">4: 高收益</div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+                            <div class="cell-card">
+                                <div class="cell-id-badge">9</div>
+                                <div class="cell-name-text">提醒有效性反馈与误报漏报标注</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">2</div>
+                                <div class="cell-name-text">资料完整性与时效风险预警</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">10</div>
+                                <div class="cell-name-text">EDC录入辅助与复核证据包整理</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">6</div>
+                                <div class="cell-name-text">相似风险案例与处理模板推荐</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">5</div>
+                                <div class="cell-name-text">访视级风险评分与贡献因子解释</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">4</div>
+                                <div class="cell-name-text">SOP语义规则匹配引擎</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffcf0">
+                        <div class="cell-items">
+                            <div class="cell-card">
+                                <div class="cell-id-badge">1</div>
+                                <div class="cell-name-text">访视事件时间线与风险证据图谱</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#f0fdf4">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#f0fdf4">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="y-label">3: 中等收益</div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+                            <div class="cell-card">
+                                <div class="cell-id-badge">15</div>
+                                <div class="cell-name-text">风险案例知识库与训练题生成</div>
+                            </div>
+                            <div class="cell-card">
+                                <div class="cell-id-badge">17</div>
+                                <div class="cell-name-text">受试者沟通话术辅助</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="y-label">2: 低收益</div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="y-label">1: 极低收益</div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fef2f2">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    <div class="grid-cell" data-cell-bg="#fffbeb">
+                        <div class="cell-items">
+
+                        </div>
+                    </div>
+
+                    
+                    
+                    
+
+                    <div style="grid-column: 1;"></div>
+                    
+                    
+                    <div class="x-label">1: 极低成本</div>
+                    
+                    <div class="x-label">2: 低成本</div>
+                    
+                    <div class="x-label">3: 中等成本</div>
+                    
+                    <div class="x-label">4: 高成本</div>
+                    
+                    <div class="x-label">5: 极高成本</div>
+                    
+                </div>
+                <div class="matrix-axis-title-x">落地可行性 (Feasibility / Cost)</div>
+            </div>
+
+            <div class="matrix-legend">
+                <div class="legend-item"><div class="legend-box" style="background: #f0fdf4"></div> Quick Wins (低成本高价值)</div>
+                <div class="legend-item"><div class="legend-box" style="background: #fffbeb"></div> Big Bets (高成本高价值)</div>
+                <div class="legend-item"><div class="legend-box" style="background: #f8fafc"></div> Fill-ins (低成本低价值)</div>
+                <div class="legend-item"><div class="legend-box" style="background: #fef2f2"></div> Avoid (高成本低价值)</div>
+            </div>
+        </div>
+
+        <!-- Strategic Insights -->
+        <div class="insights-grid">
+            <!-- Top 10 Scenarios -->
+            <div class="card insight-card">
+                <div class="section-header">
+                    <div class="section-title">Top 优先级场景 (Quick Wins)</div>
+                </div>
+                <div class="rank-list">
+                    
+                    
+
+                    <div class="rank-item">
+                        <div class="rank-num">1</div>
+                        <div class="rank-info">
+                            <div class="rank-name">CRC下一步动作智能提醒</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">59.52 pts</span>
+                                <span class="type-tag">智能提醒与任务编排</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">2</div>
+                        <div class="rank-info">
+                            <div class="rank-name">受试者状态异常预判</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">50.0 pts</span>
+                                <span class="type-tag">风险信号采集与证据建模</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">3</div>
+                        <div class="rank-info">
+                            <div class="rank-name">提醒有效性反馈与误报漏报标注</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">40.0 pts</span>
+                                <span class="type-tag">智能提醒与任务编排</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">4</div>
+                        <div class="rank-info">
+                            <div class="rank-name">资料完整性与时效风险预警</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">36.36 pts</span>
+                                <span class="type-tag">风险信号采集与证据建模</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">5</div>
+                        <div class="rank-info">
+                            <div class="rank-name">EDC录入辅助与复核证据包整理</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">36.36 pts</span>
+                                <span class="type-tag">CRC数据录入与复核辅助</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">6</div>
+                        <div class="rank-info">
+                            <div class="rank-name">相似风险案例与处理模板推荐</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">29.09 pts</span>
+                                <span class="type-tag">风险规则匹配与评分解释</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">7</div>
+                        <div class="rank-info">
+                            <div class="rank-name">访视级风险评分与贡献因子解释</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">25.6 pts</span>
+                                <span class="type-tag">风险规则匹配与评分解释</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">8</div>
+                        <div class="rank-info">
+                            <div class="rank-name">AE/SAE/CM升级判断与SLA倒计时</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">23.53 pts</span>
+                                <span class="type-tag">CRC数据录入与复核辅助</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">9</div>
+                        <div class="rank-info">
+                            <div class="rank-name">风险案例知识库与训练题生成</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">22.86 pts</span>
+                                <span class="type-tag">客户价值呈现与知识回流</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rank-item">
+                        <div class="rank-num">10</div>
+                        <div class="rank-info">
+                            <div class="rank-name">访视事件时间线与风险证据图谱</div>
+                            <div class="rank-meta">
+                                <span class="score-badge">20.0 pts</span>
+                                <span class="type-tag">风险信号采集与证据建模</span>
+                            </div>
+                        </div>
+                    </div>
+
+                
+                    
+                </div>
+            </div>
+
+            <!-- Roadmap and Insights -->
+            <div style="display: flex; flex-direction: column; gap: 32px;">
+                <div class="card insight-card">
+                    <div class="section-header">
+                        <div class="section-title">实施路线图 (Roadmap)</div>
+                    </div>
+                    <div class="roadmap-container">
+                        
+                        
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">智能提醒与任务编排</span>
+                                <span class="roadmap-stats">3 场景 · Avg 39.57</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="99.99"></div>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">风险信号采集与证据建模</span>
+                                <span class="roadmap-stats">3 场景 · Avg 35.45</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="89.58"></div>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">CRC数据录入与复核辅助</span>
+                                <span class="roadmap-stats">1 场景 · Avg 36.36</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="91.88"></div>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">风险规则匹配与评分解释</span>
+                                <span class="roadmap-stats">3 场景 · Avg 24.63</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="62.24"></div>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">CRC数据录入与复核辅助</span>
+                                <span class="roadmap-stats">1 场景 · Avg 23.53</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="59.46"></div>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-item">
+                            <div class="roadmap-header">
+                                <span class="roadmap-title">客户价值呈现与知识回流</span>
+                                <span class="roadmap-stats">1 场景 · Avg 22.86</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" data-w-pct="57.77"></div>
+                            </div>
+                        </div>
+
+                    
+                        
+                    </div>
+                </div>
+
+                <div class="card insight-card">
+                    <div class="section-header">
+                        <div class="section-title">核心战略洞察</div>
+                    </div>
+                    <div class="insight-list">
+
+                        <div class="insight-item">
+                            MVP主线应以“CRC下一步动作智能提醒”为入口，串联“受试者状态异常预判”“EDC录入辅助与复核证据包整理”“AE/SAE/CM升级判断与SLA倒计时”，形成CRC一线独立工具闭环。
+                        </div>
+
+                        <div class="insight-item">
+                            受试者状态异常预判边界限定为：CRC上传/导入检测报告后，AI基于CTCAE和医学知识库输出预识别标注与复核建议，CRC在线下获取医生确认后再回填EDC，不替代医生临床判断。
+                        </div>
+
+                        <div class="insight-item">
+                            资料完整性与时效风险预警、提醒有效性反馈、相似风险案例与处理模板推荐、风险案例知识库与训练题生成，作为CRC动作提醒和辅助判断的支撑能力同步建设。
+                        </div>
+
+                        <div class="insight-item">
+                            删除原因：医院系统接口封闭、商务周期长，多角色协同、客户视角摘要、运营画像、CAPA闭环、访视周报、跨项目规则迁移等需系统对接或面向非CRC角色的功能本轮暂缓。
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center; font-size: 12px; color: var(--color-text-muted);">
+            Generated by ai-scenario-matrix-generator ·  · &copy; 2026 Inspire AI4PM
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">已成功复制 YAML 数据到剪贴板</div>
+    
+    <script type="application/yaml" id="raw-yaml">title: 津石医药访视风险预测与智能提醒 AI 场景优先级矩阵 V2（CRC直接辅助MVP版）
+source:
+- 津石医药AI规划/津石医药-访视风险预测与智能提醒AI机会地图.yaml
+- 津石医药AI规划/津石医药-访视风险预测与智能提醒AI场景优先级矩阵.yaml
+scoring_note: 第三版矩阵基于'医院系统接口封闭、商务周期长'约束重排：剔除面向医生/医院系统的辅助诊疗和流程优化场景，仅保留CRC高频痛点（受试者筛选、随访提醒、EDC录入辅助、SAE报告初筛等）。评分引入'落地可行性'维度（权重70%），重点压低需医院HIS/EMR对接的场景；技术复杂度权重降至30%。
+useCases:
+- id: '7'
+  name: CRC下一步动作智能提醒
+  type: 智能提醒与任务编排
+  sourceActivity: CRC下一步动作提醒
+  sourceOpportunityId: opp_07
+  sourceQuadrant: 高价值高优先级
+  userCount: 5
+  usageFrequency: 5
+  businessValue: 5
+  dataComplexity: 2
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 3
+  rationale: 最高优先级：直接面向CRC，把风险和任务转成下一步动作、优先级和关闭标准，是本轮MVP主入口。
+  applicationValue: 提升一线可服务体验，让CRC获得可执行、可关闭、可追踪的行动清单。
+  coreProblem: 风险提醒如果不能转化为具体动作，CRC仍要自行判断补传、复核、沟通和更新的优先级。
+  techTypes:
+  - 任务推荐
+  - 规则引擎
+  - 智能通知
+  mvpFocus: MVP核心：CRC直接辅助
+  v2Decision: MVP核心候选：CRC直接辅助或CRC辅助判断
+  feasibility: 2
+  priorityScore: 59.52
+- id: '3'
+  name: 受试者状态异常预判
+  type: 风险信号采集与证据建模
+  sourceActivity: 受试者状态风险信号采集/临床异常预判与CRC复核证据整理
+  sourceOpportunityId: opp_03
+  sourceQuadrant: 高价值高优先级
+  userCount: 5
+  usageFrequency: 5
+  businessValue: 5
+  dataComplexity: 4
+  aiDesignComplexity: 3
+  integrationComplexity: 2
+  knowledgeComplexity: 4
+  rationale: 按用户判断前移优先级：定位为CRC侧人机协同的异常预判和复核触发建议，而非替代医生或直接面向研究者决策，因此集成复杂度和AI设计复杂度按MVP边界下调。
+  applicationValue: 缩短异常发现到CRC复核证据整理的时间，提升受试者安全感和合规追溯完整性。
+  coreProblem: 受试者状态风险依赖CRC经验和口头确认，异常响应和复核证据可能延迟。
+  techTypes:
+  - 预测模型
+  - 临床规则引擎
+  - 可解释AI
+  mvpFocus: MVP核心：CRC辅助判断
+  v2Decision: MVP核心候选：CRC直接辅助或CRC辅助判断
+  feasibility: 2
+  priorityScore: 50.0
+- id: '9'
+  name: 提醒有效性反馈与误报漏报标注
+  type: 智能提醒与任务编排
+  sourceActivity: 提醒有效性反馈
+  sourceOpportunityId: opp_09
+  sourceQuadrant: 低价值高优先级
+  userCount: 4
+  usageFrequency: 5
+  businessValue: 4
+  dataComplexity: 2
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 2
+  rationale: 作为CRC提醒和辅助判断的低成本反馈闭环保留高优先级，用于持续校准提醒有效性、误报和漏报。
+  applicationValue: 单点业务价值不如风险评分高，但它是所有智能提醒持续变准的基础能力。
+  coreProblem: 提醒是否真正降低风险缺少反馈，规则无法持续优化。
+  techTypes:
+  - 反馈学习
+  - 埋点分析
+  - 模型监控
+  mvpFocus: MVP反馈闭环
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 40.0
+- id: '2'
+  name: 资料完整性与时效风险预警
+  type: 风险信号采集与证据建模
+  sourceActivity: 资料完整性信号采集
+  sourceOpportunityId: opp_02
+  sourceQuadrant: 高价值高优先级
+  userCount: 4
+  usageFrequency: 5
+  businessValue: 4
+  dataComplexity: 3
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 3
+  rationale: 仍保留较高优先级，因其直接减少CRC补传和返工；但本轮核心不再以申办方复核体验为主，因此业务价值从5调整为4。
+  applicationValue: 提升关键文档准时完整率和申办方一次复核通过率，减少CRC补传和返工。
+  coreProblem: 资料清单、上传状态、复核状态和归档状态未形成自动校验链，缺失问题常在后端暴露。
+  techTypes:
+  - 文档智能
+  - 规则引擎
+  - 异常检测
+  mvpFocus: MVP配套快赢
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 36.36
+- id: '10'
+  name: EDC录入辅助与复核证据包整理
+  type: CRC数据录入与复核辅助
+  sourceActivity: EDC录入辅助/复核证据包整理
+  sourceOpportunityId: opp_10
+  sourceQuadrant: 低价值高优先级
+  userCount: 4
+  usageFrequency: 5
+  businessValue: 4
+  dataComplexity: 2
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 4
+  rationale: CRC将检测报告、访视记录手动上传或Excel导入后，AI基于CTCAE和医学知识库输出预识别标注与复核证据包，辅助CRC完成线下标注与EDC录入，避免医院系统对接。
+  applicationValue: 降低CRC在检测报告解读、EDC字段填写和复核材料整理上的时间成本，提升CRC线下确认后的录入完整率。
+  coreProblem: CRC需人工判读检测报告、整理复核证据并回填EDC，易遗漏关键字段或后续行动。
+  techTypes:
+  - OCR/文档解析
+  - CTCAE规则引擎
+  - 结构化抽取
+  mvpFocus: MVP核心：CRC数据录入辅助
+  v2Decision: MVP核心候选：CRC直接辅助或CRC辅助判断
+  feasibility: 2
+  priorityScore: 36.36
+- id: '6'
+  name: 相似风险案例与处理模板推荐
+  type: 风险规则匹配与评分解释
+  sourceActivity: 相似案例与处理模板推荐/风险案例沉淀与训练
+  sourceOpportunityId: opp_06
+  sourceQuadrant: 高价值低优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 4
+  dataComplexity: 3
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 3
+  rationale: 作为CRC辅助判断的相似案例和处置模板支撑前移；不做多角色协同闭环，只服务CRC查看、学习和建议解释。
+  applicationValue: 降低新人处理质量波动，减少同类风险跨中心重复发生。
+  coreProblem: 历史偏差、CAPA和客户反馈没有按场景和动作标签沉淀，案例复用效率低。
+  techTypes:
+  - 向量检索
+  - RAG
+  - 案例推理
+  mvpFocus: MVP知识支撑
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 29.09
+- id: '5'
+  name: 访视级风险评分与贡献因子解释
+  type: 风险规则匹配与评分解释
+  sourceActivity: 访视级风险评分
+  sourceOpportunityId: opp_05
+  sourceQuadrant: 高价值高优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 4
+  dataComplexity: 4
+  aiDesignComplexity: 3
+  integrationComplexity: 2
+  knowledgeComplexity: 4
+  rationale: 访视级风险评分可支撑CRC提醒和异常预判，但第一版MVP不追求完整质控资源调度，因此业务价值从5调整为4、集成复杂度下调。
+  applicationValue: 提升高风险访视提前拦截率，降低重大偏差和客户质疑概率。
+  coreProblem: 缺少动态风险评分和贡献因子解释，质控资源难以精准投放。
+  techTypes:
+  - 机器学习评分
+  - 异常检测
+  - 可解释AI
+  mvpFocus: MVP支撑底座
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 25.6
+- id: '11'
+  name: AE/SAE/CM升级判断与SLA倒计时
+  type: 临床复核与风险闭环
+  sourceActivity: AE/SAE/CM升级判断
+  sourceOpportunityId: opp_11
+  sourceQuadrant: 高价值高优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 5
+  dataComplexity: 4
+  aiDesignComplexity: 4
+  integrationComplexity: 3
+  knowledgeComplexity: 5
+  rationale: 仍为高价值场景，但AE/SAE/CM判断涉及合规和临床复杂度，MVP建议做人机协同提示、SLA倒计时和材料清单，不做自动结论。
+  applicationValue: 直接保护质量合规和客户信任，是风险预测链路中最关键的安全类场景。
+  coreProblem: AE/SAE/CM升级判断需要综合临床信息、项目规则和时限要求，人工判断压力高。
+  techTypes:
+  - NLP分类
+  - 临床规则引擎
+  - 智能SLA提醒
+  mvpFocus: MVP核心：CRC辅助判断
+  v2Decision: MVP核心候选：CRC直接辅助或CRC辅助判断
+  feasibility: 3
+  priorityScore: 23.53
+- id: '15'
+  name: 风险案例知识库与训练题生成
+  type: 客户价值呈现与知识回流
+  sourceActivity: 风险案例沉淀与训练
+  sourceOpportunityId: opp_15
+  sourceQuadrant: 低价值高优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 3
+  dataComplexity: 2
+  aiDesignComplexity: 2
+  integrationComplexity: 2
+  knowledgeComplexity: 3
+  rationale: 风险案例知识库作为CRC辅助判断和多角色知识沉淀的支撑能力保留高性价比，但不作为独立协同产品。
+  applicationValue: 单次业务价值有限，但建设成本低、可快速提升知识复用，并支撑案例推荐和风险规则优化。
+  coreProblem: 经验沉淀常停留在复盘文档，不能直接进入一线执行和新人训练。
+  techTypes:
+  - NLP抽取
+  - 生成式AI
+  - 知识库
+  mvpFocus: MVP知识支撑
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 22.86
+- id: '1'
+  name: 访视事件时间线与风险证据图谱
+  type: 风险信号采集与证据建模
+  sourceActivity: 访视事件时间线生成/资料完整性信号采集/受试者状态风险信号采集
+  sourceOpportunityId: opp_01
+  sourceQuadrant: 高价值高优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 4
+  dataComplexity: 4
+  aiDesignComplexity: 3
+  integrationComplexity: 3
+  knowledgeComplexity: 4
+  rationale: 保留为CRC风险判断底座，但不是第一个可独立交付的前台功能；主要为下一步提醒和异常预判提供上下文。
+  applicationValue: 降低项目经理跨系统还原事实的时间，让风险从事后发现转为访视前和访视中的前置识别。
+  coreProblem: 访视事实分散在CTMS、文档库、沟通群和个人记录中，风险判断缺少统一时间线和证据链。
+  techTypes:
+  - 流程挖掘
+  - NLP信息抽取
+  - 知识图谱
+  mvpFocus: MVP支撑底座
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 3
+  priorityScore: 20.0
+- id: '4'
+  name: SOP语义规则匹配引擎
+  type: 风险规则匹配与评分解释
+  sourceActivity: 风险规则与SOP匹配
+  sourceOpportunityId: opp_04
+  sourceQuadrant: 高价值低优先级
+  userCount: 3
+  usageFrequency: 4
+  businessValue: 4
+  dataComplexity: 4
+  aiDesignComplexity: 3
+  integrationComplexity: 2
+  knowledgeComplexity: 4
+  rationale: SOP语义规则作为CRC辅助判断的知识底座保留，但不作为独立前台产品优先交付；先做高频规则和引用依据。
+  applicationValue: 提升风险提示的可解释性和一线采纳率，但需要先完成知识治理和规则标准化。
+  coreProblem: SOP和项目方案多为文档化要求，难以直接转化为机器可执行规则。
+  techTypes:
+  - RAG
+  - 规则引擎
+  - 知识库
+  mvpFocus: MVP知识支撑
+  v2Decision: MVP支撑能力：知识、数据、反馈或规则底座
+  feasibility: 2
+  priorityScore: 19.2
+- id: '17'
+  name: 受试者沟通话术辅助
+  type: 智能提醒与任务编排
+  sourceActivity: CRC下一步动作提醒/受试者状态风险信号采集
+  sourceOpportunityId: opp_17
+  sourceQuadrant: 低价值低优先级
+  userCount: 4
+  usageFrequency: 4
+  businessValue: 3
+  dataComplexity: 3
+  aiDesignComplexity: 3
+  integrationComplexity: 2
+  knowledgeComplexity: 5
+  rationale: 虽面向CRC，但涉及受试者沟通和医疗建议边界，MVP只可作为确认问题清单和合规话术辅助，优先级低于异常预判和动作提醒。
+  applicationValue: 可改善少量沟通体验，但场景边界敏感、需要严格避免医疗建议越界。
+  coreProblem: 部分受试者状态确认和提醒沟通依赖CRC个人表达经验。
+  techTypes:
+  - 生成式AI
+  - 话术推荐
+  - 合规护栏
+  mvpFocus: 谨慎探索：CRC沟通辅助
+  v2Decision: 二期或谨慎探索
+  feasibility: 2
+  priorityScore: 19.2
+insights:
+- MVP主线应以'CRC下一步动作智能提醒'为入口，串联'受试者状态异常预判''EDC录入辅助与复核证据包整理''AE/SAE/CM升级判断与SLA倒计时'，形成CRC一线独立工具闭环。
+- 受试者状态异常预判边界限定为：CRC上传/导入检测报告后，AI基于CTCAE和医学知识库输出预识别标注与复核建议，CRC在线下获取CRC线下确认后再回填EDC，不替代临床判断。
+- 资料完整性与时效风险预警、提醒有效性反馈、相似风险案例与处理模板推荐、风险案例知识库与训练题生成作为CRC动作提醒和辅助判断的支撑能力同步建设。
+- 删除原因：医院系统接口封闭、商务周期长，多角色协同、客户视角摘要、运营画像、CAPA闭环等需系统对接或面向非CRC角色的功能本轮暂缓。
+version: V2
+</script>
+
+    <script>
+        function toggleStandards() {
+            const panel = document.getElementById('standards-panel');
+            const text = document.getElementById('standards-toggle-text');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                text.textContent = '隐藏说明';
+            } else {
+                panel.classList.add('hidden');
+                text.textContent = '显示说明';
+            }
+        }
+
+        function copyYAML() {
+            const yaml = document.getElementById('raw-yaml').textContent.trim();
+            navigator.clipboard.writeText(yaml).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-bg]').forEach(el => el.style.backgroundColor = el.getAttribute('data-bg'));
+            document.querySelectorAll('[data-cell-bg]').forEach(el => el.style.backgroundColor = el.getAttribute('data-cell-bg'));
+            document.querySelectorAll('[data-w-pct]').forEach(el => el.style.width = el.getAttribute('data-w-pct') + '%');
+        });
+    </script>
+</body>
+</html>

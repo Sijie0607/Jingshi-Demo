@@ -1,0 +1,32 @@
+{
+  "level": "l2",
+  "title": "GlobalMall Container Architecture",
+  "groups": [
+    { "id": "backend", "label": "Microservices Cluster", "type": "boundary" }
+  ],
+  "nodes": [
+    { "id": "app", "label": "Buyer App", "type": "person", "layer": "actor", "technology": "Flutter" },
+    { "id": "web", "label": "Web Store", "type": "person", "layer": "actor", "technology": "Next.js" },
+    { "id": "gateway", "label": "API Gateway", "type": "container", "layer": "gateway", "technology": "Spring Cloud Gateway" },
+    { "id": "order", "label": "Order Service", "parentId": "backend", "type": "system", "layer": "service", "technology": "Java" },
+    { "id": "product", "label": "Product Service", "parentId": "backend", "type": "system", "layer": "service", "technology": "Java" },
+    { "id": "user", "label": "User Service", "parentId": "backend", "type": "container", "layer": "service", "technology": "Node.js" },
+    { "id": "pay_svc", "label": "Payment Service", "parentId": "backend", "type": "container", "layer": "service", "technology": "Java" },
+    { "id": "db_order", "label": "Order DB", "type": "infra", "layer": "data", "technology": "MySQL" },
+    { "id": "db_prod", "label": "Product DB", "type": "infra", "layer": "data", "technology": "PostgreSQL" },
+    { "id": "redis", "label": "Redis Cluster", "type": "infra", "layer": "data", "technology": "Cache" },
+    { "id": "mq", "label": "Message Queue", "type": "infra", "layer": "data", "technology": "RocketMQ" }
+  ],
+  "edges": [
+    { "from": "app", "to": "gateway", "label": "HTTPS" },
+    { "from": "web", "to": "gateway", "label": "HTTPS" },
+    { "from": "gateway", "to": "order", "label": "Route" },
+    { "from": "gateway", "to": "product", "label": "Route" },
+    { "from": "gateway", "to": "user", "label": "Route" },
+    { "from": "gateway", "to": "pay_svc", "label": "Route" },
+    { "from": "order", "to": "db_order", "label": "R/W" },
+    { "from": "order", "to": "mq", "label": "Async Event" },
+    { "from": "product", "to": "db_prod", "label": "R/W" },
+    { "from": "product", "to": "redis", "label": "Cache" }
+  ]
+}

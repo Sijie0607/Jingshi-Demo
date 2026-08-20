@@ -1,0 +1,57 @@
+title: "智能电商中台系统"
+description: "支撑多端零售业务的数字化核心枢纽"
+layers:
+  - type: "user_touchpoint"
+    name: "全渠道触点层"
+    modules:
+      - name: "消费者端"
+        functions:
+          - name: "微信小程序"
+            subFunctions: ["首页展示", "商品分类", "个人中心"]
+          - name: "H5 商城"
+      - name: "商家端"
+        functions:
+          - name: "管理 App"
+          - name: "PC 后台"
+  - type: "business_scenario"
+    name: "业务场景层"
+    modules:
+      - name: "营销中心"
+        functions:
+          - name: "优惠券引擎"
+          - name: "秒杀活动"
+          - name: "会员积分"
+      - name: "交易中心"
+        functions:
+          - name: "订单流转"
+          - name: "支付结算"
+  - type: "business_common"
+    name: "通用能力层"
+    modules:
+      - name: "商品库"
+        functions:
+          - name: "类目管理"
+          - name: "库存中心"
+      - name: "用户中心"
+        functions:
+          - name: "统一账号"
+          - name: "风控校验"
+  - type: "foundation"
+    name: "基础设施层"
+    modules:
+      - name: "存储与计算"
+        functions:
+          - name: "分布式数据库"
+          - name: "缓存服务"
+  - type: "input_integration"
+    name: "外部输入"
+    modules:
+      - name: "供应链接入"
+        functions:
+          - name: "ERP 数据对接"
+  - type: "output_integration"
+    name: "外部输出"
+    modules:
+      - name: "物流追踪"
+        functions:
+          - name: "第三方快递接口"

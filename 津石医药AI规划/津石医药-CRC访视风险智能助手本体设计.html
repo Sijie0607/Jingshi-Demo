@@ -1,0 +1,4743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRC访视风险助手本体 - Agent 本体设计 | Inspire</title>
+  <style>:root{--font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC","PingFang SC",Arial,sans-serif}</style>
+  <style>
+    :root {
+      --color-primary: #10213E;
+      --color-accent: #5DB2E2;
+      --color-secondary: #625D9C;
+      --color-success: #00524C;
+      --color-warning: #F59E0B;
+      --color-destructive: #EF4444;
+      --color-background: #FFFFFF;
+      --color-bg-alt: #F5F5F6;
+      --color-foreground: #10213E;
+      --color-text-muted: #64748B;
+      --color-border: #E2E8F0;
+      --shadow-sm: 0 2px 8px rgba(16,33,62,0.08);
+      --shadow-md: 0 10px 15px -3px rgba(16,33,62,0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+      --transition: 0.15s ease-out;
+
+      /* Entity type colours */
+      --entity-core-bg: #EFF6FF;
+      --entity-core-border: #3B82F6;
+      --entity-core-badge: #1D4ED8;
+      --entity-reference-bg: #F5F3FF;
+      --entity-reference-border: #7C3AED;
+      --entity-reference-badge: #5B21B6;
+      --entity-event-bg: #FFF7ED;
+      --entity-event-border: #EA580C;
+      --entity-event-badge: #C2410C;
+
+      /* Transition type colours */
+      --transition-normal: #10B981;
+      --transition-exception: #F59E0B;
+      --transition-recovery: #6366F1;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-alt);
+      color: var(--color-foreground);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page wrap ── */
+    .page-wrap {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px;
+      width: 85%;
+      margin: 48px auto;
+      border: 1px solid var(--color-border);
+      min-height: calc(100vh - 96px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .header-left { display: flex; flex-direction: column; gap: 6px; }
+    .page-header h1 {
+      font-size: 26px; font-weight: 700; color: var(--color-primary);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-header h1::before {
+      content: ""; display: block; width: 4px; height: 24px;
+      background: var(--color-accent); border-radius: 2px; flex-shrink: 0;
+    }
+    .header-meta {
+      display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+      padding-left: 16px; margin-top: 4px;
+    }
+    .meta-badge {
+      font-size: 12px; font-weight: 600; padding: 3px 10px;
+      border-radius: 999px; border: 1px solid;
+    }
+    .meta-badge.domain  { background:#EFF6FF; border-color:#93C5FD; color:#1D4ED8; }
+    .meta-badge.role    { background:#F5F3FF; border-color:#C4B5FD; color:#5B21B6; }
+    .meta-scenario {
+      font-size: 13px; color: var(--color-text-muted);
+      padding-left: 16px; max-width: 600px; line-height: 1.5;
+    }
+    .header-right {
+      text-align: right; display: flex; flex-direction: column;
+      gap: 8px; flex-shrink: 0;
+    }
+    .meta-info { font-size: 12px; color: var(--color-text-muted); }
+    .btn-group { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-primary {
+      background: var(--color-primary); color: white; padding: 8px 14px;
+      border-radius: 6px; font-size: 12px; font-weight: 600; border: none;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-secondary {
+      background: white; color: var(--color-primary);
+      border: 1px solid var(--color-border); padding: 8px 14px;
+      border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-secondary:hover { background: var(--color-bg-alt); }
+
+    /* ── Tabs ── */
+    .tab-nav {
+      display: flex; gap: 0; border-bottom: 2px solid var(--color-border);
+      margin-bottom: 32px;
+    }
+    .tab-btn {
+      padding: 12px 24px; font-size: 14px; font-weight: 600;
+      color: var(--color-text-muted); background: none; border: none;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tab-btn:hover { color: var(--color-primary); }
+    .tab-btn.active {
+      color: var(--color-primary); border-bottom-color: var(--color-accent);
+    }
+    .tab-count {
+      font-size: 11px; background: var(--color-bg-alt); color: var(--color-text-muted);
+      border-radius: 999px; padding: 2px 7px; font-weight: 500;
+    }
+    .tab-btn.active .tab-count {
+      background: var(--color-accent); color: white;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 13px; font-weight: 700; color: var(--color-text-muted);
+      text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: 16px; margin-top: 28px;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ════════════════════════════════════════
+       TAB 1 · OBJECT RELATIONS
+       ════════════════════════════════════════ */
+
+    .entity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .entity-card {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      border: 1.5px solid;
+      position: relative;
+      transition: var(--transition);
+    }
+    .entity-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .entity-card.entity-core      { background: var(--entity-core-bg);      border-color: var(--entity-core-border); }
+    .entity-card.entity-reference { background: var(--entity-reference-bg); border-color: var(--entity-reference-border); }
+    .entity-card.entity-event     { background: var(--entity-event-bg);     border-color: var(--entity-event-border); }
+
+    .entity-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .entity-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 999px; color: white; flex-shrink: 0; margin-top: 2px;
+    }
+    .entity-core      .entity-badge { background: var(--entity-core-badge); }
+    .entity-reference .entity-badge { background: var(--entity-reference-badge); }
+    .entity-event     .entity-badge { background: var(--entity-event-badge); }
+
+    .entity-name { font-size: 15px; font-weight: 700; color: var(--color-primary); line-height: 1.3; }
+    .entity-desc { font-size: 12px; color: var(--color-text-muted); margin-bottom: 12px; line-height: 1.5; }
+
+    .entity-attrs { margin-bottom: 12px; }
+    .attr-row {
+      display: flex; gap: 6px; align-items: flex-start;
+      font-size: 11px; padding: 4px 0;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .attr-name { font-weight: 600; color: var(--color-foreground); min-width: 80px; flex-shrink: 0; }
+    .attr-type {
+      font-size: 10px; padding: 1px 6px; border-radius: 4px;
+      background: rgba(0,0,0,0.06); color: var(--color-text-muted);
+      font-family: monospace; flex-shrink: 0;
+    }
+    .attr-desc { color: var(--color-text-muted); line-height: 1.4; }
+    .attr-values { color: var(--color-text-muted); font-style: italic; }
+
+    .entity-distinctions { margin-top: 8px; }
+    .distinction-label {
+      font-size: 10px; font-weight: 700; color: #B45309;
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
+    }
+    .distinction-item {
+      display: flex; gap: 6px; align-items: flex-start;
+      font-size: 11px; color: #92400E; line-height: 1.45;
+      background: rgba(217,119,6,0.08); border-radius: 4px;
+      padding: 4px 8px; margin-bottom: 4px;
+    }
+    .distinction-icon { flex-shrink: 0; }
+
+    /* Relationships table */
+    .rel-table-wrap {
+      border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;
+    }
+    .rel-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .rel-table th {
+      background: var(--color-bg-alt); font-size: 11px; font-weight: 700;
+      color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .05em;
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border);
+    }
+    .rel-table td { padding: 10px 14px; border-bottom: 1px solid var(--color-border); }
+    .rel-table tr:last-child td { border-bottom: none; }
+    .rel-table tr:hover td { background: var(--color-bg-alt); }
+    .rel-from { font-weight: 600; color: var(--color-primary); }
+    .rel-arrow { color: var(--color-accent); font-weight: 700; text-align: center; }
+    .rel-label {
+      display: inline-block; background: var(--color-secondary);
+      color: white; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px;
+    }
+    .rel-card { font-size: 11px; color: var(--color-text-muted); font-family: monospace; }
+    .rel-desc { color: var(--color-text-muted); font-size: 12px; }
+
+    /* ════════════════════════════════════════
+       TAB 2 · ACTION BOUNDARIES
+       ════════════════════════════════════════ */
+
+    .ab-card {
+      border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+      overflow: hidden; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .ab-card:hover { box-shadow: var(--shadow-md); }
+
+    .ab-header {
+      background: var(--color-primary); color: white;
+      padding: 14px 20px; display: flex; align-items: flex-start; gap: 12px;
+    }
+    .ab-situation-num {
+      font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.2);
+      border-radius: 999px; padding: 2px 10px; flex-shrink: 0; margin-top: 2px;
+    }
+    .ab-situation-name { font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .ab-situation-desc { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; line-height: 1.5; }
+
+    .ab-body {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-top: none;
+    }
+    .ab-quadrant {
+      padding: 16px 18px;
+      border-right: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .ab-quadrant:nth-child(2)  { border-right: none; }
+    .ab-quadrant:nth-child(3)  { border-bottom: none; }
+    .ab-quadrant:nth-child(4)  { border-right: none; border-bottom: none; }
+
+    .quadrant-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .ql-evidence  { color: #1D4ED8; }
+    .ql-valid     { color: #065F46; }
+    .ql-invalid   { color: #991B1B; }
+    .ql-exception { color: #92400E; }
+
+    .ab-item {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 12px; line-height: 1.5; margin-bottom: 8px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--color-bg-alt);
+    }
+    .ab-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .ab-item-dot { flex-shrink: 0; margin-top: 3px; }
+    .ab-item-content { color: var(--color-foreground); }
+    .ab-item-source  { font-size: 11px; font-weight: 600; color: #1D4ED8; margin-bottom: 2px; }
+    .ab-item-reason  { font-size: 11px; color: var(--color-text-muted); margin-top: 3px; font-style: italic; }
+    .ab-item-condition { font-size: 11px; color: #92400E; font-weight: 600; }
+    .ab-item-action    { font-size: 12px; color: var(--color-foreground); margin-top: 2px; }
+
+    /* ════════════════════════════════════════
+       TAB 3 · STATE TRANSITIONS
+       ════════════════════════════════════════ */
+
+    .ws-block {
+      border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+      overflow: hidden; margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ws-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #1B3A6B 100%);
+      color: white; padding: 14px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .ws-name { font-size: 17px; font-weight: 700; }
+    .ws-desc { font-size: 13px; color: rgba(255,255,255,0.72); margin-top: 4px; line-height: 1.5; }
+    .ws-anchors { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .ws-anchor-chip {
+      font-size: 11px; background: rgba(255,255,255,0.15); color: white;
+      border-radius: 999px; padding: 2px 10px; font-weight: 500;
+    }
+
+    /* State flow diagram */
+    .ws-flow {
+      padding: 24px 20px;
+      overflow-x: auto;
+      background: white;
+    }
+    .states-row {
+      display: flex; gap: 0; align-items: flex-start;
+      min-width: max-content;
+    }
+    .state-col {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 130px; max-width: 160px;
+    }
+    .state-node {
+      width: 130px; padding: 10px 12px; text-align: center;
+      border: 2px solid var(--color-border); border-radius: var(--radius-md);
+      background: var(--color-bg-alt); cursor: default;
+      transition: var(--transition);
+      position: relative;
+    }
+    .state-node:hover { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(93,178,226,0.15); }
+    .state-node.terminal { border-color: var(--color-success); background: #ECFDF5; }
+    .state-node.exception { border-color: var(--color-warning); background: #FFFBEB; }
+    .state-name { font-size: 12px; font-weight: 700; color: var(--color-primary); line-height: 1.3; }
+    .state-desc { font-size: 10px; color: var(--color-text-muted); margin-top: 4px; line-height: 1.4; }
+
+    .transition-arrow {
+      display: flex; align-items: center; flex-shrink: 0;
+      padding: 0 4px; margin-top: 18px;
+    }
+    .arrow-line {
+      position: relative; height: 2px; width: 48px;
+      background: #CBD5E1;
+    }
+    .arrow-line.solid    { background: var(--transition-normal); }
+    .arrow-line.dashed   { background: transparent; border-top: 2px dashed var(--transition-exception); }
+    .arrow-line.dotted   { background: transparent; border-top: 2px dotted var(--transition-recovery); }
+    .arrow-head {
+      width: 0; height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 8px solid #CBD5E1;
+      flex-shrink: 0;
+    }
+    .arrow-head.solid    { border-left-color: var(--transition-normal); }
+    .arrow-head.dashed   { border-left-color: var(--transition-exception); }
+    .arrow-head.dotted   { border-left-color: var(--transition-recovery); }
+
+    .trans-label {
+      font-size: 9px; color: var(--color-text-muted); text-align: center;
+      max-width: 130px; line-height: 1.3; margin-top: 4px;
+    }
+
+    /* Transition details list below flow */
+    .ws-transitions-detail {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-alt);
+    }
+    .trans-detail-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--color-text-muted); margin-bottom: 10px;
+    }
+    .trans-detail-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 12px; padding: 8px 10px; background: white;
+      border-radius: var(--radius-sm); margin-bottom: 6px;
+      border: 1px solid var(--color-border);
+    }
+    .trans-type-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+    }
+    .trans-type-dot.normal    { background: var(--transition-normal); }
+    .trans-type-dot.exception { background: var(--transition-exception); }
+    .trans-type-dot.recovery  { background: var(--transition-recovery); }
+    .trans-detail-content { flex: 1; }
+    .trans-route { font-weight: 600; color: var(--color-primary); }
+    .trans-trigger { color: var(--color-text-muted); font-size: 11px; margin-top: 2px; }
+    .trans-evidence { font-size: 11px; color: #1D4ED8; margin-top: 2px; }
+
+    /* Guardrails */
+    .ws-guardrails {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border);
+    }
+    .guardrail-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: #991B1B; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .guardrail-item {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 12px; color: #7F1D1D; line-height: 1.5;
+      background: #FEF2F2; border: 1px solid #FECACA;
+      border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 6px;
+    }
+    .guardrail-icon { flex-shrink: 0; }
+
+    /* Dependency mapping */
+    .ws-deps { padding: 16px 20px; border-top: 1px solid var(--color-border); }
+    .dep-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--color-text-muted); margin-bottom: 10px;
+    }
+    .dep-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 12px; line-height: 1.5; padding: 8px 10px;
+      background: #F0F9FF; border: 1px solid #BAE6FD;
+      border-radius: var(--radius-sm); margin-bottom: 6px;
+    }
+    .dep-ws-name { font-weight: 600; color: #0369A1; }
+    .dep-condition { color: var(--color-text-muted); font-size: 11px; margin-top: 2px; }
+    .dep-impact { color: var(--color-foreground); }
+
+    /* ── Agent Prompt Panel ── */
+    .prompt-panel {
+      margin-top: 12px;
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .prompt-header {
+      background: var(--color-bg-alt); padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .prompt-header-title { font-size: 13px; font-weight: 700; color: var(--color-primary); }
+    .prompt-hint { font-size: 11px; color: var(--color-text-muted); }
+    .prompt-body {
+      padding: 16px; font-family: 'Courier New', Courier, monospace;
+      font-size: 12px; line-height: 1.6; color: #1E293B;
+      background: #0F172A; color: #E2E8F0;
+      white-space: pre-wrap; word-break: break-all;
+      max-height: 400px; overflow-y: auto;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      padding: 12px 16px; background: var(--color-bg-alt);
+      border-radius: var(--radius-md); margin-bottom: 20px;
+      font-size: 12px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .legend-line {
+      width: 28px; height: 2px; flex-shrink: 0;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      display: none; position: fixed; bottom: 32px; right: 32px;
+      background: var(--color-primary); color: white;
+      padding: 12px 20px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 500; box-shadow: var(--shadow-md);
+      z-index: 1000; animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(8px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ── Mermaid Diagram Overrides ── */
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      background: white;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      margin-top: 16px;
+    }
+    .mermaid svg {
+      max-height: 480px;
+      width: 100%;
+      height: auto;
+    }
+    .mermaid .edgePath .path {
+      stroke: var(--color-text-muted) !important;
+      stroke-width: 1.5px !important;
+      fill: none !important;
+    }
+    .mermaid .marker {
+      fill: var(--color-text-muted) !important;
+      stroke: var(--color-text-muted) !important;
+    }
+    /* Edge styles mapped to normal, exception and recovery styles */
+    .mermaid .edge-thickness-normal .path {
+      stroke: var(--transition-normal) !important;
+      stroke-width: 2px !important;
+      fill: none !important;
+    }
+    .mermaid .edge-pattern-dashed .path {
+      stroke: var(--transition-exception) !important;
+      stroke-width: 2px !important;
+      fill: none !important;
+    }
+    .mermaid .edge-thickness-thick .path {
+      stroke: var(--transition-recovery) !important;
+      stroke-width: 3px !important;
+      fill: none !important;
+    }
+    .mermaid .edgeLabel rect {
+      fill: white !important;
+      opacity: 0.9;
+    }
+    .mermaid .edgeLabel {
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      color: var(--color-text-muted) !important;
+      font-family: var(--font-family) !important;
+    }
+    .mermaid .node rect {
+      rx: var(--radius-md) !important;
+      ry: var(--radius-md) !important;
+      stroke-width: 2px !important;
+      filter: drop-shadow(0 2px 4px rgba(16,33,62,0.04));
+    }
+    .mermaid .node .label {
+      font-family: var(--font-family) !important;
+      color: var(--color-primary) !important;
+      font-size: 12px !important;
+    }
+    .mermaid .node b {
+      font-size: 13px !important;
+      color: var(--color-primary) !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <div class="header-left">
+      <h1>CRC访视风险助手本体</h1>
+      <div class="header-meta">
+        <span class="meta-badge domain">SMO访视</span>
+        <span class="meta-badge role">🤖 CRC风险辅助Agent</span>
+      </div>
+      
+      <p class="meta-scenario">面向CRC的访视风险提醒与EDC录入辅助MVP：CRC手动上传或Excel导入检测报告后，平台后端接入CTCAE和医学专业知识知识库，对检测报告扫描结果进行预识别标注并返回CRC；CRC依据返回的预识别标注对线下检测报告表进行标注，经研究者线下确认后将AI预判正确的内容用于病例填写。</p>
+      
+    </div>
+    <div class="header-right">
+      <div class="meta-info">Generated by agent-ontology-designer</div>
+      <div class="meta-info">2026-08-20 15:57</div>
+      <div class="btn-group">
+        <button class="btn-secondary" onclick="window.print()">导出 PDF</button>
+        <button class="btn-primary" onclick="copyYAML()">复制 YAML</button>
+        <button class="btn-primary" onclick="copyPrompt()">复制 Prompt</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Tabs ── -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" id="tab-btn-objects" onclick="switchTab('objects')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      对象关系
+      <span class="tab-count">10</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-actions" onclick="switchTab('actions')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      行动边界
+      <span class="tab-count">5</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-states" onclick="switchTab('states')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+      状态迁移
+      <span class="tab-count">4</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-prompt" onclick="switchTab('prompt')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Agent Prompt
+    </button>
+  </nav>
+
+  <!-- ══════════════════════════
+       TAB 1 · 对象关系
+       ══════════════════════════ -->
+  <div class="tab-panel active" id="tab-objects">
+
+    <p class="section-title">实体（Entities）</p>
+
+    <!-- Entity type legend -->
+    <div class="legend">
+      <span style="font-weight:600; color:var(--color-text-muted);">实体类型：</span>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--entity-core-badge)"></div>
+        核心对象（core）— Agent 直接操作或判断的实体
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--entity-reference-badge)"></div>
+        参考对象（reference）— 提供上下文或约束
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--entity-event-badge)"></div>
+        事件对象（event）— 记录业务发生的事件
+      </div>
+    </div>
+
+    <div class="entity-grid">
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">受试者(Patient)</div>
+        </div>
+        <p class="entity-desc">参加临床试验的受试者，是访视、检测和资料的主体；MVP中以脱敏摘要形式提供上下文，不管理其医学结论</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">subject_id</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">受试者编号</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">enrollment_date</span>
+            <span class="attr-type">datetime</span>
+            <div>
+              
+                <span class="attr-desc">入组日期</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">current_status</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">当前访视状态摘要</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>受试者信息需脱敏处理</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>AI只管理访视和资料，不输出医学结论</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">受试者访视</div>
+        </div>
+        <p class="entity-desc">某受试者在某项目某中心的一次访视实例，是风险提醒、证据整理与动作闭环的主入口；&#34;今日风险队列&#34;即访视实例按状态与风险分的过滤视图</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">visit_status</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">scheduled / arrived / executed / pending_review / closed</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">visit_window</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">方案要求的访视窗口</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">subject_status</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">受试者当前状态摘要</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">risk_score</span>
+            <span class="attr-type">number</span>
+            <div>
+              
+                <span class="attr-desc">访视级风险评分（规则+资料完整性），仅作优先级排序，不等于医学严重程度</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">sla_deadline</span>
+            <span class="attr-type">datetime</span>
+            <div>
+              
+                <span class="attr-desc">当前最紧急待办的上报或关闭截止时间</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>计划访视不等于受试者已到访</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>现场执行完成不等于资料齐全</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>受试者异常线索不等于临床判定</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>风险评分不等于医学严重程度</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-reference">
+        <div class="entity-header">
+          <span class="entity-badge">参考对象</span>
+          <div class="entity-name">访视资料</div>
+        </div>
+        <p class="entity-desc">化验单、检查单、访视记录等资料证据来源；一次访视可有多份资料，一份资料含多个检验指标</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">document_type</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">文件类型</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">document_status</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">expected / uploaded / missing / reviewed / archived</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">version</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">文件版本</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>资料已上传不等于资料已复核</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>资料完整不等于内容无风险</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>资料缺失需区分未产生和未上传</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-reference">
+        <div class="entity-header">
+          <span class="entity-badge">参考对象</span>
+          <div class="entity-name">检验指标</div>
+        </div>
+        <p class="entity-desc">从检查单/化验单中抽取出的原始检验项目与测量值（如体温、中性粒细胞绝对值、血小板），是风险判断的事实证据层，不属于事件对象</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">indicator_code</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">检验项目编码（如 ANC/PLT/ALT/TEMP）</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">indicator_name</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">检验指标名称</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">value</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">测量值及单位</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">reference_range</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">参考范围</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">trend</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">与既往访视对比的趋势变化</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">ctcae_candidate</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">AI对照CTCAE/阈值输出的候选等级，仅作候选映射，不是最终定级</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">confidence</span>
+            <span class="attr-type">number</span>
+            <div>
+              
+                <span class="attr-desc">AI识别与映射置信度</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>检验指标是事实证据，不是风险信号，也不是领域事件</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>CTCAE候选等级是AI映射结果，不是最终医学定级</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>单指标异常不等于受试者风险，需结合症状与其他指标综合判断</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">风险信号</div>
+        </div>
+        <p class="entity-desc">由检验指标、症状、时间窗或沟通记录等事实推导出的可解释风险线索；是派生解释层，不是事件对象</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">signal_type</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">subject_abnormal / ae_sae_cm / document_missing</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">severity</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">low / medium / high / critical</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">confidence</span>
+            <span class="attr-type">number</span>
+            <div>
+              
+                <span class="attr-desc">AI识别置信度</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">evidence_refs</span>
+            <span class="attr-type">list</span>
+            <div>
+              
+                <span class="attr-desc">支撑该信号的事实证据引用（检验指标、症状记录、规则依据）</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>风险信号是线索，不是最终判断</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>风险信号由检验指标等事实支撑产生，不是事件对象</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>高置信度不等于无需人工确认</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>资料风险不等于受试者安全风险</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">复核证据包</div>
+        </div>
+        <p class="entity-desc">供CRC向研究者发起线下复核的人机协同材料包，包含事实、变化、依据和待确认问题清单</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">packet_status</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">draft / ready / submitted / confirmed / revised</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">evidence_summary</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">关键证据摘要</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">question_list</span>
+            <span class="attr-type">list</span>
+            <div>
+              
+                <span class="attr-desc">待研究者线下确认的问题清单（可勾选回填）</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>证据包只整理事实，不输出判定</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>证据包ready不等于研究者已线下确认</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>研究者线下确认需转为结构化记录</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">升级提示</div>
+        </div>
+        <p class="entity-desc">针对AE/SAE/CM疑似线索的升级提示、SLA倒计时和材料清单，仅辅助人工确认，不自动判定或上报</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">hint_status</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">detected / pending_confirm / confirmed_needed / dismissed / submitted</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">sla_deadline</span>
+            <span class="attr-type">datetime</span>
+            <div>
+              
+                <span class="attr-desc">上报截止时间</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">material_checklist</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">上报材料清单</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>升级提示不等于AE/SAE/CM最终判定</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>SLA倒计时不替代人工确认</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>材料齐全不等于上报已提交</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-core">
+        <div class="entity-header">
+          <span class="entity-badge">核心对象</span>
+          <div class="entity-name">动作建议</div>
+        </div>
+        <p class="entity-desc">面向CRC的下一步动作、优先级、截止时间和关闭标准（仅CRC可执行动作，不含研究者侧操作）</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">action_type</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">supplement_doc / contact_doctor / check_subject / prepare_report / update_status</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">action_status</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">suggested / accepted / rejected / deferred / completed</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">close_criteria</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">动作关闭所需证据</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>动作建议不等于系统自动执行</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>CRC接受建议后仍需完成证据留痕</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>动作关闭不等于医学风险消失</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-event">
+        <div class="entity-header">
+          <span class="entity-badge">事件对象</span>
+          <div class="entity-name">CRC反馈</div>
+        </div>
+        <p class="entity-desc">CRC对提醒和判断建议的采纳、修正、误报、漏报和关闭反馈，用于规则和模型复盘</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">feedback_type</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">accepted / rejected / corrected / false_positive / false_negative / completed</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">correction_reason</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">CRC修正原因</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">created_at</span>
+            <span class="attr-type">datetime</span>
+            <div>
+              
+                <span class="attr-desc">反馈时间</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>CRC忽略提醒不等于提醒无效</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>误报反馈需人工复核后进入规则优化</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>反馈样本不能直接作为临床真值</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+      <div class="entity-card entity-reference">
+        <div class="entity-header">
+          <span class="entity-badge">参考对象</span>
+          <div class="entity-name">SOP规则</div>
+        </div>
+        <p class="entity-desc">项目方案、SOP、CTCAE阈值、升级条件和关闭标准的结构化规则，作为风险解释与动作关闭的知识依据</p>
+
+        
+        <div class="entity-attrs">
+          
+          <div class="attr-row">
+            <span class="attr-name">rule_type</span>
+            <span class="attr-type">enum</span>
+            <div>
+              
+                <span class="attr-values">review_trigger / ae_sae_cm / threshold / closure</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">rule_source</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">规则来源文档（如CTCAE v5.0、项目SOP）</span>
+              
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <span class="attr-name">exception_condition</span>
+            <span class="attr-type">string</span>
+            <div>
+              
+                <span class="attr-desc">例外条件</span>
+              
+            </div>
+          </div>
+          
+        </div>
+        
+
+        
+        <div class="entity-distinctions">
+          <div class="distinction-label">⚠️ 概念边界</div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>SOP规则解释不等于最终合规结论</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>通用规则不能覆盖项目特例</span>
+          </div>
+          
+          <div class="distinction-item">
+            <span class="distinction-icon">≠</span>
+            <span>无引用来源的规则不能用于强提醒</span>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+
+    
+    <p class="section-title">对象关系拓扑图（Relationships Graph）</p>
+    <div class="ws-flow" style="margin-bottom: 24px;">
+      <div class="mermaid" id="mermaid-relationships" style="width: 100%; max-width: 960px; margin: 0 auto;">
+        graph TD
+          %% Styling classes
+          classDef core fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1D4ED8;
+          classDef reference fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#5B21B6;
+          classDef event fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,color:#C2410C;
+
+          %% Nodes definition
+          
+            patient["<b>受试者(Patient)</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class patient core;
+          
+            subject_visit["<b>受试者访视</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class subject_visit core;
+          
+            source_document["<b>访视资料</b><br/><span style='font-size:10px;color:#64748B;'>参考对象</span>"]
+            class source_document reference;
+          
+            lab_indicator["<b>检验指标</b><br/><span style='font-size:10px;color:#64748B;'>参考对象</span>"]
+            class lab_indicator reference;
+          
+            risk_signal["<b>风险信号</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class risk_signal core;
+          
+            review_packet["<b>复核证据包</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class review_packet core;
+          
+            ae_sae_cm_hint["<b>升级提示</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class ae_sae_cm_hint core;
+          
+            action_recommendation["<b>动作建议</b><br/><span style='font-size:10px;color:#64748B;'>核心对象</span>"]
+            class action_recommendation core;
+          
+            crc_feedback["<b>CRC反馈</b><br/><span style='font-size:10px;color:#64748B;'>事件对象</span>"]
+            class crc_feedback event;
+          
+            sop_rule["<b>SOP规则</b><br/><span style='font-size:10px;color:#64748B;'>参考对象</span>"]
+            class sop_rule reference;
+          
+
+          %% Relationships definition
+          
+            patient -->|管理 1:N| subject_visit
+          
+            subject_visit -->|记录 1:N| source_document
+          
+            source_document -->|记录 1:N| lab_indicator
+          
+            lab_indicator -->|匹配 N:N| sop_rule
+          
+            lab_indicator -->|支撑 N:1| risk_signal
+          
+            subject_visit -->|触发 1:N| risk_signal
+          
+            risk_signal -->|触发 N:1| review_packet
+          
+            risk_signal -->|触发 N:N| ae_sae_cm_hint
+          
+            risk_signal -->|触发 N:N| action_recommendation
+          
+            ae_sae_cm_hint -->|触发 N:N| action_recommendation
+          
+            action_recommendation -->|记录 1:N| crc_feedback
+          
+            crc_feedback -->|记录 N:N| sop_rule
+          
+      </div>
+    </div>
+
+    <p class="section-title">对象关系详情（Relationships Detail）</p>
+    <div class="rel-table-wrap">
+      <table class="rel-table">
+        <thead>
+          <tr>
+            <th>从 (From)</th>
+            <th style="text-align:center;">关系</th>
+            <th>到 (To)</th>
+            <th style="text-align:center;">基数</th>
+            <th>业务含义</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="rel-from">受试者(Patient)</td>
+            <td class="rel-arrow">
+              <span class="rel-label">管理</span>
+            </td>
+            <td class="rel-from">受试者访视</td>
+            <td class="rel-card" style="text-align:center;">1:N</td>
+            <td class="rel-desc">受试者的一次或多次访视实例</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">受试者访视</td>
+            <td class="rel-arrow">
+              <span class="rel-label">记录</span>
+            </td>
+            <td class="rel-from">访视资料</td>
+            <td class="rel-card" style="text-align:center;">1:N</td>
+            <td class="rel-desc">一次访视记录多份源资料</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">访视资料</td>
+            <td class="rel-arrow">
+              <span class="rel-label">记录</span>
+            </td>
+            <td class="rel-from">检验指标</td>
+            <td class="rel-card" style="text-align:center;">1:N</td>
+            <td class="rel-desc">一份检查单/化验单含多个检验指标</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">检验指标</td>
+            <td class="rel-arrow">
+              <span class="rel-label">匹配</span>
+            </td>
+            <td class="rel-from">SOP规则</td>
+            <td class="rel-card" style="text-align:center;">N:N</td>
+            <td class="rel-desc">检验指标对照CTCAE/项目阈值与规则，产生候选等级</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">检验指标</td>
+            <td class="rel-arrow">
+              <span class="rel-label">支撑</span>
+            </td>
+            <td class="rel-from">风险信号</td>
+            <td class="rel-card" style="text-align:center;">N:1</td>
+            <td class="rel-desc">异常检验指标与症状共同支撑风险信号</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">受试者访视</td>
+            <td class="rel-arrow">
+              <span class="rel-label">触发</span>
+            </td>
+            <td class="rel-from">风险信号</td>
+            <td class="rel-card" style="text-align:center;">1:N</td>
+            <td class="rel-desc">同一次访视可触发受试者状态或升级类风险信号</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">风险信号</td>
+            <td class="rel-arrow">
+              <span class="rel-label">触发</span>
+            </td>
+            <td class="rel-from">复核证据包</td>
+            <td class="rel-card" style="text-align:center;">N:1</td>
+            <td class="rel-desc">临床类风险信号触发复核证据包整理</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">风险信号</td>
+            <td class="rel-arrow">
+              <span class="rel-label">触发</span>
+            </td>
+            <td class="rel-from">升级提示</td>
+            <td class="rel-card" style="text-align:center;">N:N</td>
+            <td class="rel-desc">疑似安全事件线索触发AE/SAE/CM升级提示</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">风险信号</td>
+            <td class="rel-arrow">
+              <span class="rel-label">触发</span>
+            </td>
+            <td class="rel-from">动作建议</td>
+            <td class="rel-card" style="text-align:center;">N:N</td>
+            <td class="rel-desc">风险信号转译CRC下一步动作建议</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">升级提示</td>
+            <td class="rel-arrow">
+              <span class="rel-label">触发</span>
+            </td>
+            <td class="rel-from">动作建议</td>
+            <td class="rel-card" style="text-align:center;">N:N</td>
+            <td class="rel-desc">升级提示生成升级准备任务</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">动作建议</td>
+            <td class="rel-arrow">
+              <span class="rel-label">记录</span>
+            </td>
+            <td class="rel-from">CRC反馈</td>
+            <td class="rel-card" style="text-align:center;">1:N</td>
+            <td class="rel-desc">动作建议记录CRC采纳、修正或关闭反馈</td>
+          </tr>
+          
+          <tr>
+            <td class="rel-from">CRC反馈</td>
+            <td class="rel-arrow">
+              <span class="rel-label">记录</span>
+            </td>
+            <td class="rel-from">SOP规则</td>
+            <td class="rel-card" style="text-align:center;">N:N</td>
+            <td class="rel-desc">反馈经研究者/组长复核后记录为规则优化候选</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+
+  </div><!-- /tab-objects -->
+
+
+  <!-- ══════════════════════════
+       TAB 2 · 行动边界
+       ══════════════════════════ -->
+  <div class="tab-panel" id="tab-actions">
+
+    <div class="legend">
+      <div class="legend-item"><span style="font-size:16px">📋</span> Required Evidence — 做判断前必须核实的门店可见证据</div>
+      <div class="legend-item"><span style="font-size:16px">✅</span> Valid Actions — 当前情境下可以执行的合法动作</div>
+      <div class="legend-item"><span style="font-size:16px">❌</span> Invalid Actions — 不应该执行（会产生错误假设）的动作</div>
+      <div class="legend-item"><span style="font-size:16px">⚠️</span> Exception Triggers — 需要标记风险或升级的触发条件</div>
+    </div>
+
+    
+    <div class="ab-card">
+      <div class="ab-header">
+        <span class="ab-situation-num">情境 1</span>
+        <div>
+          <div class="ab-situation-name">CRC打开受试者访视</div>
+          
+          <div class="ab-situation-desc">CRC进入某受试者访视，需要知道当前最应处理的下一步动作</div>
+          
+        </div>
+      </div>
+      <div class="ab-body">
+
+        <!-- Q1: Required Evidence -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-evidence">📋 Required Evidence</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">受试者访视实例</div>
+                <div>访视存在且属于当前CRC或其负责中心</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">访视资料状态</div>
+                <div>资料缺失、上传、复核、归档状态已读取</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">风险信号列表</div>
+                <div>风险信号已匹配规则依据和严重程度</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q2: Valid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-valid">✅ Valid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">汇总当前访视风险和待办动作</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">排序CRC下一步动作优先级</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">展示每个动作的依据和关闭标准</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">记录CRC接受、暂缓或修正反馈</div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q3: Invalid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-invalid">❌ Invalid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>自动替CRC关闭访视</div>
+                <div class="ab-item-reason">原因：访视关闭必须基于CRC确认和关闭证据</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>无规则依据时推送强制动作</div>
+                <div class="ab-item-reason">原因：无可追溯依据会造成错误执行</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>将风险评分解释为医学严重程度</div>
+                <div class="ab-item-reason">原因：执行优先级和临床严重性不是同一概念</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q4: Exception Triggers -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-exception">⚠️ Exception Triggers</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：关键输入缺失且无法确认风险等级</div>
+                <div class="ab-item-action">→ 降级为资料补齐提醒并要求CRC补充信息</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：同一访视存在critical风险和逾期SLA</div>
+                <div class="ab-item-action">→ 置顶提醒并要求人工确认是否进入升级链路</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="ab-card">
+      <div class="ab-header">
+        <span class="ab-situation-num">情境 2</span>
+        <div>
+          <div class="ab-situation-name">受试者状态出现异常线索</div>
+          
+          <div class="ab-situation-desc">检验指标、症状或既往访视对比提示可能需要整理复核证据</div>
+          
+        </div>
+      </div>
+      <div class="ab-body">
+
+        <!-- Q1: Required Evidence -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-evidence">📋 Required Evidence</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">检验指标</div>
+                <div>监测值与趋势已结构化，含CTCAE候选等级</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">项目方案和SOP</div>
+                <div>异常阈值、复核触发条件和例外条件已匹配</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">历史访视记录</div>
+                <div>已对比既往访视表现和趋势变化</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q2: Valid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-valid">✅ Valid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">提示异常线索和变化趋势</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">建议是否发起研究者复核</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">生成待研究者线下确认的问题清单</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">标注AI判断置信度和依据来源</div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q3: Invalid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-invalid">❌ Invalid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>输出最终临床判定结论</div>
+                <div class="ab-item-reason">原因：AI只能辅助判断，不能替代临床判定</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>直接判定受试者是否安全</div>
+                <div class="ab-item-reason">原因：安全判断需研究者线下确认</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>隐藏低置信度或依据不足提示</div>
+                <div class="ab-item-reason">原因：证据不足必须显式披露给CRC</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q4: Exception Triggers -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-exception">⚠️ Exception Triggers</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：异常线索置信度低但涉及受试者安全</div>
+                <div class="ab-item-action">→ 标记为需人工复核而非忽略</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：关键监测值缺失或格式异常</div>
+                <div class="ab-item-action">→ 提示CRC补充或核对原始记录</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="ab-card">
+      <div class="ab-header">
+        <span class="ab-situation-num">情境 3</span>
+        <div>
+          <div class="ab-situation-name">CRC发起研究者复核</div>
+          
+          <div class="ab-situation-desc">CRC准备向研究者提交复核材料，需要证据包和留痕</div>
+          
+        </div>
+      </div>
+      <div class="ab-body">
+
+        <!-- Q1: Required Evidence -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-evidence">📋 Required Evidence</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">风险信号</div>
+                <div>异常线索、严重等级和规则依据已生成</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">检验指标与原始资料</div>
+                <div>监测值、症状、检测指标变化和沟通记录可追溯</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">研究者复核记录</div>
+                <div>复核结论、时间、参与人和后续指令可记录</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q2: Valid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-valid">✅ Valid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">生成复核证据包草稿</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">列出待研究者线下确认的问题</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">记录研究者复核结论和后续动作</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">将复核结论关联到受试者访视</div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q3: Invalid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-invalid">❌ Invalid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>伪造或补写研究者线下确认结论</div>
+                <div class="ab-item-reason">原因：复核结论必须来自可追溯人工确认</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>用AI摘要替代原始证据</div>
+                <div class="ab-item-reason">原因：摘要只能辅助阅读，不能替代原始资料</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>证据包未确认就进入升级提交</div>
+                <div class="ab-item-reason">原因：升级需要明确证据和人工确认</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q4: Exception Triggers -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-exception">⚠️ Exception Triggers</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：研究者复核结论与AI建议不一致</div>
+                <div class="ab-item-action">→ 以研究者线下确认结论为准并记录差异原因</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：复核后要求补充资料</div>
+                <div class="ab-item-action">→ 生成补充资料待办并保持复核状态未关闭</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="ab-card">
+      <div class="ab-header">
+        <span class="ab-situation-num">情境 4</span>
+        <div>
+          <div class="ab-situation-name">出现AE/SAE/CM疑似线索</div>
+          
+          <div class="ab-situation-desc">检验指标、症状或研究者复核结论中出现可能触发安全事件上报的线索</div>
+          
+        </div>
+      </div>
+      <div class="ab-body">
+
+        <!-- Q1: Required Evidence -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-evidence">📋 Required Evidence</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">AE/SAE/CM规则</div>
+                <div>项目上报规则、SLA和材料清单已匹配</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">研究者复核结论</div>
+                <div>复核结论或人工确认状态已记录</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">风险台账</div>
+                <div>是否已有同一事件的升级记录，避免重复</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q2: Valid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-valid">✅ Valid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">提示疑似AE/SAE/CM线索</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">展示SLA倒计时和材料清单</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">要求研究者人工确认事件性质</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">生成升级准备任务而非自动提交</div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q3: Invalid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-invalid">❌ Invalid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>自动判定AE/SAE/CM成立</div>
+                <div class="ab-item-reason">原因：安全事件成立需人工和合规确认</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>自动提交上报</div>
+                <div class="ab-item-reason">原因：MVP边界不允许AI替代人工上报</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>因资料不全而取消升级提示</div>
+                <div class="ab-item-reason">原因：资料不全应触发补齐任务而非忽略风险</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q4: Exception Triggers -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-exception">⚠️ Exception Triggers</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：SLA剩余时间低于预设阈值</div>
+                <div class="ab-item-action">→ 升级为critical提醒并要求人工确认</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：疑似线索与既有事件重复</div>
+                <div class="ab-item-action">→ 提示可能重复并要求人工合并或驳回</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="ab-card">
+      <div class="ab-header">
+        <span class="ab-situation-num">情境 5</span>
+        <div>
+          <div class="ab-situation-name">CRC处理AI提醒后</div>
+          
+          <div class="ab-situation-desc">CRC接受、暂缓、修正、忽略或完成动作建议后，需要形成反馈闭环</div>
+          
+        </div>
+      </div>
+      <div class="ab-body">
+
+        <!-- Q1: Required Evidence -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-evidence">📋 Required Evidence</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">动作建议记录</div>
+                <div>建议ID、触发风险、推送时间和动作内容存在</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">CRC操作记录</div>
+                <div>采纳、修正、暂缓、忽略或完成状态已记录</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-source">风险结果</div>
+                <div>风险是否关闭、是否误报漏报、是否进入升级已记录</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q2: Valid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-valid">✅ Valid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">记录CRC对提醒的处理结果</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">标注误报、漏报和修正原因</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">将反馈送入规则优化候选队列</div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <div class="ab-item-content">保留研究者/组长复核后再更新规则</div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q3: Invalid Actions -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-invalid">❌ Invalid Actions</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>直接用单次反馈修改规则</div>
+                <div class="ab-item-reason">原因：单次反馈可能带有偶然性和主观偏差</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>把忽略提醒视为模型错误</div>
+                <div class="ab-item-reason">原因：忽略原因需区分忙碌、无效或已处理</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div class="ab-item-content">
+                <div>将CRC反馈作为临床真值</div>
+                <div class="ab-item-reason">原因：临床真值需要研究者或质控确认</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+        <!-- Q4: Exception Triggers -->
+        <div class="ab-quadrant">
+          <div class="quadrant-label ql-exception">⚠️ Exception Triggers</div>
+          
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：同类提醒连续被标注误报</div>
+                <div class="ab-item-action">→ 进入规则复核队列并降低推送强度</div>
+              </div>
+            </div>
+            
+            <div class="ab-item">
+              <svg class="ab-item-dot" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div class="ab-item-content">
+                <div class="ab-item-condition">当：发生漏报且后续进入升级链路</div>
+                <div class="ab-item-action">→ 标记为高优先级模型和规则复盘样本</div>
+              </div>
+            </div>
+            
+          
+        </div>
+
+      </div>
+    </div>
+    
+
+  </div><!-- /tab-actions -->
+
+
+  <!-- ══════════════════════════
+       TAB 3 · 状态迁移
+       ══════════════════════════ -->
+  <div class="tab-panel" id="tab-states">
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-line" style="background:var(--transition-normal);"></div>
+        正常迁移
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:transparent; border-top: 2px dashed var(--transition-exception); height:0;"></div>
+        异常分支
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:transparent; border-top: 2px dotted var(--transition-recovery); height:0;"></div>
+        异常恢复
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-success); border-radius:3px; width:16px; height:12px;"></div>
+        终态节点
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#FEF3C7; border:2px solid var(--color-warning); border-radius:3px; width:16px; height:12px;"></div>
+        异常态节点
+      </div>
+    </div>
+
+    
+    <div class="ws-block">
+      <!-- Workstream Header -->
+      <div class="ws-header">
+        <div style="flex:1;">
+          <div class="ws-name">⚙️ 风险识别</div>
+          <div class="ws-desc">从受试者访视进入，到抽取检验指标、汇聚上下文、识别风险信号并形成可解释风险卡</div>
+          
+          <div class="ws-anchors">
+            <span style="font-size:11px;color:rgba(255,255,255,0.55);flex-shrink:0;margin-top:2px;">锚点对象：</span>
+            
+            <span class="ws-anchor-chip">subject_visit</span>
+            
+            <span class="ws-anchor-chip">source_document</span>
+            
+            <span class="ws-anchor-chip">lab_indicator</span>
+            
+            <span class="ws-anchor-chip">risk_signal</span>
+            
+            <span class="ws-anchor-chip">sop_rule</span>
+            
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- State Flow -->
+      
+      <div class="ws-flow">
+        <div class="mermaid" id="mermaid-ws_risk_detection">
+          graph LR
+            %% Styling classes
+            classDef default fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1D4ED8;
+            classDef terminal fill:#ECFDF5,stroke:#10B981,stroke-width:2px,color:#065F46;
+            classDef exception fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px,color:#92400E;
+
+            %% Nodes definition
+            
+              
+              
+              rd_context_pending["<b>待汇聚</b><br/><span style='font-size:10px;color:#64748B;'>受试者访视存在，但时间线、资料状态和检验指标尚未汇聚</span>"]
+              
+                class rd_context_pending default;
+              
+            
+              
+              
+              rd_context_ready["<b>上下文就绪</b><br/><span style='font-size:10px;color:#64748B;'>访视上下文已汇聚，检验指标已抽取并对照规则，可进行风险信号识别</span>"]
+              
+                class rd_context_ready default;
+              
+            
+              
+              
+              rd_signal_detected["<b>已识别</b><br/><span style='font-size:10px;color:#64748B;'>已识别风险信号，等待规则解释和动作转译</span>"]
+              
+                class rd_signal_detected default;
+              
+            
+              
+              
+              rd_explained["<b>已解释</b><br/><span style='font-size:10px;color:#64748B;'>风险信号具备依据、严重等级和置信度，可进入动作提醒</span>"]
+              
+                class rd_explained terminal;
+              
+            
+              
+              
+              rd_no_signal["<b>暂无风险</b><br/><span style='font-size:10px;color:#64748B;'>本轮扫描未发现需提醒风险，但仍可被新数据重新触发</span>"]
+              
+                class rd_no_signal default;
+              
+            
+              
+              
+              rd_context_blocked["<b>信息不足</b><br/><span style='font-size:10px;color:#64748B;'>关键输入缺失或依据不足，不能生成强风险判断</span>"]
+              
+                class rd_context_blocked default;
+              
+            
+
+            %% Transitions definition
+            
+              
+                
+                  rd_context_pending -->|汇聚访视上下文| rd_context_ready
+                
+              
+                
+                  rd_context_pending -.->|检查输入完整性| rd_context_blocked
+                
+              
+            
+              
+                
+                  rd_context_ready -->|识别风险信号| rd_signal_detected
+                
+              
+                
+                  rd_context_ready -->|完成风险扫描| rd_no_signal
+                
+              
+            
+              
+                
+                  rd_signal_detected -->|匹配规则依据| rd_explained
+                
+              
+                
+                  rd_signal_detected -.->|检查依据完整性| rd_context_blocked
+                
+              
+            
+              
+            
+              
+                
+                  rd_no_signal ==>|监听新资料或新记录| rd_signal_detected
+                
+              
+            
+              
+                
+                  rd_context_blocked ==>|CRC补充或系统同步数据| rd_context_ready
+                
+              
+            
+        </div>
+      </div>
+
+      <!-- Transition Details -->
+      <div class="ws-transitions-detail">
+        <div class="trans-detail-title">迁移路径详情</div>
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待汇聚 → rd_context_ready</div>
+              <div class="trans-trigger">动作：汇聚访视上下文</div>
+              
+              <div class="trans-evidence">证据：访视实例、资料状态、检验指标已读取</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待汇聚 → rd_context_blocked</div>
+              <div class="trans-trigger">动作：检查输入完整性</div>
+              
+              <div class="trans-evidence">证据：关键资料缺失或指标无法识别</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">上下文就绪 → rd_signal_detected</div>
+              <div class="trans-trigger">动作：识别风险信号</div>
+              
+              <div class="trans-evidence">证据：至少一个风险信号命中受试者异常或升级规则</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">上下文就绪 → rd_no_signal</div>
+              <div class="trans-trigger">动作：完成风险扫描</div>
+              
+              <div class="trans-evidence">证据：未命中高频风险规则，且关键资料完整</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已识别 → rd_explained</div>
+              <div class="trans-trigger">动作：匹配规则依据</div>
+              
+              <div class="trans-evidence">证据：风险信号已关联SOP规则、CTCAE阈值或原始证据</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已识别 → rd_context_blocked</div>
+              <div class="trans-trigger">动作：检查依据完整性</div>
+              
+              <div class="trans-evidence">证据：风险信号缺少规则来源或原始证据</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">暂无风险 → rd_signal_detected</div>
+              <div class="trans-trigger">动作：监听新资料或新记录</div>
+              
+              <div class="trans-evidence">证据：新增资料、指标或状态变化触发风险规则</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">信息不足 → rd_context_ready</div>
+              <div class="trans-trigger">动作：CRC补充或系统同步数据</div>
+              
+              <div class="trans-evidence">证据：缺失字段或资料状态已补齐</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+      </div>
+      
+
+      <!-- Guardrails -->
+      
+      <div class="ws-guardrails">
+        <div class="guardrail-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          全局护栏（不可绕过）
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>风险判断必须保留来源证据和规则依据</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>信息不足时只能提示补齐，不能生成强结论</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>AI风险信号不能替代临床或合规最终判断</span>
+        </div>
+        
+      </div>
+      
+
+      <!-- Dependency Mapping -->
+      
+      <div class="ws-deps">
+        <div class="dep-title">跨流依赖（Dependency Mapping）</div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 动作提醒</div>
+            <div class="dep-condition">条件：风险识别达到已解释状态</div>
+            <div class="dep-impact">影响：允许生成CRC下一步动作建议</div>
+          </div>
+        </div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 复核升级</div>
+            <div class="dep-condition">条件：识别到受试者异常或AE/SAE/CM线索</div>
+            <div class="dep-impact">影响：触发复核证据包或升级提示流程</div>
+          </div>
+        </div>
+        
+      </div>
+      
+
+    </div><!-- /ws-block -->
+    
+    <div class="ws-block">
+      <!-- Workstream Header -->
+      <div class="ws-header">
+        <div style="flex:1;">
+          <div class="ws-name">⚙️ 动作提醒</div>
+          <div class="ws-desc">将已解释风险转化为CRC可执行、可反馈、可关闭的下一步动作</div>
+          
+          <div class="ws-anchors">
+            <span style="font-size:11px;color:rgba(255,255,255,0.55);flex-shrink:0;margin-top:2px;">锚点对象：</span>
+            
+            <span class="ws-anchor-chip">risk_signal</span>
+            
+            <span class="ws-anchor-chip">action_recommendation</span>
+            
+            <span class="ws-anchor-chip">subject_visit</span>
+            
+            <span class="ws-anchor-chip">crc_feedback</span>
+            
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- State Flow -->
+      
+      <div class="ws-flow">
+        <div class="mermaid" id="mermaid-ws_next_action">
+          graph LR
+            %% Styling classes
+            classDef default fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1D4ED8;
+            classDef terminal fill:#ECFDF5,stroke:#10B981,stroke-width:2px,color:#065F46;
+            classDef exception fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px,color:#92400E;
+
+            %% Nodes definition
+            
+              
+              
+              na_waiting_signal["<b>等待风险</b><br/><span style='font-size:10px;color:#64748B;'>尚无已解释风险，不能生成强动作建议</span>"]
+              
+                class na_waiting_signal default;
+              
+            
+              
+              
+              na_suggested["<b>已建议</b><br/><span style='font-size:10px;color:#64748B;'>系统已向CRC展示动作建议、优先级、依据和关闭标准</span>"]
+              
+                class na_suggested default;
+              
+            
+              
+              
+              na_accepted["<b>已接受</b><br/><span style='font-size:10px;color:#64748B;'>CRC已接受建议，动作进入执行中</span>"]
+              
+                class na_accepted default;
+              
+            
+              
+              
+              na_deferred["<b>已暂缓</b><br/><span style='font-size:10px;color:#64748B;'>CRC暂缓处理，系统保留提醒和后续触发条件</span>"]
+              
+                class na_deferred default;
+              
+            
+              
+              
+              na_rejected["<b>已驳回</b><br/><span style='font-size:10px;color:#64748B;'>CRC认为建议不适用或为误报，需要进入反馈复核</span>"]
+              
+                class na_rejected default;
+              
+            
+              
+              
+              na_completed["<b>已完成</b><br/><span style='font-size:10px;color:#64748B;'>CRC已完成动作并提交关闭证据</span>"]
+              
+                class na_completed default;
+              
+            
+              
+              
+              na_feedback_recorded["<b>已反馈</b><br/><span style='font-size:10px;color:#64748B;'>动作结果进入反馈闭环，用于规则和模型复盘</span>"]
+              
+                class na_feedback_recorded terminal;
+              
+            
+
+            %% Transitions definition
+            
+              
+                
+                  na_waiting_signal -->|转译下一步动作| na_suggested
+                
+              
+            
+              
+                
+                  na_suggested -->|CRC接受建议| na_accepted
+                
+              
+                
+                  na_suggested -->|CRC暂缓建议| na_deferred
+                
+              
+                
+                  na_suggested -.->|CRC驳回建议| na_rejected
+                
+              
+            
+              
+                
+                  na_accepted -->|CRC提交关闭证据| na_completed
+                
+              
+                
+                  na_accepted -.->|CRC记录阻塞原因| na_deferred
+                
+              
+            
+              
+                
+                  na_deferred ==>|CRC重新开始处理| na_accepted
+                
+              
+            
+              
+                
+                  na_rejected ==>|记录驳回反馈| na_feedback_recorded
+                
+              
+            
+              
+                
+                  na_completed -->|采集动作结果| na_feedback_recorded
+                
+              
+            
+              
+            
+        </div>
+      </div>
+
+      <!-- Transition Details -->
+      <div class="ws-transitions-detail">
+        <div class="trans-detail-title">迁移路径详情</div>
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">等待风险 → na_suggested</div>
+              <div class="trans-trigger">动作：转译下一步动作</div>
+              
+              <div class="trans-evidence">证据：风险信号处于已解释状态且匹配动作模板</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已建议 → na_accepted</div>
+              <div class="trans-trigger">动作：CRC接受建议</div>
+              
+              <div class="trans-evidence">证据：CRC点击接受或开始处理该动作</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已建议 → na_deferred</div>
+              <div class="trans-trigger">动作：CRC暂缓建议</div>
+              
+              <div class="trans-evidence">证据：CRC选择暂缓并记录原因或计划处理时间</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已建议 → na_rejected</div>
+              <div class="trans-trigger">动作：CRC驳回建议</div>
+              
+              <div class="trans-evidence">证据：CRC选择驳回并填写原因</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已接受 → na_completed</div>
+              <div class="trans-trigger">动作：CRC提交关闭证据</div>
+              
+              <div class="trans-evidence">证据：补传资料、研究者复核记录、状态更新或其他关闭证据存在</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已接受 → na_deferred</div>
+              <div class="trans-trigger">动作：CRC记录阻塞原因</div>
+              
+              <div class="trans-evidence">证据：存在无法执行原因，如资料缺失或等待研究者复核</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已暂缓 → na_accepted</div>
+              <div class="trans-trigger">动作：CRC重新开始处理</div>
+              
+              <div class="trans-evidence">证据：暂缓原因解除或截止时间临近</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已驳回 → na_feedback_recorded</div>
+              <div class="trans-trigger">动作：记录驳回反馈</div>
+              
+              <div class="trans-evidence">证据：驳回原因、误报标注或修正建议已填写</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已完成 → na_feedback_recorded</div>
+              <div class="trans-trigger">动作：采集动作结果</div>
+              
+              <div class="trans-evidence">证据：动作状态、关闭证据和风险结果已记录</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+        
+      </div>
+      
+
+      <!-- Guardrails -->
+      
+      <div class="ws-guardrails">
+        <div class="guardrail-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          全局护栏（不可绕过）
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>动作建议必须有风险来源和关闭标准</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>AI不能绕过CRC确认直接执行或关闭任务</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>CRC驳回必须记录原因，不能静默删除样本</span>
+        </div>
+        
+      </div>
+      
+
+      <!-- Dependency Mapping -->
+      
+      <div class="ws-deps">
+        <div class="dep-title">跨流依赖（Dependency Mapping）</div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 反馈学习</div>
+            <div class="dep-condition">条件：动作提醒达到已完成或已驳回状态</div>
+            <div class="dep-impact">影响：触发提醒有效性与误报漏报标注</div>
+          </div>
+        </div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 复核升级</div>
+            <div class="dep-condition">条件：动作建议要求研究者复核或AE/SAE/CM确认</div>
+            <div class="dep-impact">影响：触发复核证据包和升级提示流程</div>
+          </div>
+        </div>
+        
+      </div>
+      
+
+    </div><!-- /ws-block -->
+    
+    <div class="ws-block">
+      <!-- Workstream Header -->
+      <div class="ws-header">
+        <div style="flex:1;">
+          <div class="ws-name">⚙️ 复核升级</div>
+          <div class="ws-desc">从异常线索到复核证据包、研究者线下确认、AE/SAE/CM升级提示和人工确认</div>
+          
+          <div class="ws-anchors">
+            <span style="font-size:11px;color:rgba(255,255,255,0.55);flex-shrink:0;margin-top:2px;">锚点对象：</span>
+            
+            <span class="ws-anchor-chip">risk_signal</span>
+            
+            <span class="ws-anchor-chip">review_packet</span>
+            
+            <span class="ws-anchor-chip">ae_sae_cm_hint</span>
+            
+            <span class="ws-anchor-chip">sop_rule</span>
+            
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- State Flow -->
+      
+      <div class="ws-flow">
+        <div class="mermaid" id="mermaid-ws_review_upgrade">
+          graph LR
+            %% Styling classes
+            classDef default fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1D4ED8;
+            classDef terminal fill:#ECFDF5,stroke:#10B981,stroke-width:2px,color:#065F46;
+            classDef exception fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px,color:#92400E;
+
+            %% Nodes definition
+            
+              
+              
+              ru_signal_pending["<b>待判断</b><br/><span style='font-size:10px;color:#64748B;'>存在异常线索，但尚未明确是否需要复核或升级</span>"]
+              
+                class ru_signal_pending default;
+              
+            
+              
+              
+              ru_review_packet_ready["<b>证据包就绪</b><br/><span style='font-size:10px;color:#64748B;'>复核证据包草稿已生成，等待CRC提交或修正</span>"]
+              
+                class ru_review_packet_ready default;
+              
+            
+              
+              
+              ru_review_submitted["<b>已提交复核</b><br/><span style='font-size:10px;color:#64748B;'>研究者正在线下复核，AI等待人工结论</span>"]
+              
+                class ru_review_submitted default;
+              
+            
+              
+              
+              ru_review_confirmed["<b>复核已确认</b><br/><span style='font-size:10px;color:#64748B;'>研究者复核结论已留痕，可更新动作建议和访视状态</span>"]
+              
+                class ru_review_confirmed terminal;
+              
+            
+              
+              
+              ru_upgrade_pending["<b>待升级确认</b><br/><span style='font-size:10px;color:#64748B;'>存在AE/SAE/CM疑似线索或SLA风险，必须人工确认</span>"]
+              
+                class ru_upgrade_pending default;
+              
+            
+              
+              
+              ru_upgrade_confirmed["<b>升级确认</b><br/><span style='font-size:10px;color:#64748B;'>人工确认需要进入上报准备或正式流程</span>"]
+              
+                class ru_upgrade_confirmed default;
+              
+            
+              
+              
+              ru_upgrade_dismissed["<b>升级驳回</b><br/><span style='font-size:10px;color:#64748B;'>人工确认不进入升级，但原因必须留痕</span>"]
+              
+                class ru_upgrade_dismissed terminal;
+              
+            
+              
+              
+              ru_submitted["<b>已上报</b><br/><span style='font-size:10px;color:#64748B;'>AE/SAE/CM相关上报已通过人工确认后提交</span>"]
+              
+                class ru_submitted terminal;
+              
+            
+
+            %% Transitions definition
+            
+              
+                
+                  ru_signal_pending -->|生成复核证据包| ru_review_packet_ready
+                
+              
+                
+                  ru_signal_pending -.->|检测AE/SAE/CM疑似线索| ru_upgrade_pending
+                
+              
+            
+              
+                
+                  ru_review_packet_ready -->|CRC提交研究者复核| ru_review_submitted
+                
+              
+                
+                  ru_review_packet_ready ==>|CRC要求补充证据| ru_signal_pending
+                
+              
+            
+              
+                
+                  ru_review_submitted -->|记录研究者复核结论| ru_review_confirmed
+                
+              
+                
+                  ru_review_submitted -.->|复核结论触发升级| ru_upgrade_pending
+                
+              
+            
+              
+            
+              
+                
+                  ru_upgrade_pending -->|人工确认需升级| ru_upgrade_confirmed
+                
+              
+                
+                  ru_upgrade_pending ==>|人工确认不升级| ru_upgrade_dismissed
+                
+              
+            
+              
+                
+                  ru_upgrade_confirmed -->|完成上报提交| ru_submitted
+                
+              
+            
+              
+            
+              
+            
+        </div>
+      </div>
+
+      <!-- Transition Details -->
+      <div class="ws-transitions-detail">
+        <div class="trans-detail-title">迁移路径详情</div>
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待判断 → ru_review_packet_ready</div>
+              <div class="trans-trigger">动作：生成复核证据包</div>
+              
+              <div class="trans-evidence">证据：异常线索、检验指标、原始资料和规则依据已汇总</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待判断 → ru_upgrade_pending</div>
+              <div class="trans-trigger">动作：检测AE/SAE/CM疑似线索</div>
+              
+              <div class="trans-evidence">证据：线索命中AE/SAE/CM规则或SLA触发条件</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">证据包就绪 → ru_review_submitted</div>
+              <div class="trans-trigger">动作：CRC提交研究者复核</div>
+              
+              <div class="trans-evidence">证据：CRC确认并提交证据包</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">证据包就绪 → ru_signal_pending</div>
+              <div class="trans-trigger">动作：CRC要求补充证据</div>
+              
+              <div class="trans-evidence">证据：CRC标记资料缺失或问题清单不完整</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已提交复核 → ru_review_confirmed</div>
+              <div class="trans-trigger">动作：记录研究者复核结论</div>
+              
+              <div class="trans-evidence">证据：研究者复核结论、时间、参与人已记录</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已提交复核 → ru_upgrade_pending</div>
+              <div class="trans-trigger">动作：复核结论触发升级</div>
+              
+              <div class="trans-evidence">证据：研究者线下确认结论或规则匹配显示需进入AE/SAE/CM确认</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+        
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待升级确认 → ru_upgrade_confirmed</div>
+              <div class="trans-trigger">动作：人工确认需升级</div>
+              
+              <div class="trans-evidence">证据：CRC、项目经理或质控确认升级需要和材料清单</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待升级确认 → ru_upgrade_dismissed</div>
+              <div class="trans-trigger">动作：人工确认不升级</div>
+              
+              <div class="trans-evidence">证据：驳回原因和依据已记录</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">升级确认 → ru_submitted</div>
+              <div class="trans-trigger">动作：完成上报提交</div>
+              
+              <div class="trans-evidence">证据：上报记录或工作台提交状态存在</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+        
+          
+        
+      </div>
+      
+
+      <!-- Guardrails -->
+      
+      <div class="ws-guardrails">
+        <div class="guardrail-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          全局护栏（不可绕过）
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>AI不得输出判定或最终安全事件成立结论</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>AI不得自动提交AE/SAE/CM上报</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>SLA临近时必须提醒人工确认，不能静默等待</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>研究者线下确认结论与AI建议冲突时以研究者线下确认结论为准</span>
+        </div>
+        
+      </div>
+      
+
+      <!-- Dependency Mapping -->
+      
+      <div class="ws-deps">
+        <div class="dep-title">跨流依赖（Dependency Mapping）</div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 动作提醒</div>
+            <div class="dep-condition">条件：复核或升级流程需要CRC补充资料</div>
+            <div class="dep-impact">影响：生成新的CRC补充资料动作建议</div>
+          </div>
+        </div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 反馈学习</div>
+            <div class="dep-condition">条件：升级提示被确认、驳回或提交</div>
+            <div class="dep-impact">影响：形成高价值反馈样本用于规则复盘</div>
+          </div>
+        </div>
+        
+      </div>
+      
+
+    </div><!-- /ws-block -->
+    
+    <div class="ws-block">
+      <!-- Workstream Header -->
+      <div class="ws-header">
+        <div style="flex:1;">
+          <div class="ws-name">⚙️ 反馈学习</div>
+          <div class="ws-desc">采集CRC反馈、误报漏报和关闭结果，进入规则优化候选队列</div>
+          
+          <div class="ws-anchors">
+            <span style="font-size:11px;color:rgba(255,255,255,0.55);flex-shrink:0;margin-top:2px;">锚点对象：</span>
+            
+            <span class="ws-anchor-chip">action_recommendation</span>
+            
+            <span class="ws-anchor-chip">crc_feedback</span>
+            
+            <span class="ws-anchor-chip">sop_rule</span>
+            
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- State Flow -->
+      
+      <div class="ws-flow">
+        <div class="mermaid" id="mermaid-ws_feedback_learning">
+          graph LR
+            %% Styling classes
+            classDef default fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1D4ED8;
+            classDef terminal fill:#ECFDF5,stroke:#10B981,stroke-width:2px,color:#065F46;
+            classDef exception fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px,color:#92400E;
+
+            %% Nodes definition
+            
+              
+              
+              fl_waiting_feedback["<b>待反馈</b><br/><span style='font-size:10px;color:#64748B;'>动作建议已推送，但尚未采集CRC处理结果</span>"]
+              
+                class fl_waiting_feedback default;
+              
+            
+              
+              
+              fl_feedback_recorded["<b>已记录</b><br/><span style='font-size:10px;color:#64748B;'>CRC反馈已写入风险台账或反馈表</span>"]
+              
+                class fl_feedback_recorded default;
+              
+            
+              
+              
+              fl_review_needed["<b>待复核</b><br/><span style='font-size:10px;color:#64748B;'>反馈影响规则、模型或安全判断，需要质控或项目人员复核</span>"]
+              
+                class fl_review_needed default;
+              
+            
+              
+              
+              fl_candidate_update["<b>优化候选</b><br/><span style='font-size:10px;color:#64748B;'>反馈样本进入规则、案例或模型优化候选池</span>"]
+              
+                class fl_candidate_update default;
+              
+            
+              
+              
+              fl_closed["<b>已归档</b><br/><span style='font-size:10px;color:#64748B;'>反馈已归档或进入优化记录，闭环完成</span>"]
+              
+                class fl_closed terminal;
+              
+            
+
+            %% Transitions definition
+            
+              
+                
+                  fl_waiting_feedback -->|CRC提交反馈| fl_feedback_recorded
+                
+              
+            
+              
+                
+                  fl_feedback_recorded -.->|判断反馈是否需复核| fl_review_needed
+                
+              
+                
+                  fl_feedback_recorded -->|归档普通反馈| fl_closed
+                
+              
+            
+              
+                
+                  fl_review_needed -->|质控确认可优化| fl_candidate_update
+                
+              
+                
+                  fl_review_needed ==>|质控确认不调整| fl_closed
+                
+              
+            
+              
+                
+                  fl_candidate_update -->|完成知识库或规则更新| fl_closed
+                
+              
+            
+              
+            
+        </div>
+      </div>
+
+      <!-- Transition Details -->
+      <div class="ws-transitions-detail">
+        <div class="trans-detail-title">迁移路径详情</div>
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待反馈 → fl_feedback_recorded</div>
+              <div class="trans-trigger">动作：CRC提交反馈</div>
+              
+              <div class="trans-evidence">证据：采纳、驳回、修正、完成或误报漏报标注已记录</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot exception"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已记录 → fl_review_needed</div>
+              <div class="trans-trigger">动作：判断反馈是否需复核</div>
+              
+              <div class="trans-evidence">证据：反馈为误报、漏报、规则冲突或安全相关</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常分支</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">已记录 → fl_closed</div>
+              <div class="trans-trigger">动作：归档普通反馈</div>
+              
+              <div class="trans-evidence">证据：反馈无争议且动作已关闭</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待复核 → fl_candidate_update</div>
+              <div class="trans-trigger">动作：质控确认可优化</div>
+              
+              <div class="trans-evidence">证据：复核结论显示规则、模板或模型需要调整</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot recovery"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">待复核 → fl_closed</div>
+              <div class="trans-trigger">动作：质控确认不调整</div>
+              
+              <div class="trans-evidence">证据：复核结论显示反馈不适用于规则更新</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">异常恢复</div>
+            </div>
+          </div>
+          
+        
+          
+          <div class="trans-detail-row">
+            <div class="trans-type-dot normal"></div>
+            <div class="trans-detail-content">
+              <div class="trans-route">优化候选 → fl_closed</div>
+              <div class="trans-trigger">动作：完成知识库或规则更新</div>
+              
+              <div class="trans-evidence">证据：规则版本、案例模板或模型样本更新记录存在</div>
+              
+              <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">正常迁移</div>
+            </div>
+          </div>
+          
+        
+          
+        
+      </div>
+      
+
+      <!-- Guardrails -->
+      
+      <div class="ws-guardrails">
+        <div class="guardrail-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          全局护栏（不可绕过）
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>单次反馈不能直接修改线上规则</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>误报漏报样本需人工复核后再进入训练</span>
+        </div>
+        
+        <div class="guardrail-item">
+          <span class="guardrail-icon">🔒</span>
+          <span>临床相关反馈不能作为未经确认的真值</span>
+        </div>
+        
+      </div>
+      
+
+      <!-- Dependency Mapping -->
+      
+      <div class="ws-deps">
+        <div class="dep-title">跨流依赖（Dependency Mapping）</div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 风险识别</div>
+            <div class="dep-condition">条件：规则或模型优化候选被确认</div>
+            <div class="dep-impact">影响：后续风险识别阈值或解释依据可更新</div>
+          </div>
+        </div>
+        
+        <div class="dep-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <div>
+            <div class="dep-ws-name">→ 动作提醒</div>
+            <div class="dep-condition">条件：处置模板被更新</div>
+            <div class="dep-impact">影响：后续CRC动作建议可引用新模板</div>
+          </div>
+        </div>
+        
+      </div>
+      
+
+    </div><!-- /ws-block -->
+    
+
+  </div><!-- /tab-states -->
+
+
+  <!-- ══════════════════════════
+       TAB 4 · Agent Prompt
+       ══════════════════════════ -->
+  <div class="tab-panel" id="tab-prompt">
+
+    <div style="margin-bottom:16px; font-size:13px; color:var(--color-text-muted); line-height:1.6;">
+      以下是从本体结构自动生成的 Agent System Prompt 片段。
+      可直接复制并注入到 Agent 的系统提示词或知识库中，
+      让 Agent 掌握当前场景的业务对象边界、行动约束和状态护栏。
+    </div>
+
+    <div class="prompt-panel">
+      <div class="prompt-header">
+        <span class="prompt-header-title">🤖 Agent Prompt 片段</span>
+        <span class="prompt-hint">点击右上角「复制 Prompt」按钮一键复制</span>
+      </div>
+      <pre class="prompt-body" id="agent-prompt-content"># 业务本体：CRC访视风险助手本体
+领域：SMO访视
+Agent 角色：CRC风险辅助Agent
+场景：面向CRC的访视风险提醒与EDC录入辅助MVP：CRC手动上传或Excel导入检测报告后，平台后端接入CTCAE和医学专业知识知识库，对检测报告扫描结果进行预识别标注并返回CRC；CRC依据返回的预识别标注对线下检测报告表进行标注，经研究者线下确认后将AI预判正确的内容用于病例填写。
+
+## 1. 核心业务对象与概念边界
+### 受试者(Patient) [核心对象]
+- 定义：参加临床试验的受试者，是访视、检测和资料的主体；MVP中以脱敏摘要形式提供上下文，不管理其医学结论
+- 属性定义：
+  * subject_id (string) - 受试者编号
+  * enrollment_date (datetime) - 入组日期
+  * current_status (string) - 当前访视状态摘要
+- 关键概念边界（不可混淆）：
+  ⚠️ 受试者信息需脱敏处理
+  ⚠️ AI只管理访视和资料，不输出医学结论
+### 受试者访视 [核心对象]
+- 定义：某受试者在某项目某中心的一次访视实例，是风险提醒、证据整理与动作闭环的主入口；&#34;今日风险队列&#34;即访视实例按状态与风险分的过滤视图
+- 属性定义：
+  * visit_status (enum)（可选值：scheduled / arrived / executed / pending_review / closed） - 访视进展状态
+  * visit_window (string) - 方案要求的访视窗口
+  * subject_status (string) - 受试者当前状态摘要
+  * risk_score (number) - 访视级风险评分（规则+资料完整性），仅作优先级排序，不等于医学严重程度
+  * sla_deadline (datetime) - 当前最紧急待办的上报或关闭截止时间
+- 关键概念边界（不可混淆）：
+  ⚠️ 计划访视不等于受试者已到访
+  ⚠️ 现场执行完成不等于资料齐全
+  ⚠️ 受试者异常线索不等于临床判定
+  ⚠️ 风险评分不等于医学严重程度
+### 访视资料 [参考对象]
+- 定义：化验单、检查单、访视记录等资料证据来源；一次访视可有多份资料，一份资料含多个检验指标
+- 属性定义：
+  * document_type (string) - 文件类型
+  * document_status (enum)（可选值：expected / uploaded / missing / reviewed / archived） - 文件状态
+  * version (string) - 文件版本
+- 关键概念边界（不可混淆）：
+  ⚠️ 资料已上传不等于资料已复核
+  ⚠️ 资料完整不等于内容无风险
+  ⚠️ 资料缺失需区分未产生和未上传
+### 检验指标 [参考对象]
+- 定义：从检查单/化验单中抽取出的原始检验项目与测量值（如体温、中性粒细胞绝对值、血小板），是风险判断的事实证据层，不属于事件对象
+- 属性定义：
+  * indicator_code (string) - 检验项目编码（如 ANC/PLT/ALT/TEMP）
+  * indicator_name (string) - 检验指标名称
+  * value (string) - 测量值及单位
+  * reference_range (string) - 参考范围
+  * trend (string) - 与既往访视对比的趋势变化
+  * ctcae_candidate (string) - AI对照CTCAE/阈值输出的候选等级，仅作候选映射，不是最终定级
+  * confidence (number) - AI识别与映射置信度
+- 关键概念边界（不可混淆）：
+  ⚠️ 检验指标是事实证据，不是风险信号，也不是领域事件
+  ⚠️ CTCAE候选等级是AI映射结果，不是最终医学定级
+  ⚠️ 单指标异常不等于受试者风险，需结合症状与其他指标综合判断
+### 风险信号 [核心对象]
+- 定义：由检验指标、症状、时间窗或沟通记录等事实推导出的可解释风险线索；是派生解释层，不是事件对象
+- 属性定义：
+  * signal_type (enum)（可选值：subject_abnormal / ae_sae_cm / document_missing） - 风险信号类型（本轮MVP聚焦subject_abnormal与ae_sae_cm，document_missing列入路线图）
+  * severity (enum)（可选值：low / medium / high / critical） - 风险严重等级
+  * confidence (number) - AI识别置信度
+  * evidence_refs (list) - 支撑该信号的事实证据引用（检验指标、症状记录、规则依据）
+- 关键概念边界（不可混淆）：
+  ⚠️ 风险信号是线索，不是最终判断
+  ⚠️ 风险信号由检验指标等事实支撑产生，不是事件对象
+  ⚠️ 高置信度不等于无需人工确认
+  ⚠️ 资料风险不等于受试者安全风险
+### 复核证据包 [核心对象]
+- 定义：供CRC向研究者发起线下复核的人机协同材料包，包含事实、变化、依据和待确认问题清单
+- 属性定义：
+  * packet_status (enum)（可选值：draft / ready / submitted / confirmed / revised） - 证据包状态
+  * evidence_summary (string) - 关键证据摘要
+  * question_list (list) - 待研究者线下确认的问题清单（可勾选回填）
+- 关键概念边界（不可混淆）：
+  ⚠️ 证据包只整理事实，不输出判定
+  ⚠️ 证据包ready不等于研究者已线下确认
+  ⚠️ 研究者线下确认需转为结构化记录
+### 升级提示 [核心对象]
+- 定义：针对AE/SAE/CM疑似线索的升级提示、SLA倒计时和材料清单，仅辅助人工确认，不自动判定或上报
+- 属性定义：
+  * hint_status (enum)（可选值：detected / pending_confirm / confirmed_needed / dismissed / submitted） - 升级提示状态
+  * sla_deadline (datetime) - 上报截止时间
+  * material_checklist (string) - 上报材料清单
+- 关键概念边界（不可混淆）：
+  ⚠️ 升级提示不等于AE/SAE/CM最终判定
+  ⚠️ SLA倒计时不替代人工确认
+  ⚠️ 材料齐全不等于上报已提交
+### 动作建议 [核心对象]
+- 定义：面向CRC的下一步动作、优先级、截止时间和关闭标准（仅CRC可执行动作，不含研究者侧操作）
+- 属性定义：
+  * action_type (enum)（可选值：supplement_doc / contact_doctor / check_subject / prepare_report / update_status） - 建议动作类型
+  * action_status (enum)（可选值：suggested / accepted / rejected / deferred / completed） - CRC对动作建议的处理状态
+  * close_criteria (string) - 动作关闭所需证据
+- 关键概念边界（不可混淆）：
+  ⚠️ 动作建议不等于系统自动执行
+  ⚠️ CRC接受建议后仍需完成证据留痕
+  ⚠️ 动作关闭不等于医学风险消失
+### CRC反馈 [事件对象]
+- 定义：CRC对提醒和判断建议的采纳、修正、误报、漏报和关闭反馈，用于规则和模型复盘
+- 属性定义：
+  * feedback_type (enum)（可选值：accepted / rejected / corrected / false_positive / false_negative / completed） - 反馈类型
+  * correction_reason (string) - CRC修正原因
+  * created_at (datetime) - 反馈时间
+- 关键概念边界（不可混淆）：
+  ⚠️ CRC忽略提醒不等于提醒无效
+  ⚠️ 误报反馈需人工复核后进入规则优化
+  ⚠️ 反馈样本不能直接作为临床真值
+### SOP规则 [参考对象]
+- 定义：项目方案、SOP、CTCAE阈值、升级条件和关闭标准的结构化规则，作为风险解释与动作关闭的知识依据
+- 属性定义：
+  * rule_type (enum)（可选值：review_trigger / ae_sae_cm / threshold / closure） - 规则类型
+  * rule_source (string) - 规则来源文档（如CTCAE v5.0、项目SOP）
+  * exception_condition (string) - 例外条件
+- 关键概念边界（不可混淆）：
+  ⚠️ SOP规则解释不等于最终合规结论
+  ⚠️ 通用规则不能覆盖项目特例
+  ⚠️ 无引用来源的规则不能用于强提醒
+
+## 2. 对象关系依赖（Relationships）
+- 【受试者(Patient)】 --(管理, 基数 1:N)--&gt; 【受试者访视】
+  说明：受试者的一次或多次访视实例
+- 【受试者访视】 --(记录, 基数 1:N)--&gt; 【访视资料】
+  说明：一次访视记录多份源资料
+- 【访视资料】 --(记录, 基数 1:N)--&gt; 【检验指标】
+  说明：一份检查单/化验单含多个检验指标
+- 【检验指标】 --(匹配, 基数 N:N)--&gt; 【SOP规则】
+  说明：检验指标对照CTCAE/项目阈值与规则，产生候选等级
+- 【检验指标】 --(支撑, 基数 N:1)--&gt; 【风险信号】
+  说明：异常检验指标与症状共同支撑风险信号
+- 【受试者访视】 --(触发, 基数 1:N)--&gt; 【风险信号】
+  说明：同一次访视可触发受试者状态或升级类风险信号
+- 【风险信号】 --(触发, 基数 N:1)--&gt; 【复核证据包】
+  说明：临床类风险信号触发复核证据包整理
+- 【风险信号】 --(触发, 基数 N:N)--&gt; 【升级提示】
+  说明：疑似安全事件线索触发AE/SAE/CM升级提示
+- 【风险信号】 --(触发, 基数 N:N)--&gt; 【动作建议】
+  说明：风险信号转译CRC下一步动作建议
+- 【升级提示】 --(触发, 基数 N:N)--&gt; 【动作建议】
+  说明：升级提示生成升级准备任务
+- 【动作建议】 --(记录, 基数 1:N)--&gt; 【CRC反馈】
+  说明：动作建议记录CRC采纳、修正或关闭反馈
+- 【CRC反馈】 --(记录, 基数 N:N)--&gt; 【SOP规则】
+  说明：反馈经研究者/组长复核后记录为规则优化候选
+
+## 3. 行动边界限制（情境 - 证据 - 合法/禁止动作）
+### 情境：CRC打开受试者访视
+描述：CRC进入某受试者访视，需要知道当前最应处理的下一步动作
+必须核实的证据：
+  - [受试者访视实例] 访视存在且属于当前CRC或其负责中心
+  - [访视资料状态] 资料缺失、上传、复核、归档状态已读取
+  - [风险信号列表] 风险信号已匹配规则依据和严重程度
+✅ 合法动作（允许执行）：
+  - 汇总当前访视风险和待办动作
+  - 排序CRC下一步动作优先级
+  - 展示每个动作的依据和关闭标准
+  - 记录CRC接受、暂缓或修正反馈
+❌ 禁止动作（严禁执行，防范错误假设）：
+  - 自动替CRC关闭访视 （禁止原因：访视关闭必须基于CRC确认和关闭证据）
+  - 无规则依据时推送强制动作 （禁止原因：无可追溯依据会造成错误执行）
+  - 将风险评分解释为医学严重程度 （禁止原因：执行优先级和临床严重性不是同一概念）
+⚠️ 异常触发规则：
+  - 当满足条件【关键输入缺失且无法确认风险等级】 → 必须执行：降级为资料补齐提醒并要求CRC补充信息
+  - 当满足条件【同一访视存在critical风险和逾期SLA】 → 必须执行：置顶提醒并要求人工确认是否进入升级链路
+### 情境：受试者状态出现异常线索
+描述：检验指标、症状或既往访视对比提示可能需要整理复核证据
+必须核实的证据：
+  - [检验指标] 监测值与趋势已结构化，含CTCAE候选等级
+  - [项目方案和SOP] 异常阈值、复核触发条件和例外条件已匹配
+  - [历史访视记录] 已对比既往访视表现和趋势变化
+✅ 合法动作（允许执行）：
+  - 提示异常线索和变化趋势
+  - 建议是否发起研究者复核
+  - 生成待研究者线下确认的问题清单
+  - 标注AI判断置信度和依据来源
+❌ 禁止动作（严禁执行，防范错误假设）：
+  - 输出最终临床判定结论 （禁止原因：AI只能辅助判断，不能替代临床判定）
+  - 直接判定受试者是否安全 （禁止原因：安全判断需研究者线下确认）
+  - 隐藏低置信度或依据不足提示 （禁止原因：证据不足必须显式披露给CRC）
+⚠️ 异常触发规则：
+  - 当满足条件【异常线索置信度低但涉及受试者安全】 → 必须执行：标记为需人工复核而非忽略
+  - 当满足条件【关键监测值缺失或格式异常】 → 必须执行：提示CRC补充或核对原始记录
+### 情境：CRC发起研究者复核
+描述：CRC准备向研究者提交复核材料，需要证据包和留痕
+必须核实的证据：
+  - [风险信号] 异常线索、严重等级和规则依据已生成
+  - [检验指标与原始资料] 监测值、症状、检测指标变化和沟通记录可追溯
+  - [研究者复核记录] 复核结论、时间、参与人和后续指令可记录
+✅ 合法动作（允许执行）：
+  - 生成复核证据包草稿
+  - 列出待研究者线下确认的问题
+  - 记录研究者复核结论和后续动作
+  - 将复核结论关联到受试者访视
+❌ 禁止动作（严禁执行，防范错误假设）：
+  - 伪造或补写研究者线下确认结论 （禁止原因：复核结论必须来自可追溯人工确认）
+  - 用AI摘要替代原始证据 （禁止原因：摘要只能辅助阅读，不能替代原始资料）
+  - 证据包未确认就进入升级提交 （禁止原因：升级需要明确证据和人工确认）
+⚠️ 异常触发规则：
+  - 当满足条件【研究者复核结论与AI建议不一致】 → 必须执行：以研究者线下确认结论为准并记录差异原因
+  - 当满足条件【复核后要求补充资料】 → 必须执行：生成补充资料待办并保持复核状态未关闭
+### 情境：出现AE/SAE/CM疑似线索
+描述：检验指标、症状或研究者复核结论中出现可能触发安全事件上报的线索
+必须核实的证据：
+  - [AE/SAE/CM规则] 项目上报规则、SLA和材料清单已匹配
+  - [研究者复核结论] 复核结论或人工确认状态已记录
+  - [风险台账] 是否已有同一事件的升级记录，避免重复
+✅ 合法动作（允许执行）：
+  - 提示疑似AE/SAE/CM线索
+  - 展示SLA倒计时和材料清单
+  - 要求研究者人工确认事件性质
+  - 生成升级准备任务而非自动提交
+❌ 禁止动作（严禁执行，防范错误假设）：
+  - 自动判定AE/SAE/CM成立 （禁止原因：安全事件成立需人工和合规确认）
+  - 自动提交上报 （禁止原因：MVP边界不允许AI替代人工上报）
+  - 因资料不全而取消升级提示 （禁止原因：资料不全应触发补齐任务而非忽略风险）
+⚠️ 异常触发规则：
+  - 当满足条件【SLA剩余时间低于预设阈值】 → 必须执行：升级为critical提醒并要求人工确认
+  - 当满足条件【疑似线索与既有事件重复】 → 必须执行：提示可能重复并要求人工合并或驳回
+### 情境：CRC处理AI提醒后
+描述：CRC接受、暂缓、修正、忽略或完成动作建议后，需要形成反馈闭环
+必须核实的证据：
+  - [动作建议记录] 建议ID、触发风险、推送时间和动作内容存在
+  - [CRC操作记录] 采纳、修正、暂缓、忽略或完成状态已记录
+  - [风险结果] 风险是否关闭、是否误报漏报、是否进入升级已记录
+✅ 合法动作（允许执行）：
+  - 记录CRC对提醒的处理结果
+  - 标注误报、漏报和修正原因
+  - 将反馈送入规则优化候选队列
+  - 保留研究者/组长复核后再更新规则
+❌ 禁止动作（严禁执行，防范错误假设）：
+  - 直接用单次反馈修改规则 （禁止原因：单次反馈可能带有偶然性和主观偏差）
+  - 把忽略提醒视为模型错误 （禁止原因：忽略原因需区分忙碌、无效或已处理）
+  - 将CRC反馈作为临床真值 （禁止原因：临床真值需要研究者或质控确认）
+⚠️ 异常触发规则：
+  - 当满足条件【同类提醒连续被标注误报】 → 必须执行：进入规则复核队列并降低推送强度
+  - 当满足条件【发生漏报且后续进入升级链路】 → 必须执行：标记为高优先级模型和规则复盘样本
+
+## 4. 状态流转与全局护栏（Workstreams &amp; States）
+### 执行流（Workstream）：风险识别
+描述：从受试者访视进入，到抽取检验指标、汇聚上下文、识别风险信号并形成可解释风险卡
+状态节点及迁移路径：
+  - 状态：待汇聚 (rd_context_pending)
+    状态定义：受试者访视存在，但时间线、资料状态和检验指标尚未汇聚
+    可用的状态转移路径：
+      * --[汇聚访视上下文] (核实证据: 访视实例、资料状态、检验指标已读取)--&gt; 到达状态 rd_context_ready (性质: 正常迁移)
+      * --[检查输入完整性] (核实证据: 关键资料缺失或指标无法识别)--&gt; 到达状态 rd_context_blocked (性质: 异常分支)
+  - 状态：上下文就绪 (rd_context_ready)
+    状态定义：访视上下文已汇聚，检验指标已抽取并对照规则，可进行风险信号识别
+    可用的状态转移路径：
+      * --[识别风险信号] (核实证据: 至少一个风险信号命中受试者异常或升级规则)--&gt; 到达状态 rd_signal_detected (性质: 正常迁移)
+      * --[完成风险扫描] (核实证据: 未命中高频风险规则，且关键资料完整)--&gt; 到达状态 rd_no_signal (性质: 正常迁移)
+  - 状态：已识别 (rd_signal_detected)
+    状态定义：已识别风险信号，等待规则解释和动作转译
+    可用的状态转移路径：
+      * --[匹配规则依据] (核实证据: 风险信号已关联SOP规则、CTCAE阈值或原始证据)--&gt; 到达状态 rd_explained (性质: 正常迁移)
+      * --[检查依据完整性] (核实证据: 风险信号缺少规则来源或原始证据)--&gt; 到达状态 rd_context_blocked (性质: 异常分支)
+  - 状态：已解释 (rd_explained)
+    状态定义：风险信号具备依据、严重等级和置信度，可进入动作提醒
+  - 状态：暂无风险 (rd_no_signal)
+    状态定义：本轮扫描未发现需提醒风险，但仍可被新数据重新触发
+    可用的状态转移路径：
+      * --[监听新资料或新记录] (核实证据: 新增资料、指标或状态变化触发风险规则)--&gt; 到达状态 rd_signal_detected (性质: 异常恢复)
+  - 状态：信息不足 (rd_context_blocked)
+    状态定义：关键输入缺失或依据不足，不能生成强风险判断
+    可用的状态转移路径：
+      * --[CRC补充或系统同步数据] (核实证据: 缺失字段或资料状态已补齐)--&gt; 到达状态 rd_context_ready (性质: 异常恢复)
+🔒 全局不可绕过护栏规则：
+  - 风险判断必须保留来源证据和规则依据
+  - 信息不足时只能提示补齐，不能生成强结论
+  - AI风险信号不能替代临床或合规最终判断
+🔗 跨流依赖关系：
+  - 自身在该工作流时，若另一执行流 【动作提醒】 满足条件【风险识别达到已解释状态】，则受到影响：允许生成CRC下一步动作建议
+  - 自身在该工作流时，若另一执行流 【复核升级】 满足条件【识别到受试者异常或AE/SAE/CM线索】，则受到影响：触发复核证据包或升级提示流程
+### 执行流（Workstream）：动作提醒
+描述：将已解释风险转化为CRC可执行、可反馈、可关闭的下一步动作
+状态节点及迁移路径：
+  - 状态：等待风险 (na_waiting_signal)
+    状态定义：尚无已解释风险，不能生成强动作建议
+    可用的状态转移路径：
+      * --[转译下一步动作] (核实证据: 风险信号处于已解释状态且匹配动作模板)--&gt; 到达状态 na_suggested (性质: 正常迁移)
+  - 状态：已建议 (na_suggested)
+    状态定义：系统已向CRC展示动作建议、优先级、依据和关闭标准
+    可用的状态转移路径：
+      * --[CRC接受建议] (核实证据: CRC点击接受或开始处理该动作)--&gt; 到达状态 na_accepted (性质: 正常迁移)
+      * --[CRC暂缓建议] (核实证据: CRC选择暂缓并记录原因或计划处理时间)--&gt; 到达状态 na_deferred (性质: 正常迁移)
+      * --[CRC驳回建议] (核实证据: CRC选择驳回并填写原因)--&gt; 到达状态 na_rejected (性质: 异常分支)
+  - 状态：已接受 (na_accepted)
+    状态定义：CRC已接受建议，动作进入执行中
+    可用的状态转移路径：
+      * --[CRC提交关闭证据] (核实证据: 补传资料、研究者复核记录、状态更新或其他关闭证据存在)--&gt; 到达状态 na_completed (性质: 正常迁移)
+      * --[CRC记录阻塞原因] (核实证据: 存在无法执行原因，如资料缺失或等待研究者复核)--&gt; 到达状态 na_deferred (性质: 异常分支)
+  - 状态：已暂缓 (na_deferred)
+    状态定义：CRC暂缓处理，系统保留提醒和后续触发条件
+    可用的状态转移路径：
+      * --[CRC重新开始处理] (核实证据: 暂缓原因解除或截止时间临近)--&gt; 到达状态 na_accepted (性质: 异常恢复)
+  - 状态：已驳回 (na_rejected)
+    状态定义：CRC认为建议不适用或为误报，需要进入反馈复核
+    可用的状态转移路径：
+      * --[记录驳回反馈] (核实证据: 驳回原因、误报标注或修正建议已填写)--&gt; 到达状态 na_feedback_recorded (性质: 异常恢复)
+  - 状态：已完成 (na_completed)
+    状态定义：CRC已完成动作并提交关闭证据
+    可用的状态转移路径：
+      * --[采集动作结果] (核实证据: 动作状态、关闭证据和风险结果已记录)--&gt; 到达状态 na_feedback_recorded (性质: 正常迁移)
+  - 状态：已反馈 (na_feedback_recorded)
+    状态定义：动作结果进入反馈闭环，用于规则和模型复盘
+🔒 全局不可绕过护栏规则：
+  - 动作建议必须有风险来源和关闭标准
+  - AI不能绕过CRC确认直接执行或关闭任务
+  - CRC驳回必须记录原因，不能静默删除样本
+🔗 跨流依赖关系：
+  - 自身在该工作流时，若另一执行流 【反馈学习】 满足条件【动作提醒达到已完成或已驳回状态】，则受到影响：触发提醒有效性与误报漏报标注
+  - 自身在该工作流时，若另一执行流 【复核升级】 满足条件【动作建议要求研究者复核或AE/SAE/CM确认】，则受到影响：触发复核证据包和升级提示流程
+### 执行流（Workstream）：复核升级
+描述：从异常线索到复核证据包、研究者线下确认、AE/SAE/CM升级提示和人工确认
+状态节点及迁移路径：
+  - 状态：待判断 (ru_signal_pending)
+    状态定义：存在异常线索，但尚未明确是否需要复核或升级
+    可用的状态转移路径：
+      * --[生成复核证据包] (核实证据: 异常线索、检验指标、原始资料和规则依据已汇总)--&gt; 到达状态 ru_review_packet_ready (性质: 正常迁移)
+      * --[检测AE/SAE/CM疑似线索] (核实证据: 线索命中AE/SAE/CM规则或SLA触发条件)--&gt; 到达状态 ru_upgrade_pending (性质: 异常分支)
+  - 状态：证据包就绪 (ru_review_packet_ready)
+    状态定义：复核证据包草稿已生成，等待CRC提交或修正
+    可用的状态转移路径：
+      * --[CRC提交研究者复核] (核实证据: CRC确认并提交证据包)--&gt; 到达状态 ru_review_submitted (性质: 正常迁移)
+      * --[CRC要求补充证据] (核实证据: CRC标记资料缺失或问题清单不完整)--&gt; 到达状态 ru_signal_pending (性质: 异常恢复)
+  - 状态：已提交复核 (ru_review_submitted)
+    状态定义：研究者正在线下复核，AI等待人工结论
+    可用的状态转移路径：
+      * --[记录研究者复核结论] (核实证据: 研究者复核结论、时间、参与人已记录)--&gt; 到达状态 ru_review_confirmed (性质: 正常迁移)
+      * --[复核结论触发升级] (核实证据: 研究者线下确认结论或规则匹配显示需进入AE/SAE/CM确认)--&gt; 到达状态 ru_upgrade_pending (性质: 异常分支)
+  - 状态：复核已确认 (ru_review_confirmed)
+    状态定义：研究者复核结论已留痕，可更新动作建议和访视状态
+  - 状态：待升级确认 (ru_upgrade_pending)
+    状态定义：存在AE/SAE/CM疑似线索或SLA风险，必须人工确认
+    可用的状态转移路径：
+      * --[人工确认需升级] (核实证据: CRC、项目经理或质控确认升级需要和材料清单)--&gt; 到达状态 ru_upgrade_confirmed (性质: 正常迁移)
+      * --[人工确认不升级] (核实证据: 驳回原因和依据已记录)--&gt; 到达状态 ru_upgrade_dismissed (性质: 异常恢复)
+  - 状态：升级确认 (ru_upgrade_confirmed)
+    状态定义：人工确认需要进入上报准备或正式流程
+    可用的状态转移路径：
+      * --[完成上报提交] (核实证据: 上报记录或工作台提交状态存在)--&gt; 到达状态 ru_submitted (性质: 正常迁移)
+  - 状态：升级驳回 (ru_upgrade_dismissed)
+    状态定义：人工确认不进入升级，但原因必须留痕
+  - 状态：已上报 (ru_submitted)
+    状态定义：AE/SAE/CM相关上报已通过人工确认后提交
+🔒 全局不可绕过护栏规则：
+  - AI不得输出判定或最终安全事件成立结论
+  - AI不得自动提交AE/SAE/CM上报
+  - SLA临近时必须提醒人工确认，不能静默等待
+  - 研究者线下确认结论与AI建议冲突时以研究者线下确认结论为准
+🔗 跨流依赖关系：
+  - 自身在该工作流时，若另一执行流 【动作提醒】 满足条件【复核或升级流程需要CRC补充资料】，则受到影响：生成新的CRC补充资料动作建议
+  - 自身在该工作流时，若另一执行流 【反馈学习】 满足条件【升级提示被确认、驳回或提交】，则受到影响：形成高价值反馈样本用于规则复盘
+### 执行流（Workstream）：反馈学习
+描述：采集CRC反馈、误报漏报和关闭结果，进入规则优化候选队列
+状态节点及迁移路径：
+  - 状态：待反馈 (fl_waiting_feedback)
+    状态定义：动作建议已推送，但尚未采集CRC处理结果
+    可用的状态转移路径：
+      * --[CRC提交反馈] (核实证据: 采纳、驳回、修正、完成或误报漏报标注已记录)--&gt; 到达状态 fl_feedback_recorded (性质: 正常迁移)
+  - 状态：已记录 (fl_feedback_recorded)
+    状态定义：CRC反馈已写入风险台账或反馈表
+    可用的状态转移路径：
+      * --[判断反馈是否需复核] (核实证据: 反馈为误报、漏报、规则冲突或安全相关)--&gt; 到达状态 fl_review_needed (性质: 异常分支)
+      * --[归档普通反馈] (核实证据: 反馈无争议且动作已关闭)--&gt; 到达状态 fl_closed (性质: 正常迁移)
+  - 状态：待复核 (fl_review_needed)
+    状态定义：反馈影响规则、模型或安全判断，需要质控或项目人员复核
+    可用的状态转移路径：
+      * --[质控确认可优化] (核实证据: 复核结论显示规则、模板或模型需要调整)--&gt; 到达状态 fl_candidate_update (性质: 正常迁移)
+      * --[质控确认不调整] (核实证据: 复核结论显示反馈不适用于规则更新)--&gt; 到达状态 fl_closed (性质: 异常恢复)
+  - 状态：优化候选 (fl_candidate_update)
+    状态定义：反馈样本进入规则、案例或模型优化候选池
+    可用的状态转移路径：
+      * --[完成知识库或规则更新] (核实证据: 规则版本、案例模板或模型样本更新记录存在)--&gt; 到达状态 fl_closed (性质: 正常迁移)
+  - 状态：已归档 (fl_closed)
+    状态定义：反馈已归档或进入优化记录，闭环完成
+🔒 全局不可绕过护栏规则：
+  - 单次反馈不能直接修改线上规则
+  - 误报漏报样本需人工复核后再进入训练
+  - 临床相关反馈不能作为未经确认的真值
+🔗 跨流依赖关系：
+  - 自身在该工作流时，若另一执行流 【风险识别】 满足条件【规则或模型优化候选被确认】，则受到影响：后续风险识别阈值或解释依据可更新
+  - 自身在该工作流时，若另一执行流 【动作提醒】 满足条件【处置模板被更新】，则受到影响：后续CRC动作建议可引用新模板
+</pre>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <p class="section-title">原始 YAML 本体</p>
+      <div class="prompt-panel">
+        <div class="prompt-header">
+          <span class="prompt-header-title">📄 Source YAML</span>
+          <span class="prompt-hint">点击「复制 YAML」按钮一键复制</span>
+        </div>
+        <pre class="prompt-body" id="raw-yaml-content">title: CRC访视风险助手本体
+domain: SMO访视
+scenario_description: 面向CRC的访视风险提醒与EDC录入辅助MVP：CRC手动上传或Excel导入检测报告后，平台后端接入CTCAE和医学专业知识知识库，对检测报告扫描结果进行预识别标注并返回CRC；CRC依据返回的预识别标注对线下检测报告表进行标注，经研究者线下确认后将AI预判正确的内容用于病例填写。
+target_agent_role: CRC风险辅助Agent
+entities:
+- id: patient
+  name: 受试者(Patient)
+  type: core
+  description: 参加临床试验的受试者，是访视、检测和资料的主体；MVP中以脱敏摘要形式提供上下文，不管理其医学结论
+  attributes:
+  - name: subject_id
+    type: string
+    description: 受试者编号
+  - name: enrollment_date
+    type: datetime
+    description: 入组日期
+  - name: current_status
+    type: string
+    description: 当前访视状态摘要
+  key_distinctions:
+  - 受试者信息需脱敏处理
+  - AI只管理访视和资料，不输出医学结论
+- id: subject_visit
+  name: 受试者访视
+  type: core
+  description: 某受试者在某项目某中心的一次访视实例，是风险提醒、证据整理与动作闭环的主入口；&#34;今日风险队列&#34;即访视实例按状态与风险分的过滤视图
+  attributes:
+  - name: visit_status
+    type: enum
+    values:
+    - scheduled
+    - arrived
+    - executed
+    - pending_review
+    - closed
+    description: 访视进展状态
+  - name: visit_window
+    type: string
+    description: 方案要求的访视窗口
+  - name: subject_status
+    type: string
+    description: 受试者当前状态摘要
+  - name: risk_score
+    type: number
+    description: 访视级风险评分（规则+资料完整性），仅作优先级排序，不等于医学严重程度
+  - name: sla_deadline
+    type: datetime
+    description: 当前最紧急待办的上报或关闭截止时间
+  key_distinctions:
+  - 计划访视不等于受试者已到访
+  - 现场执行完成不等于资料齐全
+  - 受试者异常线索不等于临床判定
+  - 风险评分不等于医学严重程度
+- id: source_document
+  name: 访视资料
+  type: reference
+  description: 化验单、检查单、访视记录等资料证据来源；一次访视可有多份资料，一份资料含多个检验指标
+  attributes:
+  - name: document_type
+    type: string
+    description: 文件类型
+  - name: document_status
+    type: enum
+    values:
+    - expected
+    - uploaded
+    - missing
+    - reviewed
+    - archived
+    description: 文件状态
+  - name: version
+    type: string
+    description: 文件版本
+  key_distinctions:
+  - 资料已上传不等于资料已复核
+  - 资料完整不等于内容无风险
+  - 资料缺失需区分未产生和未上传
+- id: lab_indicator
+  name: 检验指标
+  type: reference
+  description: 从检查单/化验单中抽取出的原始检验项目与测量值（如体温、中性粒细胞绝对值、血小板），是风险判断的事实证据层，不属于事件对象
+  attributes:
+  - name: indicator_code
+    type: string
+    description: 检验项目编码（如 ANC/PLT/ALT/TEMP）
+  - name: indicator_name
+    type: string
+    description: 检验指标名称
+  - name: value
+    type: string
+    description: 测量值及单位
+  - name: reference_range
+    type: string
+    description: 参考范围
+  - name: trend
+    type: string
+    description: 与既往访视对比的趋势变化
+  - name: ctcae_candidate
+    type: string
+    description: AI对照CTCAE/阈值输出的候选等级，仅作候选映射，不是最终定级
+  - name: confidence
+    type: number
+    description: AI识别与映射置信度
+  key_distinctions:
+  - 检验指标是事实证据，不是风险信号，也不是领域事件
+  - CTCAE候选等级是AI映射结果，不是最终医学定级
+  - 单指标异常不等于受试者风险，需结合症状与其他指标综合判断
+- id: risk_signal
+  name: 风险信号
+  type: core
+  description: 由检验指标、症状、时间窗或沟通记录等事实推导出的可解释风险线索；是派生解释层，不是事件对象
+  attributes:
+  - name: signal_type
+    type: enum
+    values:
+    - subject_abnormal
+    - ae_sae_cm
+    - document_missing
+    description: 风险信号类型（本轮MVP聚焦subject_abnormal与ae_sae_cm，document_missing列入路线图）
+  - name: severity
+    type: enum
+    values:
+    - low
+    - medium
+    - high
+    - critical
+    description: 风险严重等级
+  - name: confidence
+    type: number
+    description: AI识别置信度
+  - name: evidence_refs
+    type: list
+    description: 支撑该信号的事实证据引用（检验指标、症状记录、规则依据）
+  key_distinctions:
+  - 风险信号是线索，不是最终判断
+  - 风险信号由检验指标等事实支撑产生，不是事件对象
+  - 高置信度不等于无需人工确认
+  - 资料风险不等于受试者安全风险
+- id: review_packet
+  name: 复核证据包
+  type: core
+  description: 供CRC向研究者发起线下复核的人机协同材料包，包含事实、变化、依据和待确认问题清单
+  attributes:
+  - name: packet_status
+    type: enum
+    values:
+    - draft
+    - ready
+    - submitted
+    - confirmed
+    - revised
+    description: 证据包状态
+  - name: evidence_summary
+    type: string
+    description: 关键证据摘要
+  - name: question_list
+    type: list
+    description: 待研究者线下确认的问题清单（可勾选回填）
+  key_distinctions:
+  - 证据包只整理事实，不输出判定
+  - 证据包ready不等于研究者已线下确认
+  - 研究者线下确认需转为结构化记录
+- id: ae_sae_cm_hint
+  name: 升级提示
+  type: core
+  description: 针对AE/SAE/CM疑似线索的升级提示、SLA倒计时和材料清单，仅辅助人工确认，不自动判定或上报
+  attributes:
+  - name: hint_status
+    type: enum
+    values:
+    - detected
+    - pending_confirm
+    - confirmed_needed
+    - dismissed
+    - submitted
+    description: 升级提示状态
+  - name: sla_deadline
+    type: datetime
+    description: 上报截止时间
+  - name: material_checklist
+    type: string
+    description: 上报材料清单
+  key_distinctions:
+  - 升级提示不等于AE/SAE/CM最终判定
+  - SLA倒计时不替代人工确认
+  - 材料齐全不等于上报已提交
+- id: action_recommendation
+  name: 动作建议
+  type: core
+  description: 面向CRC的下一步动作、优先级、截止时间和关闭标准（仅CRC可执行动作，不含研究者侧操作）
+  attributes:
+  - name: action_type
+    type: enum
+    values:
+    - supplement_doc
+    - contact_doctor
+    - check_subject
+    - prepare_report
+    - update_status
+    description: 建议动作类型
+  - name: action_status
+    type: enum
+    values:
+    - suggested
+    - accepted
+    - rejected
+    - deferred
+    - completed
+    description: CRC对动作建议的处理状态
+  - name: close_criteria
+    type: string
+    description: 动作关闭所需证据
+  key_distinctions:
+  - 动作建议不等于系统自动执行
+  - CRC接受建议后仍需完成证据留痕
+  - 动作关闭不等于医学风险消失
+- id: crc_feedback
+  name: CRC反馈
+  type: event
+  description: CRC对提醒和判断建议的采纳、修正、误报、漏报和关闭反馈，用于规则和模型复盘
+  attributes:
+  - name: feedback_type
+    type: enum
+    values:
+    - accepted
+    - rejected
+    - corrected
+    - false_positive
+    - false_negative
+    - completed
+    description: 反馈类型
+  - name: correction_reason
+    type: string
+    description: CRC修正原因
+  - name: created_at
+    type: datetime
+    description: 反馈时间
+  key_distinctions:
+  - CRC忽略提醒不等于提醒无效
+  - 误报反馈需人工复核后进入规则优化
+  - 反馈样本不能直接作为临床真值
+- id: sop_rule
+  name: SOP规则
+  type: reference
+  description: 项目方案、SOP、CTCAE阈值、升级条件和关闭标准的结构化规则，作为风险解释与动作关闭的知识依据
+  attributes:
+  - name: rule_type
+    type: enum
+    values:
+    - review_trigger
+    - ae_sae_cm
+    - threshold
+    - closure
+    description: 规则类型
+  - name: rule_source
+    type: string
+    description: 规则来源文档（如CTCAE v5.0、项目SOP）
+  - name: exception_condition
+    type: string
+    description: 例外条件
+  key_distinctions:
+  - SOP规则解释不等于最终合规结论
+  - 通用规则不能覆盖项目特例
+  - 无引用来源的规则不能用于强提醒
+relationships:
+- from: patient
+  to: subject_visit
+  label: 管理
+  cardinality: 1:N
+  description: 受试者的一次或多次访视实例
+- from: subject_visit
+  to: source_document
+  label: 记录
+  cardinality: 1:N
+  description: 一次访视记录多份源资料
+- from: source_document
+  to: lab_indicator
+  label: 记录
+  cardinality: 1:N
+  description: 一份检查单/化验单含多个检验指标
+- from: lab_indicator
+  to: sop_rule
+  label: 匹配
+  cardinality: N:N
+  description: 检验指标对照CTCAE/项目阈值与规则，产生候选等级
+- from: lab_indicator
+  to: risk_signal
+  label: 支撑
+  cardinality: N:1
+  description: 异常检验指标与症状共同支撑风险信号
+- from: subject_visit
+  to: risk_signal
+  label: 触发
+  cardinality: 1:N
+  description: 同一次访视可触发受试者状态或升级类风险信号
+- from: risk_signal
+  to: review_packet
+  label: 触发
+  cardinality: N:1
+  description: 临床类风险信号触发复核证据包整理
+- from: risk_signal
+  to: ae_sae_cm_hint
+  label: 触发
+  cardinality: N:N
+  description: 疑似安全事件线索触发AE/SAE/CM升级提示
+- from: risk_signal
+  to: action_recommendation
+  label: 触发
+  cardinality: N:N
+  description: 风险信号转译CRC下一步动作建议
+- from: ae_sae_cm_hint
+  to: action_recommendation
+  label: 触发
+  cardinality: N:N
+  description: 升级提示生成升级准备任务
+- from: action_recommendation
+  to: crc_feedback
+  label: 记录
+  cardinality: 1:N
+  description: 动作建议记录CRC采纳、修正或关闭反馈
+- from: crc_feedback
+  to: sop_rule
+  label: 记录
+  cardinality: N:N
+  description: 反馈经研究者/组长复核后记录为规则优化候选
+action_boundaries:
+- id: ab_next_action
+  situation: CRC打开受试者访视
+  situation_description: CRC进入某受试者访视，需要知道当前最应处理的下一步动作
+  required_evidence:
+  - source: 受试者访视实例
+    checks: 访视存在且属于当前CRC或其负责中心
+  - source: 访视资料状态
+    checks: 资料缺失、上传、复核、归档状态已读取
+  - source: 风险信号列表
+    checks: 风险信号已匹配规则依据和严重程度
+  valid_actions:
+  - 汇总当前访视风险和待办动作
+  - 排序CRC下一步动作优先级
+  - 展示每个动作的依据和关闭标准
+  - 记录CRC接受、暂缓或修正反馈
+  invalid_actions:
+  - action: 自动替CRC关闭访视
+    reason: 访视关闭必须基于CRC确认和关闭证据
+  - action: 无规则依据时推送强制动作
+    reason: 无可追溯依据会造成错误执行
+  - action: 将风险评分解释为医学严重程度
+    reason: 执行优先级和临床严重性不是同一概念
+  exception_triggers:
+  - condition: 关键输入缺失且无法确认风险等级
+    action: 降级为资料补齐提醒并要求CRC补充信息
+  - condition: 同一访视存在critical风险和逾期SLA
+    action: 置顶提醒并要求人工确认是否进入升级链路
+- id: ab_subject_abnormal
+  situation: 受试者状态出现异常线索
+  situation_description: 检验指标、症状或既往访视对比提示可能需要整理复核证据
+  required_evidence:
+  - source: 检验指标
+    checks: 监测值与趋势已结构化，含CTCAE候选等级
+  - source: 项目方案和SOP
+    checks: 异常阈值、复核触发条件和例外条件已匹配
+  - source: 历史访视记录
+    checks: 已对比既往访视表现和趋势变化
+  valid_actions:
+  - 提示异常线索和变化趋势
+  - 建议是否发起研究者复核
+  - 生成待研究者线下确认的问题清单
+  - 标注AI判断置信度和依据来源
+  invalid_actions:
+  - action: 输出最终临床判定结论
+    reason: AI只能辅助判断，不能替代临床判定
+  - action: 直接判定受试者是否安全
+    reason: 安全判断需研究者线下确认
+  - action: 隐藏低置信度或依据不足提示
+    reason: 证据不足必须显式披露给CRC
+  exception_triggers:
+  - condition: 异常线索置信度低但涉及受试者安全
+    action: 标记为需人工复核而非忽略
+  - condition: 关键监测值缺失或格式异常
+    action: 提示CRC补充或核对原始记录
+- id: ab_review_packet
+  situation: CRC发起研究者复核
+  situation_description: CRC准备向研究者提交复核材料，需要证据包和留痕
+  required_evidence:
+  - source: 风险信号
+    checks: 异常线索、严重等级和规则依据已生成
+  - source: 检验指标与原始资料
+    checks: 监测值、症状、检测指标变化和沟通记录可追溯
+  - source: 研究者复核记录
+    checks: 复核结论、时间、参与人和后续指令可记录
+  valid_actions:
+  - 生成复核证据包草稿
+  - 列出待研究者线下确认的问题
+  - 记录研究者复核结论和后续动作
+  - 将复核结论关联到受试者访视
+  invalid_actions:
+  - action: 伪造或补写研究者线下确认结论
+    reason: 复核结论必须来自可追溯人工确认
+  - action: 用AI摘要替代原始证据
+    reason: 摘要只能辅助阅读，不能替代原始资料
+  - action: 证据包未确认就进入升级提交
+    reason: 升级需要明确证据和人工确认
+  exception_triggers:
+  - condition: 研究者复核结论与AI建议不一致
+    action: 以研究者线下确认结论为准并记录差异原因
+  - condition: 复核后要求补充资料
+    action: 生成补充资料待办并保持复核状态未关闭
+- id: ab_ae_sae_cm
+  situation: 出现AE/SAE/CM疑似线索
+  situation_description: 检验指标、症状或研究者复核结论中出现可能触发安全事件上报的线索
+  required_evidence:
+  - source: AE/SAE/CM规则
+    checks: 项目上报规则、SLA和材料清单已匹配
+  - source: 研究者复核结论
+    checks: 复核结论或人工确认状态已记录
+  - source: 风险台账
+    checks: 是否已有同一事件的升级记录，避免重复
+  valid_actions:
+  - 提示疑似AE/SAE/CM线索
+  - 展示SLA倒计时和材料清单
+  - 要求研究者人工确认事件性质
+  - 生成升级准备任务而非自动提交
+  invalid_actions:
+  - action: 自动判定AE/SAE/CM成立
+    reason: 安全事件成立需人工和合规确认
+  - action: 自动提交上报
+    reason: MVP边界不允许AI替代人工上报
+  - action: 因资料不全而取消升级提示
+    reason: 资料不全应触发补齐任务而非忽略风险
+  exception_triggers:
+  - condition: SLA剩余时间低于预设阈值
+    action: 升级为critical提醒并要求人工确认
+  - condition: 疑似线索与既有事件重复
+    action: 提示可能重复并要求人工合并或驳回
+- id: ab_feedback_learning
+  situation: CRC处理AI提醒后
+  situation_description: CRC接受、暂缓、修正、忽略或完成动作建议后，需要形成反馈闭环
+  required_evidence:
+  - source: 动作建议记录
+    checks: 建议ID、触发风险、推送时间和动作内容存在
+  - source: CRC操作记录
+    checks: 采纳、修正、暂缓、忽略或完成状态已记录
+  - source: 风险结果
+    checks: 风险是否关闭、是否误报漏报、是否进入升级已记录
+  valid_actions:
+  - 记录CRC对提醒的处理结果
+  - 标注误报、漏报和修正原因
+  - 将反馈送入规则优化候选队列
+  - 保留研究者/组长复核后再更新规则
+  invalid_actions:
+  - action: 直接用单次反馈修改规则
+    reason: 单次反馈可能带有偶然性和主观偏差
+  - action: 把忽略提醒视为模型错误
+    reason: 忽略原因需区分忙碌、无效或已处理
+  - action: 将CRC反馈作为临床真值
+    reason: 临床真值需要研究者或质控确认
+  exception_triggers:
+  - condition: 同类提醒连续被标注误报
+    action: 进入规则复核队列并降低推送强度
+  - condition: 发生漏报且后续进入升级链路
+    action: 标记为高优先级模型和规则复盘样本
+workstreams:
+- id: ws_risk_detection
+  name: 风险识别
+  description: 从受试者访视进入，到抽取检验指标、汇聚上下文、识别风险信号并形成可解释风险卡
+  anchor_objects:
+  - subject_visit
+  - source_document
+  - lab_indicator
+  - risk_signal
+  - sop_rule
+  states:
+  - id: rd_context_pending
+    name: 待汇聚
+    description: 受试者访视存在，但时间线、资料状态和检验指标尚未汇聚
+    transitions:
+    - to_state: rd_context_ready
+      trigger_action: 汇聚访视上下文
+      required_evidence: 访视实例、资料状态、检验指标已读取
+      type: normal
+    - to_state: rd_context_blocked
+      trigger_action: 检查输入完整性
+      required_evidence: 关键资料缺失或指标无法识别
+      type: exception
+  - id: rd_context_ready
+    name: 上下文就绪
+    description: 访视上下文已汇聚，检验指标已抽取并对照规则，可进行风险信号识别
+    transitions:
+    - to_state: rd_signal_detected
+      trigger_action: 识别风险信号
+      required_evidence: 至少一个风险信号命中受试者异常或升级规则
+      type: normal
+    - to_state: rd_no_signal
+      trigger_action: 完成风险扫描
+      required_evidence: 未命中高频风险规则，且关键资料完整
+      type: normal
+  - id: rd_signal_detected
+    name: 已识别
+    description: 已识别风险信号，等待规则解释和动作转译
+    transitions:
+    - to_state: rd_explained
+      trigger_action: 匹配规则依据
+      required_evidence: 风险信号已关联SOP规则、CTCAE阈值或原始证据
+      type: normal
+    - to_state: rd_context_blocked
+      trigger_action: 检查依据完整性
+      required_evidence: 风险信号缺少规则来源或原始证据
+      type: exception
+  - id: rd_explained
+    name: 已解释
+    description: 风险信号具备依据、严重等级和置信度，可进入动作提醒
+    transitions: []
+  - id: rd_no_signal
+    name: 暂无风险
+    description: 本轮扫描未发现需提醒风险，但仍可被新数据重新触发
+    transitions:
+    - to_state: rd_signal_detected
+      trigger_action: 监听新资料或新记录
+      required_evidence: 新增资料、指标或状态变化触发风险规则
+      type: recovery
+  - id: rd_context_blocked
+    name: 信息不足
+    description: 关键输入缺失或依据不足，不能生成强风险判断
+    transitions:
+    - to_state: rd_context_ready
+      trigger_action: CRC补充或系统同步数据
+      required_evidence: 缺失字段或资料状态已补齐
+      type: recovery
+  guardrails:
+  - 风险判断必须保留来源证据和规则依据
+  - 信息不足时只能提示补齐，不能生成强结论
+  - AI风险信号不能替代临床或合规最终判断
+  dependency_mapping:
+  - workstream: ws_next_action
+    condition: 风险识别达到已解释状态
+    impact: 允许生成CRC下一步动作建议
+  - workstream: ws_review_upgrade
+    condition: 识别到受试者异常或AE/SAE/CM线索
+    impact: 触发复核证据包或升级提示流程
+- id: ws_next_action
+  name: 动作提醒
+  description: 将已解释风险转化为CRC可执行、可反馈、可关闭的下一步动作
+  anchor_objects:
+  - risk_signal
+  - action_recommendation
+  - subject_visit
+  - crc_feedback
+  states:
+  - id: na_waiting_signal
+    name: 等待风险
+    description: 尚无已解释风险，不能生成强动作建议
+    transitions:
+    - to_state: na_suggested
+      trigger_action: 转译下一步动作
+      required_evidence: 风险信号处于已解释状态且匹配动作模板
+      type: normal
+  - id: na_suggested
+    name: 已建议
+    description: 系统已向CRC展示动作建议、优先级、依据和关闭标准
+    transitions:
+    - to_state: na_accepted
+      trigger_action: CRC接受建议
+      required_evidence: CRC点击接受或开始处理该动作
+      type: normal
+    - to_state: na_deferred
+      trigger_action: CRC暂缓建议
+      required_evidence: CRC选择暂缓并记录原因或计划处理时间
+      type: normal
+    - to_state: na_rejected
+      trigger_action: CRC驳回建议
+      required_evidence: CRC选择驳回并填写原因
+      type: exception
+  - id: na_accepted
+    name: 已接受
+    description: CRC已接受建议，动作进入执行中
+    transitions:
+    - to_state: na_completed
+      trigger_action: CRC提交关闭证据
+      required_evidence: 补传资料、研究者复核记录、状态更新或其他关闭证据存在
+      type: normal
+    - to_state: na_deferred
+      trigger_action: CRC记录阻塞原因
+      required_evidence: 存在无法执行原因，如资料缺失或等待研究者复核
+      type: exception
+  - id: na_deferred
+    name: 已暂缓
+    description: CRC暂缓处理，系统保留提醒和后续触发条件
+    transitions:
+    - to_state: na_accepted
+      trigger_action: CRC重新开始处理
+      required_evidence: 暂缓原因解除或截止时间临近
+      type: recovery
+  - id: na_rejected
+    name: 已驳回
+    description: CRC认为建议不适用或为误报，需要进入反馈复核
+    transitions:
+    - to_state: na_feedback_recorded
+      trigger_action: 记录驳回反馈
+      required_evidence: 驳回原因、误报标注或修正建议已填写
+      type: recovery
+  - id: na_completed
+    name: 已完成
+    description: CRC已完成动作并提交关闭证据
+    transitions:
+    - to_state: na_feedback_recorded
+      trigger_action: 采集动作结果
+      required_evidence: 动作状态、关闭证据和风险结果已记录
+      type: normal
+  - id: na_feedback_recorded
+    name: 已反馈
+    description: 动作结果进入反馈闭环，用于规则和模型复盘
+    transitions: []
+  guardrails:
+  - 动作建议必须有风险来源和关闭标准
+  - AI不能绕过CRC确认直接执行或关闭任务
+  - CRC驳回必须记录原因，不能静默删除样本
+  dependency_mapping:
+  - workstream: ws_feedback_learning
+    condition: 动作提醒达到已完成或已驳回状态
+    impact: 触发提醒有效性与误报漏报标注
+  - workstream: ws_review_upgrade
+    condition: 动作建议要求研究者复核或AE/SAE/CM确认
+    impact: 触发复核证据包和升级提示流程
+- id: ws_review_upgrade
+  name: 复核升级
+  description: 从异常线索到复核证据包、研究者线下确认、AE/SAE/CM升级提示和人工确认
+  anchor_objects:
+  - risk_signal
+  - review_packet
+  - ae_sae_cm_hint
+  - sop_rule
+  states:
+  - id: ru_signal_pending
+    name: 待判断
+    description: 存在异常线索，但尚未明确是否需要复核或升级
+    transitions:
+    - to_state: ru_review_packet_ready
+      trigger_action: 生成复核证据包
+      required_evidence: 异常线索、检验指标、原始资料和规则依据已汇总
+      type: normal
+    - to_state: ru_upgrade_pending
+      trigger_action: 检测AE/SAE/CM疑似线索
+      required_evidence: 线索命中AE/SAE/CM规则或SLA触发条件
+      type: exception
+  - id: ru_review_packet_ready
+    name: 证据包就绪
+    description: 复核证据包草稿已生成，等待CRC提交或修正
+    transitions:
+    - to_state: ru_review_submitted
+      trigger_action: CRC提交研究者复核
+      required_evidence: CRC确认并提交证据包
+      type: normal
+    - to_state: ru_signal_pending
+      trigger_action: CRC要求补充证据
+      required_evidence: CRC标记资料缺失或问题清单不完整
+      type: recovery
+  - id: ru_review_submitted
+    name: 已提交复核
+    description: 研究者正在线下复核，AI等待人工结论
+    transitions:
+    - to_state: ru_review_confirmed
+      trigger_action: 记录研究者复核结论
+      required_evidence: 研究者复核结论、时间、参与人已记录
+      type: normal
+    - to_state: ru_upgrade_pending
+      trigger_action: 复核结论触发升级
+      required_evidence: 研究者线下确认结论或规则匹配显示需进入AE/SAE/CM确认
+      type: exception
+  - id: ru_review_confirmed
+    name: 复核已确认
+    description: 研究者复核结论已留痕，可更新动作建议和访视状态
+    transitions: []
+  - id: ru_upgrade_pending
+    name: 待升级确认
+    description: 存在AE/SAE/CM疑似线索或SLA风险，必须人工确认
+    transitions:
+    - to_state: ru_upgrade_confirmed
+      trigger_action: 人工确认需升级
+      required_evidence: CRC、项目经理或质控确认升级需要和材料清单
+      type: normal
+    - to_state: ru_upgrade_dismissed
+      trigger_action: 人工确认不升级
+      required_evidence: 驳回原因和依据已记录
+      type: recovery
+  - id: ru_upgrade_confirmed
+    name: 升级确认
+    description: 人工确认需要进入上报准备或正式流程
+    transitions:
+    - to_state: ru_submitted
+      trigger_action: 完成上报提交
+      required_evidence: 上报记录或工作台提交状态存在
+      type: normal
+  - id: ru_upgrade_dismissed
+    name: 升级驳回
+    description: 人工确认不进入升级，但原因必须留痕
+    transitions: []
+  - id: ru_submitted
+    name: 已上报
+    description: AE/SAE/CM相关上报已通过人工确认后提交
+    transitions: []
+  guardrails:
+  - AI不得输出判定或最终安全事件成立结论
+  - AI不得自动提交AE/SAE/CM上报
+  - SLA临近时必须提醒人工确认，不能静默等待
+  - 研究者线下确认结论与AI建议冲突时以研究者线下确认结论为准
+  dependency_mapping:
+  - workstream: ws_next_action
+    condition: 复核或升级流程需要CRC补充资料
+    impact: 生成新的CRC补充资料动作建议
+  - workstream: ws_feedback_learning
+    condition: 升级提示被确认、驳回或提交
+    impact: 形成高价值反馈样本用于规则复盘
+- id: ws_feedback_learning
+  name: 反馈学习
+  description: 采集CRC反馈、误报漏报和关闭结果，进入规则优化候选队列
+  anchor_objects:
+  - action_recommendation
+  - crc_feedback
+  - sop_rule
+  states:
+  - id: fl_waiting_feedback
+    name: 待反馈
+    description: 动作建议已推送，但尚未采集CRC处理结果
+    transitions:
+    - to_state: fl_feedback_recorded
+      trigger_action: CRC提交反馈
+      required_evidence: 采纳、驳回、修正、完成或误报漏报标注已记录
+      type: normal
+  - id: fl_feedback_recorded
+    name: 已记录
+    description: CRC反馈已写入风险台账或反馈表
+    transitions:
+    - to_state: fl_review_needed
+      trigger_action: 判断反馈是否需复核
+      required_evidence: 反馈为误报、漏报、规则冲突或安全相关
+      type: exception
+    - to_state: fl_closed
+      trigger_action: 归档普通反馈
+      required_evidence: 反馈无争议且动作已关闭
+      type: normal
+  - id: fl_review_needed
+    name: 待复核
+    description: 反馈影响规则、模型或安全判断，需要质控或项目人员复核
+    transitions:
+    - to_state: fl_candidate_update
+      trigger_action: 质控确认可优化
+      required_evidence: 复核结论显示规则、模板或模型需要调整
+      type: normal
+    - to_state: fl_closed
+      trigger_action: 质控确认不调整
+      required_evidence: 复核结论显示反馈不适用于规则更新
+      type: recovery
+  - id: fl_candidate_update
+    name: 优化候选
+    description: 反馈样本进入规则、案例或模型优化候选池
+    transitions:
+    - to_state: fl_closed
+      trigger_action: 完成知识库或规则更新
+      required_evidence: 规则版本、案例模板或模型样本更新记录存在
+      type: normal
+  - id: fl_closed
+    name: 已归档
+    description: 反馈已归档或进入优化记录，闭环完成
+    transitions: []
+  guardrails:
+  - 单次反馈不能直接修改线上规则
+  - 误报漏报样本需人工复核后再进入训练
+  - 临床相关反馈不能作为未经确认的真值
+  dependency_mapping:
+  - workstream: ws_risk_detection
+    condition: 规则或模型优化候选被确认
+    impact: 后续风险识别阈值或解释依据可更新
+  - workstream: ws_next_action
+    condition: 处置模板被更新
+    impact: 后续CRC动作建议可引用新模板
+</pre>
+      </div>
+    </div>
+
+  </div><!-- /tab-prompt -->
+
+</div><!-- /page-wrap -->
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  // Initialize Mermaid with custom configuration
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'Plus Jakarta Sans, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      lineColor: '#CBD5E1',
+      primaryColor: '#EFF6FF',
+      primaryTextColor: '#1D4ED8',
+      primaryBorderColor: '#3B82F6',
+      secondaryColor: '#F5F3FF',
+      tertiaryColor: '#FFF7ED',
+      edgeLabelBackground: '#FFFFFF'
+    }
+  });
+
+  let mermaidInitialized = false;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Render objects relationship graph immediately on page load
+    mermaid.init(undefined, '#mermaid-relationships');
+  });
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('tab-btn-' + name).classList.add('active');
+
+    // Render Mermaid diagrams lazily when the tab becomes active and visible
+    if (name === 'states' && !mermaidInitialized) {
+      setTimeout(() => {
+        mermaid.init(undefined, '.tab-panel#tab-states .mermaid');
+        mermaidInitialized = true;
+      }, 50);
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 2500);
+  }
+
+  function copyYAML() {
+    const text = document.getElementById('raw-yaml-content').textContent.trim();
+    navigator.clipboard.writeText(text).then(() => showToast('✅ YAML 已复制'));
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById('agent-prompt-content').textContent.trim();
+    navigator.clipboard.writeText(text).then(() => showToast('✅ Prompt 已复制'));
+  }
+</script>
+</body>
+</html>

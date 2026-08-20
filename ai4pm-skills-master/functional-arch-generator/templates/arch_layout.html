@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.title }} - Functional Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #fcfcfd;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-soft: rgba(226, 232, 240, 0.8);
+            
+            /* High-end HSL Palette */
+            --h-tp: 226; --s-tp: 80%; --l-tp: 60%; /* Touchpoint: Blue */
+            --h-sc: 142; --s-sc: 70%; --l-sc: 45%; /* Scenario: Green */
+            --h-cm: 270; --s-cm: 70%; --l-cm: 60%; /* Common: Purple */
+            --h-fd: 215; --s-fd: 20%; --l-fd: 50%; /* Foundation: Slate */
+            --h-in: 45;  --s-in: 90%; --l-in: 45%; /* Input: Gold */
+            --h-ot: 190; --s-ot: 80%; --l-ot: 45%; /* Output: Cyan */
+
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 60px 40px;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        header {
+            margin-bottom: 60px;
+            text-align: center;
+            animation: fadeInDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+        }
+
+        .description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .architecture-grid {
+            display: flex;
+            gap: 32px;
+            align-items: stretch;
+            perspective: 1000px;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-canvas {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Layer Container */
+        .layer {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-premium);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: fadeSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        .layer:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .layer-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            background: linear-gradient(to right, rgba(var(--h), var(--s), var(--l), 0.1), transparent);
+            color: hsl(var(--h), var(--s), calc(var(--l) * 0.6));
+        }
+
+        .layer-header i { width: 20px; height: 20px; }
+
+        .layer-content {
+            padding: 28px;
+            display: grid;
+            gap: 24px;
+        }
+
+        /* Layer Theming */
+        .layer-user_touchpoint { --h: var(--h-tp); --s: var(--s-tp); --l: var(--l-tp); }
+        .layer-business_scenario { --h: var(--h-sc); --s: var(--s-sc); --l: var(--l-sc); }
+        .layer-business_common { --h: var(--h-cm); --s: var(--s-cm); --l: var(--l-cm); }
+        .layer-foundation { --h: var(--h-fd); --s: var(--s-fd); --l: var(--l-fd); }
+        .layer-input_integration { --h: var(--h-in); --s: var(--s-in); --l: var(--l-in); }
+        .layer-output_integration { --h: var(--h-ot); --s: var(--s-ot); --l: var(--l-ot); }
+
+        /* Module Card */
+        .module-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .module-card:hover {
+            background: white;
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--h), var(--s), var(--l), 0.3);
+        }
+
+        .module-card.high-importance {
+            border-left: 4px solid hsl(var(--h), var(--s), var(--l));
+        }
+
+        .module-header {
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            background: rgba(var(--h), var(--s), var(--l), 0.02);
+        }
+
+        .module-status {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: hsl(var(--h), var(--s), var(--l), 0.1);
+            color: hsl(var(--h), var(--s), calc(var(--l) * 0.7));
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .module-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Function Item */
+        .function-item {
+            background-color: #fff;
+            border: 1px solid #f1f5f9;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .function-item:hover {
+            transform: translateX(4px);
+            border-color: hsl(var(--h), var(--s), var(--l), 0.2);
+        }
+
+        .function-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .function-name { font-weight: 600; color: #1e293b; }
+
+        .sub-functions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-top: 10px;
+            border-top: 1px dashed #f1f5f9;
+        }
+
+        .sub-function-tag {
+            font-size: 0.75rem;
+            background-color: #f8fafc;
+            color: #64748b;
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Integration Arrows */
+        .sidebar-input::after, .sidebar-output::before {
+            font-family: 'Outfit';
+            font-size: 32px;
+            opacity: 0.3;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .sidebar-input::after { content: "→"; right: -24px; color: hsl(var(--h-in), 80%, 50%); }
+        .sidebar-output::before { content: "←"; left: -24px; color: hsl(var(--h-ot), 80%, 50%); }
+
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+
+        .footer-note {
+            margin-top: 80px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 1200px) {
+            .architecture-grid { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .sidebar-input::after, .sidebar-output::before { display: none; }
+        }
+
+        @media print {
+            body { padding: 20px; background: white; }
+            .layer { box-shadow: none; break-inside: avoid; }
+            .module-card { backdrop-filter: none; }
+        }
+        
+        .btn-copy-yaml {
+          background: #0f172a; color: #fff;
+          padding: 8px 16px; border-radius: 8px;
+          font-size: 13px; font-weight: 600;
+          border: none; cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 16px;
+        }
+        .btn-copy-yaml:hover { background: #334155; }
+        
+        .toast {
+          position: fixed; bottom: 24px; right: 24px;
+          background: #10b981; color: #fff;
+          padding: 10px 20px; border-radius: 6px;
+          font-size: 13px; font-weight: 600;
+          display: none; z-index: 1000;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ data.title }}</h1>
+            <button class="btn-copy-yaml" onclick="copyYAML()">复制原始 YAML</button>
+            {% if data.description %}
+            <p class="description">{{ data.description }}</p>
+            {% endif %}
+        </header>
+
+        <div class="architecture-grid">
+            <!-- Left Sidebar (Input Integration) -->
+            {% if data.groups.left %}
+            <div class="sidebar sidebar-input">
+                {% for layer in data.groups.left %}
+                <div class="layer layer-{{ layer.type }} stagger-{{ loop.index }}">
+                    <div class="layer-header">
+                        <i data-lucide="{{ layer.icon }}"></i>
+                        <span>{{ layer.name }}</span>
+                    </div>
+                    <div class="layer-content">
+                        {% for module in layer.modules %}
+                        <div class="module-card {% if module.importance == 'high' %}high-importance{% endif %}">
+                            <div class="module-header">
+                                <span>{{ module.name }}</span>
+                                {% if module.status %}
+                                <span class="module-status">{{ module.status }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="module-body">
+                                {% for func in module.functions %}
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">{{ func.name }}</span>
+                                        {% if func.status %}
+                                        <span class="module-status" style="font-size: 0.6rem;">{{ func.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if func.subFunctions %}
+                                    <div class="sub-functions">
+                                        {% for sub in func.subFunctions %}
+                                        <span class="sub-function-tag">{{ sub }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Central Content -->
+            <div class="main-canvas">
+                {% for layer in data.groups.central %}
+                <div class="layer layer-{{ layer.type }} stagger-{{ loop.index + 1 }}">
+                    <div class="layer-header">
+                        <i data-lucide="{{ layer.icon }}"></i>
+                        <span>{{ layer.name }}</span>
+                    </div>
+                    <div class="layer-content" data-cols="{{ layer.total_cols or 1 }}">
+                        {% for module in layer.modules %}
+                        <div class="module-card {% if module.importance == 'high' %}high-importance{% endif %}" data-span="{{ module.col_span or 1 }}">
+                            <div class="module-header">
+                                <span>{{ module.name }}</span>
+                                {% if module.status %}
+                                <span class="module-status">{{ module.status }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="module-body">
+                                {% for func in module.functions %}
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">{{ func.name }}</span>
+                                        {% if func.status %}
+                                        <span class="module-status" style="font-size: 0.6rem;">{{ func.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if func.subFunctions %}
+                                    <div class="sub-functions">
+                                        {% for sub in func.subFunctions %}
+                                        <span class="sub-function-tag">{{ sub }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Bottom Layer (Foundation) -->
+                {% if data.groups.bottom %}
+                {% for layer in data.groups.bottom %}
+                <div class="layer layer-{{ layer.type }} stagger-5">
+                    <div class="layer-header">
+                        <i data-lucide="{{ layer.icon }}"></i>
+                        <span>{{ layer.name }}</span>
+                    </div>
+                    <div class="layer-content" data-cols="{{ layer.total_cols or 1 }}">
+                        {% for module in layer.modules %}
+                        <div class="module-card {% if module.importance == 'high' %}high-importance{% endif %}" data-span="{{ module.col_span or 1 }}">
+                            <div class="module-header">
+                                <span>{{ module.name }}</span>
+                                {% if module.status %}
+                                <span class="module-status">{{ module.status }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="module-body">
+                                {% for func in module.functions %}
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">{{ func.name }}</span>
+                                        {% if func.status %}
+                                        <span class="module-status" style="font-size: 0.6rem;">{{ func.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if func.subFunctions %}
+                                    <div class="sub-functions">
+                                        {% for sub in func.subFunctions %}
+                                        <span class="sub-function-tag">{{ sub }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Right Sidebar (Output Integration) -->
+            {% if data.groups.right %}
+            <div class="sidebar sidebar-output">
+                {% for layer in data.groups.right %}
+                <div class="layer layer-{{ layer.type }} stagger-{{ loop.index }}">
+                    <div class="layer-header">
+                        <i data-lucide="{{ layer.icon }}"></i>
+                        <span>{{ layer.name }}</span>
+                    </div>
+                    <div class="layer-content">
+                        {% for module in layer.modules %}
+                        <div class="module-card {% if module.importance == 'high' %}high-importance{% endif %}">
+                            <div class="module-header">
+                                <span>{{ module.name }}</span>
+                                {% if module.status %}
+                                <span class="module-status">{{ module.status }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="module-body">
+                                {% for func in module.functions %}
+                                <div class="function-item">
+                                    <div class="function-main">
+                                        <span class="function-name">{{ func.name }}</span>
+                                        {% if func.status %}
+                                        <span class="module-status" style="font-size: 0.6rem;">{{ func.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if func.subFunctions %}
+                                    <div class="sub-functions">
+                                        {% for sub in func.subFunctions %}
+                                        <span class="sub-function-tag">{{ sub }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer-note">
+            Architectural Excellence &bull; AIProdArch Engine &bull; {{ data.title }}
+        </div>
+    </div>
+    <div class="toast" id="toast">已成功复制 YAML 数据</div>
+    
+    <script type="application/yaml" id="raw-yaml">
+{{ raw_yaml }}
+    </script>
+
+    <script>
+        function copyYAML() {
+            const yaml = document.getElementById('raw-yaml').textContent.trim();
+            navigator.clipboard.writeText(yaml).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            });
+        }
+        lucide.createIcons();
+
+        // Apply dynamic grid styles
+        document.querySelectorAll('[data-cols]').forEach(el => {
+            el.style.gridTemplateColumns = `repeat(${el.getAttribute('data-cols')}, 1fr)`;
+        });
+        document.querySelectorAll('[data-span]').forEach(el => {
+            el.style.gridColumn = `span ${el.getAttribute('data-span')}`;
+        });
+    </script>
+</body>
+</html>
